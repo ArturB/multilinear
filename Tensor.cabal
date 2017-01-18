@@ -20,13 +20,13 @@ library
                        Tensor.Lazy
                        Tensor.Multilinear
                        Tensor.Restricted
-  build-depends:       
+  build-depends:
                        base >= 4.7 && < 5,
                        binary -any,
                        vector -any,
                        vector-binary-instances -any
   default-language:    Haskell2010
-  ghc-options:         -Wall -Werror
+  ghc-options:         -Wall
 
 executable Tensor-exe
   hs-source-dirs:      app
