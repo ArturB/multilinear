@@ -1,0 +1,107 @@
+Configuring HStringTemplate-0.8.5...
+Building HStringTemplate-0.8.5...
+Preprocessing library HStringTemplate-0.8.5...
+
+Text\StringTemplate\GenericStandard.hs:1:33: warning:
+    -XOverlappingInstances is deprecated: instead use per-instance pragmas OVERLAPPING/OVERLAPPABLE/OVERLAPS
+
+Text\StringTemplate\Instances.hs:1:38: warning:
+    -XOverlappingInstances is deprecated: instead use per-instance pragmas OVERLAPPING/OVERLAPPABLE/OVERLAPS
+[1 of 8] Compiling Text.StringTemplate.Classes ( Text\StringTemplate\Classes.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\Classes.o )
+
+Text\StringTemplate\Classes.hs:63:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable b
+    * In the type signature for:
+           stShowsToSE :: (StringTemplateShows a, Stringable b) =>
+                          a -> SElem b
+[2 of 8] Compiling Text.StringTemplate.Instances ( Text\StringTemplate\Instances.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\Instances.o )
+
+Text\StringTemplate\Instances.hs:68:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: Ix i
+    * In the instance declaration for `ToSElem (Array i a)'
+
+Text\StringTemplate\Instances.hs:93:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: Integral a
+    * In the instance declaration for `ToSElem (Ratio a)'
+[3 of 8] Compiling Text.StringTemplate.GenericStandard ( Text\StringTemplate\GenericStandard.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\GenericStandard.o )
+[4 of 8] Compiling Text.StringTemplate.Base ( Text\StringTemplate\Base.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\Base.o )
+
+Text\StringTemplate\Base.hs:17:1: warning: [-Wunused-imports]
+    The import of `Control.Applicative' is redundant
+      except perhaps to import instances from `Control.Applicative'
+    To import instances alone, use: import Control.Applicative()
+
+Text\StringTemplate\Base.hs:23:1: warning: [-Wunused-imports]
+    The import of `Data.Monoid' is redundant
+      except perhaps to import instances from `Data.Monoid'
+    To import instances alone, use: import Data.Monoid()
+
+Text\StringTemplate\Base.hs:102:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           checkTemplate :: Stringable a =>
+                            StringTemplate a -> (Maybe String, Maybe [String], Maybe [String])
+
+Text\StringTemplate\Base.hs:151:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           getStringTemplate :: Stringable a =>
+                                String -> STGroup a -> Maybe (StringTemplate a)
+
+Text\StringTemplate\Base.hs:157:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           getStringTemplate' :: Stringable a =>
+                                 String -> STGroup a -> Maybe (StringTemplate a)
+
+Text\StringTemplate\Base.hs:166:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           setEncoder :: Stringable a =>
+                         (a -> a) -> StringTemplate a -> StringTemplate a
+
+Text\StringTemplate\Base.hs:199:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           envInsApp :: Stringable a => String -> SElem a -> SEnv a -> SEnv a
+
+Text\StringTemplate\Base.hs:250:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           chkStmp :: Stringable a =>
+                      (Char, Char)
+                      -> String
+                      -> SEnv a
+                      -> (Maybe String, Maybe [String], Maybe [String])
+
+Text\StringTemplate\Base.hs:554:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Stringable a
+    * In the type signature for:
+           cycleApp :: Stringable a =>
+                       [([SElem a], [SElem a]) -> SEnv a -> a]
+                       -> [([SElem a], [SElem a])] -> SEnv a -> [a]
+[5 of 8] Compiling Text.StringTemplate.Group ( Text\StringTemplate\Group.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\Group.o )
+
+Text\StringTemplate\Group.hs:12:1: warning: [-Wunused-imports]
+    The import of `Control.Applicative' is redundant
+      except perhaps to import instances from `Control.Applicative'
+    To import instances alone, use: import Control.Applicative()
+
+Text\StringTemplate\Group.hs:16:1: warning: [-Wunused-imports]
+    The import of `Data.Monoid' is redundant
+      except perhaps to import instances from `Data.Monoid'
+    To import instances alone, use: import Data.Monoid()
+[6 of 8] Compiling Text.StringTemplate.Renderf ( Text\StringTemplate\Renderf.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\Renderf.o )
+[7 of 8] Compiling Text.StringTemplate.QQ ( Text\StringTemplate\QQ.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate\QQ.o )
+
+Text\StringTemplate\QQ.hs:28:8: warning: [-Wmissing-fields]
+    * Fields of `QuasiQuoter' not initialised: quoteType, quoteDec
+    * In the expression:
+        QuasiQuoter {quoteExp = quoteTmplExp, quotePat = quoteTmplPat}
+      In an equation for `stmp':
+          stmp
+            = QuasiQuoter {quoteExp = quoteTmplExp, quotePat = quoteTmplPat}
+[8 of 8] Compiling Text.StringTemplate ( Text\StringTemplate.hs, .stack-work\dist\b7fec021\build\Text\StringTemplate.o )
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\HStringTemplate-0.8.5-5Ph9KsKJXGmBwxAVRA26e5
+Registering HStringTemplate-0.8.5...

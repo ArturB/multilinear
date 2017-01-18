@@ -1,0 +1,76 @@
+Configuring syb-0.6...
+Building syb-0.6...
+Preprocessing library syb-0.6...
+[ 1 of 16] Compiling Data.Generics.Basics ( src\Data\Generics\Basics.hs, .stack-work\dist\b7fec021\build\Data\Generics\Basics.o )
+[ 2 of 16] Compiling Generics.SYB.Basics ( src\Generics\SYB\Basics.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Basics.o )
+[ 3 of 16] Compiling Data.Generics.Instances ( src\Data\Generics\Instances.hs, .stack-work\dist\b7fec021\build\Data\Generics\Instances.o )
+[ 4 of 16] Compiling Generics.SYB.Instances ( src\Generics\SYB\Instances.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Instances.o )
+[ 5 of 16] Compiling Data.Generics.Aliases ( src\Data\Generics\Aliases.hs, .stack-work\dist\b7fec021\build\Data\Generics\Aliases.o )
+
+src\Data\Generics\Aliases.hs:181:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Monad m
+    * In the type signature for:
+           extM :: (Monad m, Typeable a, Typeable b) =>
+                   (a -> m a) -> (b -> m b) -> a -> m a
+
+src\Data\Generics\Aliases.hs:207:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Monad m
+    * In the type signature for:
+           extR :: (Monad m, Typeable a, Typeable b) => m a -> m b -> m a
+
+src\Data\Generics\Aliases.hs:338:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Monad m
+    * In the type signature for:
+           ext1M :: (Monad m, Data d, Typeable t) =>
+                    (forall e. Data e => e -> m e)
+                    -> (forall f. Data f => t f -> m (t f)) -> d -> m d
+
+src\Data\Generics\Aliases.hs:354:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Monad m
+    * In the type signature for:
+           ext1R :: (Monad m, Data d, Typeable t) =>
+                    m d -> (forall e. Data e => m (t e)) -> m d
+
+src\Data\Generics\Aliases.hs:389:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Monad m
+    * In the type signature for:
+           ext2M :: (Monad m, Data d, Typeable t) =>
+                    (forall e. Data e => e -> m e)
+                    -> (forall d1 d2. (Data d1, Data d2) => t d1 d2 -> m (t d1 d2))
+                    -> d
+                    -> m d
+
+src\Data\Generics\Aliases.hs:405:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Monad m
+    * In the type signature for:
+           ext2R :: (Monad m, Data d, Typeable t) =>
+                    m d -> (forall d1 d2. (Data d1, Data d2) => m (t d1 d2)) -> m d
+[ 6 of 16] Compiling Data.Generics.Schemes ( src\Data\Generics\Schemes.hs, .stack-work\dist\b7fec021\build\Data\Generics\Schemes.o )
+[ 7 of 16] Compiling Generics.SYB.Schemes ( src\Generics\SYB\Schemes.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Schemes.o )
+[ 8 of 16] Compiling Data.Generics.Text ( src\Data\Generics\Text.hs, .stack-work\dist\b7fec021\build\Data\Generics\Text.o )
+[ 9 of 16] Compiling Generics.SYB.Text ( src\Generics\SYB\Text.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Text.o )
+[10 of 16] Compiling Data.Generics.Twins ( src\Data\Generics\Twins.hs, .stack-work\dist\b7fec021\build\Data\Generics\Twins.o )
+[11 of 16] Compiling Generics.SYB.Twins ( src\Generics\SYB\Twins.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Twins.o )
+[12 of 16] Compiling Data.Generics.Builders ( src\Data\Generics\Builders.hs, .stack-work\dist\b7fec021\build\Data\Generics\Builders.o )
+
+src\Data\Generics\Builders.hs:33:3: warning: [-Wredundant-constraints]
+    * Redundant constraint: Data a
+    * In the type signature for:
+           general :: Data a => a
+      In an equation for `empty':
+          empty
+            = general `extB` char `extB` int `extB` integer `extB` float
+              `extB` double
+            where
+                general :: Data a => a
+                general = fromConstrB empty (indexConstr (dataTypeOf general) 1)
+                char = '\NUL'
+                int = 0 :: Int
+                ....
+[13 of 16] Compiling Generics.SYB.Builders ( src\Generics\SYB\Builders.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Builders.o )
+[14 of 16] Compiling Generics.SYB.Aliases ( src\Generics\SYB\Aliases.hs, .stack-work\dist\b7fec021\build\Generics\SYB\Aliases.o )
+[15 of 16] Compiling Data.Generics    ( src\Data\Generics.hs, .stack-work\dist\b7fec021\build\Data\Generics.o )
+[16 of 16] Compiling Generics.SYB     ( src\Generics\SYB.hs, .stack-work\dist\b7fec021\build\Generics\SYB.o )
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\syb-0.6-C65vWCsht6A8uLstpQIXyj
+Registering syb-0.6...

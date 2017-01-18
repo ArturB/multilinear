@@ -1,0 +1,45 @@
+Configuring conduit-extra-1.1.15...
+Building conduit-extra-1.1.15...
+Preprocessing library conduit-extra-1.1.15...
+[ 1 of 11] Compiling Data.Conduit.Zlib ( Data\Conduit\Zlib.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Zlib.o )
+
+Data\Conduit\Zlib.hs:36:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: MonadThrow m
+    * In the type signature for:
+           unsafeLiftIO :: (MonadBase base m, PrimMonad base, MonadThrow m) =>
+                           IO a -> m a
+[ 2 of 11] Compiling Data.Conduit.Text ( Data\Conduit\Text.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Text.o )
+[ 3 of 11] Compiling Data.Conduit.Network.UDP ( Data\Conduit\Network\UDP.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Network\UDP.o )
+[ 4 of 11] Compiling Data.Conduit.Network ( Data\Conduit\Network.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Network.o )
+[ 5 of 11] Compiling Data.Conduit.Lazy ( Data\Conduit\Lazy.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Lazy.o )
+[ 6 of 11] Compiling Data.Conduit.Filesystem ( Data\Conduit\Filesystem.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Filesystem.o )
+[ 7 of 11] Compiling Data.Conduit.ByteString.Builder ( Data\Conduit\ByteString\Builder.hs, .stack-work\dist\b7fec021\build\Data\Conduit\ByteString\Builder.o )
+[ 8 of 11] Compiling Data.Conduit.Blaze ( Data\Conduit\Blaze.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Blaze.o )
+[ 9 of 11] Compiling Data.Conduit.Binary ( Data\Conduit\Binary.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Binary.o )
+
+Data\Conduit\Binary.hs:513:28: warning: [-Wdeprecations]
+    In the use of `inlinePerformIO'
+    (imported from Data.ByteString.Internal):
+    Deprecated: "If you think you know what you are doing, use 'unsafePerformIO'. If you are sure you know what you are doing, use 'unsafeDupablePerformIO'. If you enjoy sharing an address space with a malevolent agent of chaos, try 'accursedUnutterablePerformIO'."
+
+Data\Conduit\Binary.hs:515:20: warning: [-Wdeprecations]
+    In the use of `inlinePerformIO'
+    (imported from Data.ByteString.Internal):
+    Deprecated: "If you think you know what you are doing, use 'unsafePerformIO'. If you are sure you know what you are doing, use 'unsafeDupablePerformIO'. If you enjoy sharing an address space with a malevolent agent of chaos, try 'accursedUnutterablePerformIO'."
+
+Data\Conduit\Binary.hs:566:33: warning: [-Wname-shadowing]
+    This binding for `bs' shadows the existing binding
+      bound at Data\Conduit\Binary.hs:558:18
+
+Data\Conduit\Binary.hs:580:36: warning: [-Wdeprecations]
+    In the use of `inlinePerformIO'
+    (imported from Data.ByteString.Internal):
+    Deprecated: "If you think you know what you are doing, use 'unsafePerformIO'. If you are sure you know what you are doing, use 'unsafeDupablePerformIO'. If you enjoy sharing an address space with a malevolent agent of chaos, try 'accursedUnutterablePerformIO'."
+[10 of 11] Compiling Data.Conduit.Process ( Data\Conduit\Process.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Process.o )
+[11 of 11] Compiling Data.Conduit.Attoparsec ( Data\Conduit\Attoparsec.hs, .stack-work\dist\b7fec021\build\Data\Conduit\Attoparsec.o )
+
+Data\Conduit\Attoparsec.hs:77:5: warning: [-Wunused-top-binds]
+    Defined but not used: `notEmpty'
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\conduit-extra-1.1.15-EErBnZcR7lE16Ho7y3ZNZH
+Registering conduit-extra-1.1.15...

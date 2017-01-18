@@ -1,0 +1,1955 @@
+
+==================== FINAL INTERFACE ====================
+2017-01-18 08:42:10.0321026 UTC
+
+interface Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Restricted 8001
+  interface hash: 13eea0193b34b45f11f06c15dfe63e44
+  ABI hash: 874b0b4031888e427dfbcae7c9bb8a5b
+  export-list hash: a249b43cfb1b1bc37b324369a3fbd025
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: 11c1d53d86ff1fc48fbbf191e9636203
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Tensor.Restricted._dot
+  Tensor.Restricted.commonIndex
+  Tensor.Restricted.kr
+  Tensor.Restricted.kr3
+  Tensor.Restricted.kr4
+  Tensor.Restricted.switchInd
+  Tensor.Restricted.switchInd'
+  Tensor.Restricted.Tensor{Tensor.Restricted.Scalar Tensor.Restricted.Tensor scalarVal tensorData tensorIndex}
+module dependencies: Tensor.Index Tensor.Multilinear
+package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.0.0
+                      binary-0.8.3.0@binary-0.8.3.0
+                      bytestring-0.10.8.1@bytestring-0.10.8.1
+                      containers-0.5.7.1@containers-0.5.7.1
+                      deepseq-1.4.2.0@deepseq-1.4.2.0 ghc-prim-0.5.0.0
+                      integer-gmp-1.0.0.1
+                      primitive-0.6.1.0@primitive-0.6.1.0-Ip44DqhfCp21tTUYbecwa
+                      transformers-0.5.2.0@transformers-0.5.2.0
+                      vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6
+                      vector-binary-instances-0.2.3.4@vector-binary-instances-0.2.3.4-5cD0L2W335u9PwXg62l6tz
+orphans: base-4.9.0.0:GHC.Base base-4.9.0.0:GHC.Float
+         binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Generic
+         bytestring-0.10.8.1@bytestring-0.10.8.1:Data.ByteString.Builder
+         transformers-0.5.2.0@transformers-0.5.2.0:Control.Monad.Trans.Error
+         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Fusion.Bundle
+         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Unboxed
+         vector-binary-instances-0.2.3.4@vector-binary-instances-0.2.3.4-5cD0L2W335u9PwXg62l6tz:Data.Vector.Binary
+family instance modules: base-4.9.0.0:Control.Applicative
+                         base-4.9.0.0:Data.Complex base-4.9.0.0:Data.Either
+                         base-4.9.0.0:Data.Functor.Const base-4.9.0.0:Data.Functor.Identity
+                         base-4.9.0.0:Data.List.NonEmpty base-4.9.0.0:Data.Monoid
+                         base-4.9.0.0:Data.Semigroup base-4.9.0.0:Data.Type.Equality
+                         base-4.9.0.0:Data.Version base-4.9.0.0:Data.Void
+                         base-4.9.0.0:GHC.Exts base-4.9.0.0:GHC.Generics
+                         base-4.9.0.0:GHC.IO.Exception base-4.9.0.0:GHC.TypeLits
+                         containers-0.5.7.1@containers-0.5.7.1:Data.IntMap.Base
+                         containers-0.5.7.1@containers-0.5.7.1:Data.IntSet.Base
+                         containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
+                         containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
+                         containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
+                         primitive-0.6.1.0@primitive-0.6.1.0-Ip44DqhfCp21tTUYbecwa:Control.Monad.Primitive
+                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector
+                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Primitive
+                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Storable
+                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Unboxed
+                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Unboxed.Base
+import  -/  Tensor.Index 769fc71ede0f3c521fe8f01a59c93ce2
+  exports: 930656b70af87576c7a90bf4d49280ce
+  !=! 9096a8a158b1a821f37b5f7a103175f6
+  Contravariant 95abc25e82ccd5aa632597d8abc168d6
+  Covariant 48737a6f916c7e33799bcffe9bcb42c9
+  Indifferent d026770809a3eb33bf559767e8eafac7
+  TIndex 2753f84c83e056ab8ce78b76a493bc70
+  indexCount e6361dd771af0e7f5641972cfbd02207
+  indexName a632d0855c89d2b841a50231d46ba9b4
+import  -/  Tensor.Multilinear e804dcdd8bcab18f25b2eb331b7bd79c
+  exports: e49ee3c72622a4e8e3598ca8218de8c6
+  !* a59a73497bd28d010b04268a8b63f486
+  Multilinear d8b955e1c4876d342b96642893829a80
+  concat b015dbd4f819361706d5ce24f9508b40
+  elems ce0101b3ad2768e1a62f98e4312fc5f3
+  generate d67df8fb8ae8de0636f47d98358b58c8
+  indices 54d8c6ad831d6ca4237cd83a6895baef
+  order b2e7421c5aee0928642985e7ba6479f8
+  rename 7304efb5da1774eea4c7bddceba5b464
+  transpose 3884cc351c2a7611e8f3d221703145c1
+import  -/  base-4.9.0.0:Control.Monad b6b2f076948b5e8acd6d95beb4d22bfc
+import  -/  base-4.9.0.0:Data.Foldable 3cbed01c922be29649c33015287c82ca
+import  -/  base-4.9.0.0:Data.Functor 67cebb006c069ea73adcd2d468cdb0dc
+import  -/  base-4.9.0.0:Data.List d711f98b49ef5d33e5b3d404631ed073
+import  -/  base-4.9.0.0:Data.Maybe 086a84053ef7f7810663b5f03b7ec3f7
+import  -/  base-4.9.0.0:GHC.Base dd8044a8d640eee51828c17c476a6ba7
+import  -/  base-4.9.0.0:GHC.Err 20faef8829fd13c027d0ee2213637534
+import  -/  base-4.9.0.0:GHC.Float a46e197015eefaa013d7004e58481c54
+import  -/  base-4.9.0.0:GHC.List 47d436dfb7454bb1883fb4d943e3f389
+import  -/  base-4.9.0.0:GHC.Num f0aed3315b3ed1b330b71fc4148a5581
+import  -/  base-4.9.0.0:GHC.Real 011de9ca3282ad24a84e4e15f974f98e
+import  -/  base-4.9.0.0:GHC.Show 0b5845243cb2ec62b57dd6963d276ec6
+import  -/  base-4.9.0.0:Prelude 2d9cd8b0ec3d728f62b734df888d2e34
+import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary 6874ec1640b9c9e26e0b523287f2c847
+import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Class 8597f8b1c2ab4e12727292e0fd7fcc19
+import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Get.Internal 2e7605525151d1d4905dbc0c729d189c
+import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
+import  -/  vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector 6029dc705b85b20ddfdd0de7b2fd05c2
+import  -/  vector-binary-instances-0.2.3.4@vector-binary-instances-0.2.3.4-5cD0L2W335u9PwXg62l6tz:Data.Vector.Binary 4aed2c2e52d3a50268490a6d19180d6b
+cab35feca86acb0b8e036b132091c584
+  (!*!) ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(C(U),A,C(U),A,A,A,C(U))><S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor ::
+    Data.Binary.Class.Binary a =>
+    Data.Binary.Class.Binary (Tensor.Restricted.Tensor a)
+  DFunId
+  {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)>m,
+     Unfolding: DFun: @ a ($dBinary :: Data.Binary.Class.Binary a).
+                  @ (Tensor.Restricted.Tensor a)
+                  (Tensor.Restricted.$fBinaryTensor_$cput @ a $dBinary)
+                  (Tensor.Restricted.$fBinaryTensor_$cget @ a $dBinary)
+                  (Tensor.Restricted.$fBinaryTensor_$cputList @ a $dBinary) -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor1 ::
+    Data.Binary.Class.Binary a =>
+    [Tensor.Restricted.Tensor a] -> Data.Binary.Put.Put
+  {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)> -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor2 ::
+    Data.Binary.Class.Binary a =>
+    forall r.
+    Data.ByteString.Internal.ByteString
+    -> Data.Binary.Get.Internal.Success (Tensor.Restricted.Tensor a) r
+    -> Data.Binary.Get.Internal.Decoder r
+  {- Arity: 3,
+     Strictness: <L,U(A,U,A)><S(LLLS),1*U(U,U,U,U)><L,C(C1(U))>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, False)
+                (\ @ a
+                   (w :: Data.Binary.Class.Binary a)
+                   @ r
+                   (w1 :: Data.ByteString.Internal.ByteString)
+                   (w2 :: Data.Binary.Get.Internal.Success
+                            (Tensor.Restricted.Tensor a) r) ->
+                 case w1 of ww { Data.ByteString.Internal.PS ww1 ww2 ww3 ww4 ->
+                 Tensor.Restricted.$wds @ a w @ r ww1 ww2 ww3 ww4 w2 }) -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor3 ::
+    Data.Binary.Class.Binary a =>
+    Tensor.Restricted.Tensor a -> Data.Binary.Put.Put
+  {- Arity: 2, Strictness: <L,U(C(U(U,U)),A,A)><S,1*U>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a
+                   (w :: Data.Binary.Class.Binary a)
+                   (w1 :: Tensor.Restricted.Tensor a) ->
+                 case Tensor.Restricted.$wds1 @ a w w1 of ww { (#,#) ww1 ww2 ->
+                 (Data.Binary.Put.PairS @ () ww1 ww2)
+                   `cast`
+                 (Sym (Data.Binary.Put.N:PutM[0]) <()>_N) }) -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor_$cget ::
+    Data.Binary.Class.Binary a =>
+    Data.Binary.Get.Internal.Get (Tensor.Restricted.Tensor a)
+  {- Arity: 3,
+     Strictness: <L,U(A,U,A)><S(LLLS),1*U(U,U,U,U)><L,C(C1(U))>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fBinaryTensor2
+                  `cast`
+                (forall (a :: <*>_N).
+                 <Data.Binary.Class.Binary a>_R
+                 ->_R Sym (Data.Binary.Get.Internal.N:Get[0]
+                               <Tensor.Restricted.Tensor a>_R)) -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor_$cput ::
+    Data.Binary.Class.Binary a =>
+    Tensor.Restricted.Tensor a -> Data.Binary.Put.Put
+  {- Arity: 2, Strictness: <L,U(C(U(U,U)),A,A)><S,1*U>m,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fBinaryTensor3 -}
+cab35feca86acb0b8e036b132091c584
+  $fBinaryTensor_$cputList ::
+    Data.Binary.Class.Binary a =>
+    [Tensor.Restricted.Tensor a] -> Data.Binary.Put.Put
+  {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fBinaryTensor1 -}
+cab35feca86acb0b8e036b132091c584
+  $fEqTensor ::
+    GHC.Classes.Eq a => GHC.Classes.Eq (Tensor.Restricted.Tensor a)
+  DFunId
+  {- Arity: 1, HasNoCafRefs, Strictness: <L,U(C(C1(U)),A)>m,
+     Unfolding: DFun: @ a ($dEq :: GHC.Classes.Eq a).
+                  @ (Tensor.Restricted.Tensor a)
+                  (Tensor.Restricted.$fEqTensor_$c== @ a $dEq)
+                  (Tensor.Restricted.$fEqTensor_$c/= @ a $dEq) -}
+cab35feca86acb0b8e036b132091c584
+  $fEqTensor1 ::
+    GHC.Classes.Eq a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 3, HasNoCafRefs,
+     Strictness: <L,U(C(C1(U)),A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (3, True, False)
+                (\ @ a
+                   ($dEq :: GHC.Classes.Eq a)
+                   (a1 :: Tensor.Restricted.Tensor a)
+                   (b :: Tensor.Restricted.Tensor a) ->
+                 case a1 of a2 { DEFAULT ->
+                 case b of b1 { DEFAULT ->
+                 case Tensor.Restricted.$fEqTensor2 @ a $dEq a2 b1 of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False } } }) -}
+cab35feca86acb0b8e036b132091c584
+  $fEqTensor2 ::
+    GHC.Classes.Eq a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 3, HasNoCafRefs,
+     Strictness: <L,U(C(C1(U)),A)><S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fEqTensor_$c/= ::
+    GHC.Classes.Eq a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 3, HasNoCafRefs,
+     Strictness: <L,U(C(C1(U)),A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fEqTensor1 -}
+cab35feca86acb0b8e036b132091c584
+  $fEqTensor_$c== ::
+    GHC.Classes.Eq a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 3, HasNoCafRefs,
+     Strictness: <L,U(C(C1(U)),A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fEqTensor2 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor ::
+    GHC.Float.Floating a =>
+    GHC.Float.Floating (Tensor.Restricted.Tensor a)
+  DFunId
+  {- Arity: 1,
+     Strictness: <L,U(U(U(U,U,U,U,U,U,U),U,U,U),1*U,C(U),C(U),A,A,A,C(U),C(U),A,C(U),C(U),C(U),C(U),C(U),A,C(U),C(U),C(U),A,A,A,A)>,
+     Unfolding: DFun: @ a ($dFloating :: GHC.Float.Floating a).
+                  @ (Tensor.Restricted.Tensor a)
+                  (Tensor.Restricted.$fFloatingTensor32 @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor31 @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$cexp @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$clog @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$csqrt @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$c** @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$clogBase @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$csin @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$ccos @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$ctan @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$casin @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$cacos @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$catan @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$csinh @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$ccosh @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$ctanh @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$casinh @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$cacosh @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$catanh @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$clog1p @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$cexpm1 @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$clog1pexp @ a $dFloating)
+                  (Tensor.Restricted.$fFloatingTensor_$clog1mexp @ a $dFloating) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor1 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(S(S(LLLLLLC(S))LLL)LLLLLLLLLLLLLLLLLLLLLL),U(U(U(U,U,U,U,U,U,U),U,U,U),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 let {
+                   $dNum :: GHC.Real.Fractional a
+                   = GHC.Float.$p1Floating @ a $dFloating
+                 } in
+                 let {
+                   $dNum1 :: GHC.Num.Num a = GHC.Real.$p1Fractional @ a $dNum
+                 } in
+                 case GHC.Num.fromInteger
+                        @ a
+                        $dNum1
+                        Tensor.Restricted.$fFloatingTensor8 of dt { DEFAULT ->
+                 Tensor.Restricted.$fFloatingTensor4
+                   @ a
+                   $dFloating
+                   (Tensor.Restricted.$fFloatingTensor3
+                      @ a
+                      $dNum1
+                      (Tensor.Restricted.Scalar @ a dt)
+                      (Tensor.Restricted.$fFloatingTensor2 @ a $dFloating eta)) }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor10 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(1*U,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 let {
+                   $dFractional :: GHC.Real.Fractional a
+                   = GHC.Float.$p1Floating @ a $dFloating
+                 } in
+                 let {
+                   $dNum :: GHC.Num.Num a = GHC.Real.$p1Fractional @ a $dFractional
+                 } in
+                 case GHC.Num.fromInteger
+                        @ a
+                        $dNum
+                        Tensor.Restricted.$fFloatingTensor7 of dt { DEFAULT ->
+                 Tensor.Restricted.$fFloatingTensor3
+                   @ a
+                   $dNum
+                   (Tensor.Restricted.$fFloatingTensor2 @ a $dFloating eta)
+                   (Tensor.Restricted.Scalar @ a dt) }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor11 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor12 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor13 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor14 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(1*U(A,C(U),A,A),A,A,A,A,A,A,A,A,A,A,A,A,C(U),C(U),A,A,A,A,A,A,A,A)><S,U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 Tensor.Restricted.$fFloatingTensor17
+                   @ a
+                   (GHC.Float.$p1Floating @ a $dFloating)
+                   (Tensor.Restricted.$fFloatingTensor16 @ a $dFloating eta)
+                   (Tensor.Restricted.$fFloatingTensor15 @ a $dFloating eta)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor15 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor16 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor17 ::
+    GHC.Real.Fractional a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <L,U(A,C(U),A,A)><S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor18 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor19 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor2 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor20 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor21 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(1*U(A,C(U),A,A),A,A,A,A,A,A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 Tensor.Restricted.$fFloatingTensor17
+                   @ a
+                   (GHC.Float.$p1Floating @ a $dFloating)
+                   (Tensor.Restricted.$fFloatingTensor23 @ a $dFloating eta)
+                   (Tensor.Restricted.$fFloatingTensor22 @ a $dFloating eta)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor22 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor23 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor24 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(1*U(A,C(U),A,A),A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a)
+                   (eta1 :: Tensor.Restricted.Tensor a) ->
+                 Tensor.Restricted.$fFloatingTensor17
+                   @ a
+                   (GHC.Float.$p1Floating @ a $dFloating)
+                   (Tensor.Restricted.$fFloatingTensor6 @ a $dFloating eta1)
+                   (Tensor.Restricted.$fFloatingTensor6 @ a $dFloating eta)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor25 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(1*U(1*U(C(U),A,C(U),A,A,A,C(U)),A,A,A),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a)
+                   (eta1 :: Tensor.Restricted.Tensor a) ->
+                 Tensor.Restricted.$fFloatingTensor2
+                   @ a
+                   $dFloating
+                   (Tensor.Restricted.$fFloatingTensor26
+                      @ a
+                      (GHC.Real.$p1Fractional @ a (GHC.Float.$p1Floating @ a $dFloating))
+                      (Tensor.Restricted.$fFloatingTensor6 @ a $dFloating eta)
+                      eta1)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor26 ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(C(U),A,C(U),A,A,A,C(U))><S,1*U><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dNum :: GHC.Num.Num a)
+                   (ds2 :: Tensor.Restricted.Tensor a)
+                   (ds3 :: Tensor.Restricted.Tensor a) ->
+                 case ds2 of wild {
+                   Tensor.Restricted.Scalar x1
+                   -> case ds3 of wild1 {
+                        Tensor.Restricted.Scalar x2
+                        -> case GHC.Num.* @ a $dNum x1 x2 of dt { DEFAULT ->
+                           Tensor.Restricted.Scalar @ a dt }
+                        Tensor.Restricted.Tensor ipv ipv1
+                        -> Tensor.Restricted.$fFloatingTensor27
+                             @ a
+                             @ a
+                             (GHC.Num.* @ a $dNum x1)
+                             wild1 }
+                   Tensor.Restricted.Tensor ipv ipv1
+                   -> case ds3 of wild1 {
+                        Tensor.Restricted.Scalar x2
+                        -> Tensor.Restricted.$fFloatingTensor27
+                             @ a
+                             @ a
+                             (\ (ds4 :: a) -> GHC.Num.* @ a $dNum ds4 x2)
+                             wild
+                        Tensor.Restricted.Tensor ipv2 ipv3
+                        -> Tensor.Restricted.!*!
+                             @ a
+                             $dNum
+                             (Tensor.Restricted.switchInd'
+                                @ a
+                                wild
+                                (Tensor.Restricted.commonIndex @ a wild wild1))
+                             (Tensor.Restricted.switchInd'
+                                @ a
+                                wild1
+                                (Tensor.Restricted.commonIndex @ a wild wild1)) } }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor27 ::
+    (a -> b)
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor b
+  {- Arity: 2, Strictness: <S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor28 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(S(LLLC(S))LLLLLLLLLLLLLLLLLLLLLL),U(U(U(C(U),A,C(U),A,A,A,C(U)),A,A,1*C1(U)),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 case GHC.Real.fromRational
+                        @ a
+                        (GHC.Float.$p1Floating @ a $dFloating)
+                        Tensor.Restricted.$fFloatingTensor29 of dt { DEFAULT ->
+                 Tensor.Restricted.$fFloatingTensor25
+                   @ a
+                   $dFloating
+                   eta
+                   (Tensor.Restricted.Scalar @ a dt) }) -}
+b5bb067d5cd12882c22e1b851b2e8364
+  $fFloatingTensor29 :: GHC.Real.Ratio GHC.Integer.Type.Integer
+  {- HasNoCafRefs,
+     Unfolding: (GHC.Real.:%
+                   @ GHC.Integer.Type.Integer
+                   Tensor.Restricted.$fFloatingTensor7
+                   Tensor.Restricted.$fFloatingTensor30) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor3 ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(A,C(C1(U)),A,A,A,A,A)><S,1*U><S,1*U> -}
+2c80444d271d0bc5d90ce9503a1d4e5c
+  $fFloatingTensor30 :: GHC.Integer.Type.Integer
+  {- HasNoCafRefs, Unfolding: (2) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor31 ::
+    GHC.Float.Floating a => Tensor.Restricted.Tensor a
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <S(LSLLLLLLLLLLLLLLLLLLLLL),1*U(A,1*U,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)>m1,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a ($dFloating :: GHC.Float.Floating a) ->
+                 case GHC.Float.pi @ a $dFloating of dt { DEFAULT ->
+                 Tensor.Restricted.Scalar @ a dt }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor32 ::
+    GHC.Float.Floating a =>
+    GHC.Real.Fractional (Tensor.Restricted.Tensor a)
+  {- Arity: 1,
+     Strictness: <L,1*U(1*U(U(C(U),C(C1(U)),C(U),A,C(U),C(U),C(U)),C(U),A,C(U)),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)>m,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a ($dFloating :: GHC.Float.Floating a) ->
+                 Tensor.Restricted.$fFractionalTensor
+                   @ a
+                   (GHC.Float.$p1Floating @ a $dFloating)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor4 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(1*U,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 let {
+                   $dFractional :: GHC.Real.Fractional a
+                   = GHC.Float.$p1Floating @ a $dFloating
+                 } in
+                 let {
+                   $dNum :: GHC.Num.Num a = GHC.Real.$p1Fractional @ a $dFractional
+                 } in
+                 case GHC.Num.fromInteger
+                        @ a
+                        $dNum
+                        Tensor.Restricted.$fFloatingTensor7 of dt { DEFAULT ->
+                 Tensor.Restricted.$fFloatingTensor6
+                   @ a
+                   $dFloating
+                   (Tensor.Restricted.$fFloatingTensor5
+                      @ a
+                      $dNum
+                      (Tensor.Restricted.Scalar @ a dt)
+                      eta) }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor5 ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <L,U(C(U),A,A,A,A,A,A)><S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor6 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
+0c72f521322688a488cd65852011ed78
+  $fFloatingTensor7 :: GHC.Integer.Type.Integer
+  {- HasNoCafRefs, Unfolding: (1) -}
+67d0aae2e7dd3c71a8c1a52c014e7ca0
+  $fFloatingTensor8 :: GHC.Integer.Type.Integer
+  {- HasNoCafRefs, Unfolding: (0) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor9 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(U,A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a
+                   ($dFloating :: GHC.Float.Floating a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 Tensor.Restricted.$fFloatingTensor4
+                   @ a
+                   $dFloating
+                   (Tensor.Restricted.$fFloatingTensor2 @ a $dFloating eta)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$c** ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(1*U(1*U(C(U),A,C(U),A,A,A,C(U)),A,A,A),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor25 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$cacos ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor19 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$cacosh ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor12 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$casin ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor20 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$casinh ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor13 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$catan ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor18 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$catanh ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor11 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$ccos ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor22 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$ccosh ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor15 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$cexp ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor2 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$cexpm1 ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(1*U,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor10 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$clog ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor6 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$clog1mexp ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(S(S(LLLLLLC(S))LLL)LLLLLLLLLLLLLLLLLLLLLL),U(U(U(U,U,U,U,U,U,U),U,U,U),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor1 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$clog1p ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(1*U,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor4 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$clog1pexp ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(U,A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor9 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$clogBase ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3,
+     Strictness: <L,U(1*U(A,C(U),A,A),A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor24 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$csin ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor23 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$csinh ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor16 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$csqrt ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(S(LLLC(S))LLLLLLLLLLLLLLLLLLLLLL),U(U(U(C(U),A,C(U),A,A,A,C(U)),A,A,1*C1(U)),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor28 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$ctan ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(1*U(A,C(U),A,A),A,A,A,A,A,A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor21 -}
+cab35feca86acb0b8e036b132091c584
+  $fFloatingTensor_$ctanh ::
+    GHC.Float.Floating a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <L,U(1*U(A,C(U),A,A),A,A,A,A,A,A,A,A,A,A,A,A,C(U),C(U),A,A,A,A,A,A,A,A)><S,U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor14 -}
+cab35feca86acb0b8e036b132091c584
+  $fFractionalTensor ::
+    GHC.Real.Fractional a =>
+    GHC.Real.Fractional (Tensor.Restricted.Tensor a)
+  DFunId
+  {- Arity: 1,
+     Strictness: <L,U(U(C(U),C(C1(U)),C(U),A,C(U),C(U),C(U)),C(U),A,C(U))>m,
+     Unfolding: DFun: @ a ($dFractional :: GHC.Real.Fractional a).
+                  @ (Tensor.Restricted.Tensor a)
+                  (Tensor.Restricted.$fFractionalTensor3 @ a $dFractional)
+                  (Tensor.Restricted.$fFractionalTensor_$c/ @ a $dFractional)
+                  (Tensor.Restricted.$fFractionalTensor_$crecip @ a $dFractional)
+                  (Tensor.Restricted.$fFractionalTensor1 @ a $dFractional) -}
+cab35feca86acb0b8e036b132091c584
+  $fFractionalTensor1 ::
+    GHC.Real.Fractional a =>
+    GHC.Real.Rational -> Tensor.Restricted.Tensor a
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <S(LLLC(S)),1*U(A,A,A,1*C1(U))><S(SS),1*U(U,U)>m1,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a
+                   ($dFractional :: GHC.Real.Fractional a)
+                   (x :: GHC.Real.Rational) ->
+                 case x of x1 { GHC.Real.:% ipv ipv1 ->
+                 case GHC.Real.fromRational @ a $dFractional x1 of dt { DEFAULT ->
+                 Tensor.Restricted.Scalar @ a dt } }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFractionalTensor2 ::
+    GHC.Real.Fractional a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(S(LLLLLLC(S))LLL),U(1*U(A,A,A,A,A,A,1*C1(U)),C(U),A,A)><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dFractional :: GHC.Real.Fractional a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 case GHC.Num.fromInteger
+                        @ a
+                        (GHC.Real.$p1Fractional @ a $dFractional)
+                        Tensor.Restricted.$fFloatingTensor7 of dt { DEFAULT ->
+                 Tensor.Restricted.$fFloatingTensor17
+                   @ a
+                   $dFractional
+                   (Tensor.Restricted.Scalar @ a dt)
+                   eta }) -}
+cab35feca86acb0b8e036b132091c584
+  $fFractionalTensor3 ::
+    GHC.Real.Fractional a => GHC.Num.Num (Tensor.Restricted.Tensor a)
+  {- Arity: 1,
+     Strictness: <L,1*U(1*U(C(U),C(C1(U)),C(U),A,C(U),C(U),C(U)),A,A,A)>m,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a ($dFractional :: GHC.Real.Fractional a) ->
+                 Tensor.Restricted.$fNumTensor
+                   @ a
+                   (GHC.Real.$p1Fractional @ a $dFractional)) -}
+cab35feca86acb0b8e036b132091c584
+  $fFractionalTensor_$c/ ::
+    GHC.Real.Fractional a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <L,U(A,C(U),A,A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor17 -}
+cab35feca86acb0b8e036b132091c584
+  $fFractionalTensor_$crecip ::
+    GHC.Real.Fractional a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(S(LLLLLLC(S))LLL),U(1*U(A,A,A,A,A,A,1*C1(U)),C(U),A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFractionalTensor2 -}
+cab35feca86acb0b8e036b132091c584
+  $fFunctorTensor :: GHC.Base.Functor Tensor.Restricted.Tensor
+  DFunId
+  {- Strictness: m,
+     Unfolding: DFun:.
+                  @ Tensor.Restricted.Tensor
+                  Tensor.Restricted.$fFloatingTensor27
+                  Tensor.Restricted.$fFunctorTensor1 -}
+cab35feca86acb0b8e036b132091c584
+  $fFunctorTensor1 ::
+    a -> Tensor.Restricted.Tensor b -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a @ b (eta :: a) (eta1 :: Tensor.Restricted.Tensor b) ->
+                 Tensor.Restricted.$fFloatingTensor27
+                   @ b
+                   @ a
+                   (\ (ds2 :: b) -> eta)
+                   eta1) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor ::
+    Tensor.Multilinear.Multilinear Tensor.Restricted.Tensor
+  DFunId
+  {- Unfolding: DFun:.
+                  @ Tensor.Restricted.Tensor
+                  Tensor.Restricted.$fFunctorTensor
+                  Tensor.Restricted.$fMultilinearTensor_$c!?
+                  Tensor.Restricted.$fFloatingTensor26
+                  Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                  Tensor.Restricted.$fMultilinearTensor_$cfromList
+                  Tensor.Restricted.$fMultilinearTensor8
+                  Tensor.Restricted.$fMultilinearTensor7
+                  Tensor.Restricted.commonIndex1
+                  Tensor.Restricted.$fMultilinearTensor6
+                  Tensor.Restricted.$fMultilinearTensor5
+                  Tensor.Restricted.$fMultilinearTensor4
+                  Tensor.Restricted.$fMultilinearTensor3
+                  Tensor.Restricted.$fMultilinearTensor_$ctranspose1
+                  Tensor.Restricted.$fMultilinearTensor2
+                  Tensor.Restricted.$fMultilinearTensor1 -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor1 ::
+    Tensor.Index.TIndex
+    -> Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <S,U><S,U><S,U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fMultilinearTensor2 -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor10 ::
+    GHC.Types.SPEC
+    -> (Data.Vector.Generic.Base.Mutable
+          Data.Vector.Vector
+          (Control.Monad.Primitive.PrimState (GHC.ST.ST GHC.Prim.RealWorld))
+          (Tensor.Restricted.Tensor a),
+        GHC.Types.Int)
+    -> [Tensor.Restricted.Tensor a]
+    -> GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld,
+          (Data.Vector.Generic.Base.Mutable
+             Data.Vector.Vector
+             (Control.Monad.Primitive.PrimState (GHC.ST.ST GHC.Prim.RealWorld))
+             (Tensor.Restricted.Tensor a),
+           GHC.Types.Int) #)
+  {- Arity: 4, Strictness: <S,1*U><L,U(U(U,U,U),U(U))><S,1*U><S,U> -}
+b6f5974295fdbebe82d1d37e42cf5a6c
+  $fMultilinearTensor11 :: GHC.Types.Int
+  {- HasNoCafRefs, Unfolding: (GHC.Types.I# 0#) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor12 ::
+    GHC.Types.SPEC
+    -> (Data.Vector.Generic.Base.Mutable
+          Data.Vector.Vector
+          (Control.Monad.Primitive.PrimState (GHC.ST.ST GHC.Prim.RealWorld))
+          (Tensor.Restricted.Tensor a),
+        GHC.Types.Int)
+    -> [Tensor.Restricted.Tensor a]
+    -> GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld,
+          (Data.Vector.Generic.Base.Mutable
+             Data.Vector.Vector
+             (Control.Monad.Primitive.PrimState (GHC.ST.ST GHC.Prim.RealWorld))
+             (Tensor.Restricted.Tensor a),
+           GHC.Types.Int) #)
+  {- Arity: 4, Strictness: <S,1*U><L,U(U(U,U,U),U(U))><S,1*U><S,U> -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor13 ::
+    GHC.Base.Maybe (Tensor.Restricted.Tensor a)
+  {- Strictness: x -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor14 ::
+    GHC.Prim.Int# -> GHC.Prim.Int# -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U><L,U>x -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor15 ::
+    GHC.Base.Maybe (Tensor.Restricted.Tensor a)
+  {- Strictness: x -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor2 ::
+    Tensor.Index.TIndex
+    -> Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <S,U><S,U><S,U> -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor3 ::
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 1, Strictness: <S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor4 ::
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 2, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fMultilinearTensor_$s$dm!==! -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor5 ::
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 2, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ @ a
+                   (t1 :: Tensor.Restricted.Tensor a)
+                   (t2 :: Tensor.Restricted.Tensor a) ->
+                 case t2 of t4 { DEFAULT ->
+                 (Tensor.Restricted.$fMultilinearTensor_go
+                    (Tensor.Restricted.commonIndex1 @ a t1)
+                    (Tensor.Restricted.commonIndex1 @ a t4))
+                   `cast`
+                 (Data.Monoid.N:All[0]) }) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor6 ::
+    Tensor.Restricted.Tensor a
+    -> GHC.Base.String -> GHC.Base.String -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <S,1*U><S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor7 :: Tensor.Restricted.Tensor a -> GHC.Types.Int
+  {- Arity: 1, Strictness: <S,1*U>m, Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a (w :: Tensor.Restricted.Tensor a) ->
+                 case Tensor.Restricted.$wds2 @ a w of ww { DEFAULT ->
+                 GHC.Types.I# ww }) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor8 ::
+    Tensor.Restricted.Tensor a -> (GHC.Types.Int, GHC.Types.Int)
+  {- Arity: 1, Strictness: <S,1*U>m, Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a (w :: Tensor.Restricted.Tensor a) ->
+                 case Tensor.Restricted.$wds3 @ a w of ww { (#,#) ww1 ww2 ->
+                 (ww1, ww2) }) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor9 ::
+    GHC.Types.SPEC
+    -> (Data.Vector.Generic.Base.Mutable
+          Data.Vector.Vector
+          (Control.Monad.Primitive.PrimState (GHC.ST.ST GHC.Prim.RealWorld))
+          (Tensor.Restricted.Tensor a),
+        GHC.Types.Int)
+    -> [Tensor.Restricted.Tensor a]
+    -> GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld,
+          (Data.Vector.Generic.Base.Mutable
+             Data.Vector.Vector
+             (Control.Monad.Primitive.PrimState (GHC.ST.ST GHC.Prim.RealWorld))
+             (Tensor.Restricted.Tensor a),
+           GHC.Types.Int) #)
+  {- Arity: 4, Strictness: <S,1*U><L,U(U(U,U,U),U(U))><S,1*U><S,U> -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor_$c!? ::
+    Tensor.Restricted.Tensor a
+    -> GHC.Types.Int -> GHC.Base.Maybe (Tensor.Restricted.Tensor a)
+  {- Arity: 2, Strictness: <S,1*U><S(S),1*U(U)>m2, Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a (w :: Tensor.Restricted.Tensor a) (w1 :: GHC.Types.Int) ->
+                 case w1 of ww { GHC.Types.I# ww1 ->
+                 case Tensor.Restricted.$w$c!? @ a w ww1 of ww2 { Unit# ww3 ->
+                 GHC.Base.Just @ (Tensor.Restricted.Tensor a) ww3 } }) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor_$cfromList ::
+    Tensor.Index.TIndex -> [a] -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <S,1*U><S,1*U>m2, Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a (w :: Tensor.Index.TIndex) (w1 :: [a]) ->
+                 case Tensor.Restricted.$w$cfromList
+                        @ a
+                        w
+                        w1 of ww { (#,#) ww1 ww2 ->
+                 Tensor.Restricted.Tensor @ a ww1 ww2 }) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor_$cgenerate ::
+    Tensor.Index.TIndex
+    -> (GHC.Types.Int -> Tensor.Restricted.Tensor a)
+    -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor_$ctranspose1 ::
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>,
+     Unfolding: (\ @ a (ds2 :: Tensor.Restricted.Tensor a) ->
+                 case ds2 of wild {
+                   Tensor.Restricted.Scalar x -> wild
+                   Tensor.Restricted.Tensor ds3 ts
+                   -> case ds3 of wild1 {
+                        Tensor.Index.Covariant dt name
+                        -> Tensor.Restricted.Tensor
+                             @ a
+                             (Tensor.Index.Contravariant dt name)
+                             ts
+                        Tensor.Index.Contravariant dt name
+                        -> Tensor.Restricted.Tensor @ a (Tensor.Index.Covariant dt name) ts
+                        Tensor.Index.Indifferent dt name -> wild } }) -}
+cab35feca86acb0b8e036b132091c584
+  $fMultilinearTensor_$s$dm!==! ::
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Types.Bool
+  {- Arity: 2, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a
+                   (t1 :: Tensor.Restricted.Tensor a)
+                   (t2 :: Tensor.Restricted.Tensor a) ->
+                 case t1 of t4 { DEFAULT ->
+                 case t2 of t5 { DEFAULT ->
+                 Tensor.Restricted.$fMultilinearTensor5 @ a t4 t5 } }) -}
+f4c6cbf813ca1936325a254cae6cf492
+  $fMultilinearTensor_go ::
+    [Tensor.Index.TIndex] -> [Tensor.Index.TIndex] -> Data.Monoid.All
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><L,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor ::
+    GHC.Num.Num a => GHC.Num.Num (Tensor.Restricted.Tensor a)
+  DFunId
+  {- Arity: 1,
+     Strictness: <L,U(C(U),C(C1(U)),C(U),A,C(U),C(U),C(U))>m,
+     Unfolding: DFun: @ a ($dNum :: GHC.Num.Num a).
+                  @ (Tensor.Restricted.Tensor a)
+                  (Tensor.Restricted.$fNumTensor_$c+ @ a $dNum)
+                  (Tensor.Restricted.$fNumTensor_$c- @ a $dNum)
+                  (Tensor.Restricted.$fFloatingTensor26 @ a $dNum)
+                  (Tensor.Restricted.$fNumTensor_$cnegate @ a $dNum)
+                  (Tensor.Restricted.$fNumTensor_$cabs @ a $dNum)
+                  (Tensor.Restricted.$fNumTensor_$csignum @ a $dNum)
+                  (Tensor.Restricted.$fNumTensor1 @ a $dNum) -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor1 ::
+    GHC.Num.Num a =>
+    GHC.Integer.Type.Integer -> Tensor.Restricted.Tensor a
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <S(LLLLLLC(S)),1*U(A,A,A,A,A,A,1*C1(U))><S,1*U>m1,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a ($dNum :: GHC.Num.Num a) (x :: GHC.Integer.Type.Integer) ->
+                 case x of x1 { DEFAULT ->
+                 case GHC.Num.fromInteger @ a $dNum x1 of dt { DEFAULT ->
+                 Tensor.Restricted.Scalar @ a dt } }) -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor2 ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,C(U),A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor3 ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,C(U),A,A)><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor4 ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(LLLLLLC(S)),U(A,C(C1(U)),A,A,A,A,1*C1(U))><S,1*U>,
+     Unfolding: (\ @ a
+                   ($dNum :: GHC.Num.Num a)
+                   (eta :: Tensor.Restricted.Tensor a) ->
+                 case GHC.Num.fromInteger
+                        @ a
+                        $dNum
+                        Tensor.Restricted.$fFloatingTensor8 of dt { DEFAULT ->
+                 Tensor.Restricted.$fFloatingTensor3
+                   @ a
+                   $dNum
+                   (Tensor.Restricted.Scalar @ a dt)
+                   eta }) -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor_$c+ ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <L,U(C(U),A,A,A,A,A,A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor5 -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor_$c- ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 3, Strictness: <L,U(A,C(C1(U)),A,A,A,A,A)><S,1*U><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fFloatingTensor3 -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor_$cabs ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,C(U),A,A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fNumTensor3 -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor_$cnegate ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2,
+     Strictness: <S(LLLLLLC(S)),U(A,C(C1(U)),A,A,A,A,1*C1(U))><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fNumTensor4 -}
+cab35feca86acb0b8e036b132091c584
+  $fNumTensor_$csignum ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,C(U),A)><S,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fNumTensor2 -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor ::
+    GHC.Show.Show a => GHC.Show.Show (Tensor.Restricted.Tensor a)
+  DFunId
+  {- Arity: 1, Strictness: <L,U(A,C(U),A)>m,
+     Unfolding: DFun: @ a ($dShow :: GHC.Show.Show a).
+                  @ (Tensor.Restricted.Tensor a)
+                  (Tensor.Restricted.$fShowTensor_$cshowsPrec @ a $dShow)
+                  (Tensor.Restricted.$fShowTensor_$cshow @ a $dShow)
+                  (Tensor.Restricted.$fShowTensor_$cshowList @ a $dShow) -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor1 ::
+    GHC.Show.Show a => [Tensor.Restricted.Tensor a] -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,U(A,C(U),A)><S,1*U><L,U>,
+     Unfolding: (\ @ a
+                   ($dShow :: GHC.Show.Show a)
+                   (ls :: [Tensor.Restricted.Tensor a])
+                   (s :: GHC.Base.String) ->
+                 let {
+                   lvl77 :: Tensor.Restricted.Tensor a -> GHC.Base.String
+                   = Tensor.Restricted.$fShowTensor2 @ a $dShow
+                 } in
+                 GHC.Show.showList__
+                   @ (Tensor.Restricted.Tensor a)
+                   (\ (x :: Tensor.Restricted.Tensor a)
+                      (s1 :: GHC.Base.String)[OneShot] ->
+                    GHC.Base.++ @ GHC.Types.Char (lvl77 x) s1)
+                   ls
+                   s) -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor2 ::
+    GHC.Show.Show a => Tensor.Restricted.Tensor a -> GHC.Base.String
+  {- Arity: 1, Strictness: <L,U(A,C(U),A)> -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor3 ::
+    GHC.Show.Show a =>
+    GHC.Types.Int -> Tensor.Restricted.Tensor a -> GHC.Show.ShowS
+  {- Arity: 4, Strictness: <L,U(A,C(U),A)><L,A><L,U><L,1*U>,
+     Unfolding: InlineRule (4, True, False)
+                (\ @ a
+                   ($dShow :: GHC.Show.Show a)
+                   (ds2 :: GHC.Types.Int)
+                   (x :: Tensor.Restricted.Tensor a)
+                   (s :: GHC.Base.String) ->
+                 GHC.Base.augment
+                   @ GHC.Types.Char
+                   (\ @ b
+                      (c :: GHC.Types.Char -> b -> b)[OneShot]
+                      (n :: b)[OneShot] ->
+                    GHC.Base.foldr
+                      @ GHC.Types.Char
+                      @ b
+                      c
+                      n
+                      (Tensor.Restricted.$fShowTensor2 @ a $dShow x))
+                   s) -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor_$cshow ::
+    GHC.Show.Show a => Tensor.Restricted.Tensor a -> GHC.Base.String
+  {- Arity: 1, Strictness: <L,U(A,C(U),A)>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fShowTensor2 -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor_$cshowList ::
+    GHC.Show.Show a => [Tensor.Restricted.Tensor a] -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,U(A,C(U),A)><S,1*U><L,U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fShowTensor1 -}
+cab35feca86acb0b8e036b132091c584
+  $fShowTensor_$cshowsPrec ::
+    GHC.Show.Show a =>
+    GHC.Types.Int -> Tensor.Restricted.Tensor a -> GHC.Show.ShowS
+  {- Arity: 4, Strictness: <L,U(A,C(U),A)><L,A><L,U><L,1*U>,
+     Unfolding: InlineRule (0, True, True)
+                Tensor.Restricted.$fShowTensor3 -}
+0ddb0d0f1e5d685883f85bfdbd6b608a
+  $tc'Scalar :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1427787049303785293##
+                   4163579772116192252##
+                   Tensor.Restricted.$trModule
+                   Tensor.Restricted.$tc'Scalar1) -}
+267019e1371ae787164787e5f5e12969
+  $tc'Scalar1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Scalar"#) -}
+9a20b260340a2787fcb7a760bd50f035
+  $tc'Tensor :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   16669137873843754194##
+                   8302181846300601936##
+                   Tensor.Restricted.$trModule
+                   Tensor.Restricted.$tc'Tensor1) -}
+6bbb328b40dfb160e9a3290995e6550a
+  $tc'Tensor1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Tensor"#) -}
+6e760691aaac73f4857594eff7f0bf86
+  $tcTensor :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   7539650681459429837##
+                   9707602141204626817##
+                   Tensor.Restricted.$trModule
+                   Tensor.Restricted.$tcTensor1) -}
+b6a627351f8368de5fbf5f73ba9c588d
+  $tcTensor1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Tensor"#) -}
+21ae577d0294d1bd150a369706e67ed4
+  $trModule :: GHC.Types.Module
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.Module
+                   Tensor.Restricted.$trModule2
+                   Tensor.Restricted.$trModule1) -}
+4ca145591a267abf9feee43736f6d4f8
+  $trModule1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Tensor.Restricted"#) -}
+82fa42bd9e1d1b8d6084f766ad690626
+  $trModule2 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS
+                   "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"#) -}
+cab35feca86acb0b8e036b132091c584
+  $w$c!? ::
+    Tensor.Restricted.Tensor a
+    -> GHC.Prim.Int# -> (# Tensor.Restricted.Tensor a #)
+  {- Arity: 2, Strictness: <S,1*U><S,U>, Inline: [0],
+     Unfolding: (\ @ a
+                   (w :: Tensor.Restricted.Tensor a)
+                   (ww :: GHC.Prim.Int#) ->
+                 case w of wild {
+                   Tensor.Restricted.Scalar ds2
+                   -> case Tensor.Restricted.$fMultilinearTensor15
+                      ret_ty (# Tensor.Restricted.Tensor a #)
+                      of {}
+                   Tensor.Restricted.Tensor ds2 ts1
+                   -> case ts1 of wild1 { Data.Vector.Vector dt dt1 dt2 ->
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.<# ww 0#) of wild2 {
+                        GHC.Types.False
+                        -> case Data.Vector.Generic.length
+                                  @ Data.Vector.Vector
+                                  @ (Tensor.Restricted.Tensor a)
+                                  (Data.Vector.$fVectorVectora @ (Tensor.Restricted.Tensor a))
+                                  wild1 of wild3 { GHC.Types.I# y ->
+                           case GHC.Prim.tagToEnum#
+                                  @ GHC.Types.Bool
+                                  (GHC.Prim.>=# ww y) of wild4 {
+                             GHC.Types.False
+                             -> (# case GHC.Prim.tagToEnum#
+                                          @ GHC.Types.Bool
+                                          (GHC.Prim.>=# ww 0#) of wild5 {
+                                     GHC.Types.False
+                                     -> Tensor.Restricted.$fMultilinearTensor14 @ a y ww
+                                     GHC.Types.True
+                                     -> case GHC.Prim.tagToEnum#
+                                               @ GHC.Types.Bool
+                                               (GHC.Prim.<# ww y) of wild6 {
+                                          GHC.Types.False
+                                          -> Tensor.Restricted.$fMultilinearTensor14 @ a y ww
+                                          GHC.Types.True
+                                          -> case GHC.Prim.indexArray#
+                                                    @ (Tensor.Restricted.Tensor a)
+                                                    dt2
+                                                    (GHC.Prim.+# dt ww) of ds3 { Unit# ipv ->
+                                             ipv } } } #)
+                             GHC.Types.True
+                             -> case Tensor.Restricted.$fMultilinearTensor13
+                                ret_ty (# Tensor.Restricted.Tensor a #)
+                                of {} } }
+                        GHC.Types.True
+                        -> case Tensor.Restricted.$fMultilinearTensor13
+                           ret_ty (# Tensor.Restricted.Tensor a #)
+                           of {} } } }) -}
+cab35feca86acb0b8e036b132091c584
+  $w$cfromList ::
+    Tensor.Index.TIndex
+    -> [a]
+    -> (# Tensor.Index.TIndex,
+          Data.Vector.Vector (Tensor.Restricted.Tensor a) #)
+  {- Arity: 2, Strictness: <S,1*U><S,1*U>, Inline: [0],
+     Unfolding: (\ @ a (w :: Tensor.Index.TIndex) (w1 :: [a]) ->
+                 case w of wild {
+                   Tensor.Index.Covariant dt name
+                   -> case GHC.List.$wlenAcc @ a w1 0# of ww2 { DEFAULT ->
+                      case GHC.Magic.runRW#
+                             @ 'GHC.Types.PtrRepLifted
+                             @ (Data.Vector.Vector (Tensor.Restricted.Tensor a))
+                             (\ (s1 :: GHC.Prim.State# GHC.Prim.RealWorld)[OneShot] ->
+                              case GHC.Prim.newArray#
+                                     @ (Tensor.Restricted.Tensor a)
+                                     @ (Control.Monad.Primitive.PrimState
+                                          (GHC.ST.ST GHC.Prim.RealWorld))
+                                     0#
+                                     (Data.Vector.Mutable.uninitialised
+                                        @ (Tensor.Restricted.Tensor a))
+                                     s1
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Sym (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                                  <GHC.Prim.RealWorld>_N)))_R of ds2 { (#,#) ipv ipv1 ->
+                              case Tensor.Restricted.$fMultilinearTensor12
+                                     @ a
+                                     GHC.Types.SPEC
+                                     ((Data.Vector.Mutable.MVector
+                                         @ (Control.Monad.Primitive.PrimState
+                                              (GHC.ST.ST GHC.Prim.RealWorld))
+                                         @ (Tensor.Restricted.Tensor a)
+                                         0#
+                                         0#
+                                         ipv1)
+                                        `cast`
+                                      (Sub (Sym (Data.Vector.D:R:MutableVector[0])) <Control.Monad.Primitive.PrimState
+                                                                                       (GHC.ST.ST
+                                                                                          GHC.Prim.RealWorld)>_N <Tensor.Restricted.Tensor
+                                                                                                                    a>_N),
+                                      Tensor.Restricted.$fMultilinearTensor11)
+                                     (GHC.Base.map
+                                        @ a
+                                        @ (Tensor.Restricted.Tensor a)
+                                        (Tensor.Restricted.$WScalar @ a)
+                                        w1)
+                                     ipv
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                             <GHC.Prim.RealWorld>_N))_R of ds3 { (#,#) ipv6 ipv7 ->
+                              case ipv7 of wild5 { (,) v' n ->
+                              case v'
+                                     `cast`
+                                   (Sub (Data.Vector.D:R:MutableVector[0]) <Control.Monad.Primitive.PrimState
+                                                                              (GHC.ST.ST
+                                                                                 GHC.Prim.RealWorld)>_N <Tensor.Restricted.Tensor
+                                                                                                           a>_N) of wild1 { Data.Vector.Mutable.MVector dt1 dt2 dt3 ->
+                              case n of dt5 { GHC.Types.I# dt6 ->
+                              case GHC.Prim.unsafeFreezeArray#
+                                     @ (Control.Monad.Primitive.PrimState
+                                          (GHC.ST.ST GHC.Prim.RealWorld))
+                                     @ (Tensor.Restricted.Tensor a)
+                                     dt3
+                                     ipv6
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Sym (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                                  <GHC.Prim.RealWorld>_N)))_R of ds4 { (#,#) ipv2 ipv3 ->
+                              (# ipv2
+                                   `cast`
+                                 (GHC.Prim.State#
+                                    (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                         <GHC.Prim.RealWorld>_N))_R,
+                                 Data.Vector.Vector
+                                   @ (Tensor.Restricted.Tensor a)
+                                   dt1
+                                   dt6
+                                   ipv3 #) } } } } } }) of ds2 { (#,#) ipv1 ipv2 ->
+                      case ipv2 of dt1 { Data.Vector.Vector ipv ipv4 ipv5 ->
+                      (# Tensor.Index.Covariant ww2 name, dt1 #) } } }
+                   Tensor.Index.Contravariant dt name
+                   -> case GHC.List.$wlenAcc @ a w1 0# of ww2 { DEFAULT ->
+                      case GHC.Magic.runRW#
+                             @ 'GHC.Types.PtrRepLifted
+                             @ (Data.Vector.Vector (Tensor.Restricted.Tensor a))
+                             (\ (s1 :: GHC.Prim.State# GHC.Prim.RealWorld)[OneShot] ->
+                              case GHC.Prim.newArray#
+                                     @ (Tensor.Restricted.Tensor a)
+                                     @ (Control.Monad.Primitive.PrimState
+                                          (GHC.ST.ST GHC.Prim.RealWorld))
+                                     0#
+                                     (Data.Vector.Mutable.uninitialised
+                                        @ (Tensor.Restricted.Tensor a))
+                                     s1
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Sym (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                                  <GHC.Prim.RealWorld>_N)))_R of ds2 { (#,#) ipv ipv1 ->
+                              case Tensor.Restricted.$fMultilinearTensor10
+                                     @ a
+                                     GHC.Types.SPEC
+                                     ((Data.Vector.Mutable.MVector
+                                         @ (Control.Monad.Primitive.PrimState
+                                              (GHC.ST.ST GHC.Prim.RealWorld))
+                                         @ (Tensor.Restricted.Tensor a)
+                                         0#
+                                         0#
+                                         ipv1)
+                                        `cast`
+                                      (Sub (Sym (Data.Vector.D:R:MutableVector[0])) <Control.Monad.Primitive.PrimState
+                                                                                       (GHC.ST.ST
+                                                                                          GHC.Prim.RealWorld)>_N <Tensor.Restricted.Tensor
+                                                                                                                    a>_N),
+                                      Tensor.Restricted.$fMultilinearTensor11)
+                                     (GHC.Base.map
+                                        @ a
+                                        @ (Tensor.Restricted.Tensor a)
+                                        (Tensor.Restricted.$WScalar @ a)
+                                        w1)
+                                     ipv
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                             <GHC.Prim.RealWorld>_N))_R of ds3 { (#,#) ipv6 ipv7 ->
+                              case ipv7 of wild5 { (,) v' n ->
+                              case v'
+                                     `cast`
+                                   (Sub (Data.Vector.D:R:MutableVector[0]) <Control.Monad.Primitive.PrimState
+                                                                              (GHC.ST.ST
+                                                                                 GHC.Prim.RealWorld)>_N <Tensor.Restricted.Tensor
+                                                                                                           a>_N) of wild1 { Data.Vector.Mutable.MVector dt1 dt2 dt3 ->
+                              case n of dt5 { GHC.Types.I# dt6 ->
+                              case GHC.Prim.unsafeFreezeArray#
+                                     @ (Control.Monad.Primitive.PrimState
+                                          (GHC.ST.ST GHC.Prim.RealWorld))
+                                     @ (Tensor.Restricted.Tensor a)
+                                     dt3
+                                     ipv6
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Sym (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                                  <GHC.Prim.RealWorld>_N)))_R of ds4 { (#,#) ipv2 ipv3 ->
+                              (# ipv2
+                                   `cast`
+                                 (GHC.Prim.State#
+                                    (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                         <GHC.Prim.RealWorld>_N))_R,
+                                 Data.Vector.Vector
+                                   @ (Tensor.Restricted.Tensor a)
+                                   dt1
+                                   dt6
+                                   ipv3 #) } } } } } }) of ds2 { (#,#) ipv1 ipv2 ->
+                      case ipv2 of dt1 { Data.Vector.Vector ipv ipv4 ipv5 ->
+                      (# Tensor.Index.Contravariant ww2 name, dt1 #) } } }
+                   Tensor.Index.Indifferent dt name
+                   -> case GHC.List.$wlenAcc @ a w1 0# of ww2 { DEFAULT ->
+                      case GHC.Magic.runRW#
+                             @ 'GHC.Types.PtrRepLifted
+                             @ (Data.Vector.Vector (Tensor.Restricted.Tensor a))
+                             (\ (s1 :: GHC.Prim.State# GHC.Prim.RealWorld)[OneShot] ->
+                              case GHC.Prim.newArray#
+                                     @ (Tensor.Restricted.Tensor a)
+                                     @ (Control.Monad.Primitive.PrimState
+                                          (GHC.ST.ST GHC.Prim.RealWorld))
+                                     0#
+                                     (Data.Vector.Mutable.uninitialised
+                                        @ (Tensor.Restricted.Tensor a))
+                                     s1
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Sym (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                                  <GHC.Prim.RealWorld>_N)))_R of ds2 { (#,#) ipv ipv1 ->
+                              case Tensor.Restricted.$fMultilinearTensor9
+                                     @ a
+                                     GHC.Types.SPEC
+                                     ((Data.Vector.Mutable.MVector
+                                         @ (Control.Monad.Primitive.PrimState
+                                              (GHC.ST.ST GHC.Prim.RealWorld))
+                                         @ (Tensor.Restricted.Tensor a)
+                                         0#
+                                         0#
+                                         ipv1)
+                                        `cast`
+                                      (Sub (Sym (Data.Vector.D:R:MutableVector[0])) <Control.Monad.Primitive.PrimState
+                                                                                       (GHC.ST.ST
+                                                                                          GHC.Prim.RealWorld)>_N <Tensor.Restricted.Tensor
+                                                                                                                    a>_N),
+                                      Tensor.Restricted.$fMultilinearTensor11)
+                                     (GHC.Base.map
+                                        @ a
+                                        @ (Tensor.Restricted.Tensor a)
+                                        (Tensor.Restricted.$WScalar @ a)
+                                        w1)
+                                     ipv
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                             <GHC.Prim.RealWorld>_N))_R of ds3 { (#,#) ipv6 ipv7 ->
+                              case ipv7 of wild5 { (,) v' n ->
+                              case v'
+                                     `cast`
+                                   (Sub (Data.Vector.D:R:MutableVector[0]) <Control.Monad.Primitive.PrimState
+                                                                              (GHC.ST.ST
+                                                                                 GHC.Prim.RealWorld)>_N <Tensor.Restricted.Tensor
+                                                                                                           a>_N) of wild1 { Data.Vector.Mutable.MVector dt1 dt2 dt3 ->
+                              case n of dt5 { GHC.Types.I# dt6 ->
+                              case GHC.Prim.unsafeFreezeArray#
+                                     @ (Control.Monad.Primitive.PrimState
+                                          (GHC.ST.ST GHC.Prim.RealWorld))
+                                     @ (Tensor.Restricted.Tensor a)
+                                     dt3
+                                     ipv6
+                                       `cast`
+                                     (GHC.Prim.State#
+                                        (Sym (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                                  <GHC.Prim.RealWorld>_N)))_R of ds4 { (#,#) ipv2 ipv3 ->
+                              (# ipv2
+                                   `cast`
+                                 (GHC.Prim.State#
+                                    (Control.Monad.Primitive.D:R:PrimStateST[0]
+                                         <GHC.Prim.RealWorld>_N))_R,
+                                 Data.Vector.Vector
+                                   @ (Tensor.Restricted.Tensor a)
+                                   dt1
+                                   dt6
+                                   ipv3 #) } } } } } }) of ds2 { (#,#) ipv1 ipv2 ->
+                      case ipv2 of dt1 { Data.Vector.Vector ipv ipv4 ipv5 ->
+                      (# Tensor.Index.Indifferent ww2 name, dt1 #) } } } }) -}
+cab35feca86acb0b8e036b132091c584
+  $wds ::
+    Data.Binary.Class.Binary a =>
+    forall r.
+    GHC.Prim.Addr#
+    -> GHC.ForeignPtr.ForeignPtrContents
+    -> GHC.Prim.Int#
+    -> GHC.Prim.Int#
+    -> Data.Binary.Get.Internal.Success (Tensor.Restricted.Tensor a) r
+    -> Data.Binary.Get.Internal.Decoder r
+  {- Arity: 6,
+     Strictness: <L,U(A,U,A)><L,U><L,U><L,U><S,U><L,C(C1(U))>,
+     Inline: [0] -}
+cab35feca86acb0b8e036b132091c584
+  $wds1 ::
+    Data.Binary.Class.Binary a =>
+    Tensor.Restricted.Tensor a
+    -> (# (), Data.ByteString.Builder.Internal.Builder #)
+  {- Arity: 2, Strictness: <L,U(C(U(U,U)),A,A)><S,1*U>,
+     Inline: [0] -}
+cab35feca86acb0b8e036b132091c584
+  $wds2 :: Tensor.Restricted.Tensor a -> GHC.Prim.Int#
+  {- Arity: 1, Strictness: <S,1*U>, Inline: [0] -}
+cab35feca86acb0b8e036b132091c584
+  $wds3 ::
+    Tensor.Restricted.Tensor a -> (# GHC.Types.Int, GHC.Types.Int #)
+  {- Arity: 1, Strictness: <S,1*U>, Inline: [0] -}
+aa4639c089d93a4c351d34e4fba7e5dc
+  $wkr ::
+    GHC.Num.Num a => GHC.Prim.Int# -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,A,C(U))><S,U>, Inline: [0],
+     Unfolding: (\ @ a (w :: GHC.Num.Num a) (ww :: GHC.Prim.Int#) ->
+                 case Tensor.Restricted.kr2 of dt { DEFAULT ->
+                 let {
+                   lvl77 :: Tensor.Index.TIndex
+                   = case Tensor.Restricted.kr1 of dt1 { DEFAULT ->
+                     Tensor.Index.Covariant ww dt1 }
+                 } in
+                 let {
+                   lvl78 :: a
+                   = GHC.Num.fromInteger @ a w Tensor.Restricted.$fFloatingTensor8
+                 } in
+                 let {
+                   lvl79 :: a
+                   = GHC.Num.fromInteger @ a w Tensor.Restricted.$fFloatingTensor7
+                 } in
+                 Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                   @ a
+                   (Tensor.Index.Covariant ww dt)
+                   (\ (i :: GHC.Types.Int) ->
+                    case i of i1 { GHC.Types.I# ipv ->
+                    Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                      @ a
+                      lvl77
+                      (\ (j :: GHC.Types.Int) ->
+                       case j of j1 { GHC.Types.I# ipv1 ->
+                       case case GHC.Prim.tagToEnum#
+                                   @ GHC.Types.Bool
+                                   (GHC.Prim.==# ipv ipv1) of wild {
+                              GHC.Types.False -> lvl78
+                              GHC.Types.True -> lvl79 } of dt1 { DEFAULT ->
+                       Tensor.Restricted.Scalar @ a dt1 } }) }) }) -}
+68a1067321f9e36a4594eadfbcffba23
+  $wkr3 ::
+    GHC.Num.Num a => GHC.Prim.Int# -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,A,C(U))><S,U>, Inline: [0],
+     Unfolding: (\ @ a (w :: GHC.Num.Num a) (ww :: GHC.Prim.Int#) ->
+                 case Tensor.Restricted.kr2 of dt { DEFAULT ->
+                 let {
+                   lvl77 :: Tensor.Index.TIndex
+                   = case Tensor.Restricted.kr1 of dt1 { DEFAULT ->
+                     Tensor.Index.Covariant ww dt1 }
+                 } in
+                 let {
+                   lvl78 :: Tensor.Index.TIndex
+                   = case Tensor.Restricted.kr6 of dt1 { DEFAULT ->
+                     Tensor.Index.Covariant ww dt1 }
+                 } in
+                 let {
+                   lvl79 :: a
+                   = GHC.Num.fromInteger @ a w Tensor.Restricted.$fFloatingTensor8
+                 } in
+                 let {
+                   lvl80 :: a
+                   = GHC.Num.fromInteger @ a w Tensor.Restricted.$fFloatingTensor7
+                 } in
+                 Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                   @ a
+                   (Tensor.Index.Covariant ww dt)
+                   (\ (i :: GHC.Types.Int) ->
+                    case i of i1 { GHC.Types.I# ipv ->
+                    Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                      @ a
+                      lvl77
+                      (\ (j :: GHC.Types.Int) ->
+                       case j of j1 { GHC.Types.I# ipv1 ->
+                       let {
+                         lvl81 :: GHC.Types.Bool
+                         = GHC.Prim.tagToEnum# @ GHC.Types.Bool (GHC.Prim.==# ipv ipv1)
+                       } in
+                       Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                         @ a
+                         lvl78
+                         (\ (k :: GHC.Types.Int) ->
+                          case k of k1 { GHC.Types.I# ipv2 ->
+                          case case lvl81 of wild {
+                                 GHC.Types.False -> lvl79
+                                 GHC.Types.True
+                                 -> case GHC.Prim.tagToEnum#
+                                           @ GHC.Types.Bool
+                                           (GHC.Prim.==# ipv1 ipv2) of wild1 {
+                                      GHC.Types.False -> lvl79
+                                      GHC.Types.True -> lvl80 } } of dt1 { DEFAULT ->
+                          Tensor.Restricted.Scalar @ a dt1 } }) }) }) }) -}
+4fc8afcf25bddb0a79b244b37c2599e3
+  $wkr4 ::
+    GHC.Num.Num a => GHC.Prim.Int# -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,A,C(U))><S,U>, Inline: [0],
+     Unfolding: (\ @ a (w :: GHC.Num.Num a) (ww :: GHC.Prim.Int#) ->
+                 case Tensor.Restricted.kr2 of dt { DEFAULT ->
+                 let {
+                   lvl77 :: Tensor.Index.TIndex
+                   = case Tensor.Restricted.kr1 of dt1 { DEFAULT ->
+                     Tensor.Index.Covariant ww dt1 }
+                 } in
+                 let {
+                   lvl78 :: Tensor.Index.TIndex
+                   = case Tensor.Restricted.kr6 of dt1 { DEFAULT ->
+                     Tensor.Index.Covariant ww dt1 }
+                 } in
+                 let {
+                   lvl79 :: Tensor.Index.TIndex
+                   = case Tensor.Restricted.kr7 of dt1 { DEFAULT ->
+                     Tensor.Index.Covariant ww dt1 }
+                 } in
+                 let {
+                   lvl80 :: a
+                   = GHC.Num.fromInteger @ a w Tensor.Restricted.$fFloatingTensor8
+                 } in
+                 let {
+                   lvl81 :: a
+                   = GHC.Num.fromInteger @ a w Tensor.Restricted.$fFloatingTensor7
+                 } in
+                 Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                   @ a
+                   (Tensor.Index.Covariant ww dt)
+                   (\ (i :: GHC.Types.Int) ->
+                    case i of i1 { GHC.Types.I# ipv ->
+                    Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                      @ a
+                      lvl77
+                      (\ (j :: GHC.Types.Int) ->
+                       case j of j1 { GHC.Types.I# ipv1 ->
+                       let {
+                         lvl82 :: GHC.Types.Bool
+                         = GHC.Prim.tagToEnum# @ GHC.Types.Bool (GHC.Prim.==# ipv ipv1)
+                       } in
+                       Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                         @ a
+                         lvl78
+                         (\ (k :: GHC.Types.Int) ->
+                          case k of k1 { GHC.Types.I# ipv2 ->
+                          let {
+                            lvl83 :: GHC.Types.Bool
+                            = GHC.Prim.tagToEnum# @ GHC.Types.Bool (GHC.Prim.==# ipv1 ipv2)
+                          } in
+                          Tensor.Restricted.$fMultilinearTensor_$cgenerate
+                            @ a
+                            lvl79
+                            (\ (l :: GHC.Types.Int) ->
+                             case l of l1 { GHC.Types.I# ipv3 ->
+                             case case lvl82 of wild {
+                                    GHC.Types.False -> lvl80
+                                    GHC.Types.True
+                                    -> case lvl83 of wild1 {
+                                         GHC.Types.False -> lvl80
+                                         GHC.Types.True
+                                         -> case GHC.Prim.tagToEnum#
+                                                   @ GHC.Types.Bool
+                                                   (GHC.Prim.==# ipv2 ipv3) of wild2 {
+                                              GHC.Types.False -> lvl80
+                                              GHC.Types.True -> lvl81 } } } of dt1 { DEFAULT ->
+                             Tensor.Restricted.Scalar @ a dt1 } }) }) }) }) }) -}
+cab35feca86acb0b8e036b132091c584
+  data Tensor a
+    = Scalar {scalarVal :: !a}
+    | Tensor {tensorIndex :: !Tensor.Index.TIndex,
+              tensorData :: !Data.Vector.Vector (Tensor.Restricted.Tensor a)}
+9c52459b56fe932464c3d7ed6ef834ea
+  _dot ::
+    GHC.Num.Num a =>
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> Tensor.Restricted.Tensor a
+  {- Arity: 1, Strictness: <L,U(C(U),A,C(U),A,A,A,C(U))> -}
+cab35feca86acb0b8e036b132091c584
+  commonIndex ::
+    Tensor.Restricted.Tensor a
+    -> Tensor.Restricted.Tensor a -> GHC.Base.Maybe GHC.Base.String
+  {- Arity: 2, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ @ a
+                   (ds2 :: Tensor.Restricted.Tensor a)
+                   (ds3 :: Tensor.Restricted.Tensor a) ->
+                 case ds2 of wild {
+                   Tensor.Restricted.Scalar ds4
+                   -> case ds3 of ds5 { DEFAULT ->
+                      GHC.Base.Nothing @ GHC.Base.String }
+                   Tensor.Restricted.Tensor ipv ipv1
+                   -> case ds3 of wild1 {
+                        Tensor.Restricted.Scalar ds4 -> GHC.Base.Nothing @ GHC.Base.String
+                        Tensor.Restricted.Tensor ipv2 ipv3
+                        -> case GHC.Base.map
+                                  @ Tensor.Index.TIndex
+                                  @ [GHC.Types.Char]
+                                  Tensor.Index.indexName
+                                  (Tensor.Restricted.commonIndex1
+                                     @ a
+                                     wild1) of indicesNames2 { DEFAULT ->
+                           case GHC.Base.map
+                                  @ Tensor.Index.TIndex
+                                  @ [GHC.Types.Char]
+                                  Tensor.Index.indexName
+                                  (Tensor.Restricted.commonIndex1
+                                     @ a
+                                     wild) of indicesNames1 { DEFAULT ->
+                           letrec {
+                             go1 :: [[GHC.Types.Char]] -> GHC.Base.Maybe GHC.Base.String
+                               {- Arity: 1, Strictness: <S,1*U> -}
+                             = \ (ds4 :: [[GHC.Types.Char]]) ->
+                               case ds4 of wild2 {
+                                 [] -> GHC.Base.Nothing @ GHC.Base.String
+                                 : y ys
+                                 -> case y of i { DEFAULT ->
+                                    letrec {
+                                      go2 :: [GHC.Base.String] -> Data.Monoid.First GHC.Base.String
+                                        {- Arity: 1, Strictness: <S,1*U> -}
+                                      = \ (ds5 :: [GHC.Base.String]) ->
+                                        case ds5 of wild3 {
+                                          []
+                                          -> (GHC.Base.Nothing @ GHC.Base.String)
+                                               `cast`
+                                             (Sym (Data.Monoid.N:First[0]) <GHC.Base.String>_N)
+                                          : y1 ys1
+                                          -> case GHC.Base.eqString y1 i of wild4 {
+                                               GHC.Types.False -> go2 ys1
+                                               GHC.Types.True
+                                               -> (GHC.Base.Just @ GHC.Base.String y1)
+                                                    `cast`
+                                                  (Sym (Data.Monoid.N:First[0]) <GHC.Base.String>_N) } }
+                                    } in
+                                    case (go2 indicesNames2)
+                                           `cast`
+                                         (Data.Monoid.N:First[0] <GHC.Base.String>_N) of wild3 {
+                                      GHC.Base.Nothing -> go1 ys GHC.Base.Just ipv4 -> wild3 } } }
+                           } in
+                           go1 indicesNames1 } } } }) -}
+cab35feca86acb0b8e036b132091c584
+  commonIndex1 :: Tensor.Restricted.Tensor a -> [Tensor.Index.TIndex]
+  {- Arity: 1, Strictness: <S,1*U> -}
+ea87dbf3444224a26fb97131d539519b
+  kr :: GHC.Num.Num a => GHC.Types.Int -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,A,C(U))><S(S),1*U(U)>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a (w :: GHC.Num.Num a) (w1 :: GHC.Types.Int) ->
+                 case w1 of ww { GHC.Types.I# ww1 ->
+                 Tensor.Restricted.$wkr @ a w ww1 }) -}
+85b94bbbcf191d6f79043c910d319ab9
+  kr1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "j"#) -}
+41781ed600b663f83d7d9e7261833f1b
+  kr2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "i"#) -}
+cfa330fea5465cc94e7838c5aca44579
+  kr3 :: GHC.Num.Num a => GHC.Types.Int -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,A,C(U))><S(S),1*U(U)>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a (w :: GHC.Num.Num a) (w1 :: GHC.Types.Int) ->
+                 case w1 of ww { GHC.Types.I# ww1 ->
+                 Tensor.Restricted.$wkr3 @ a w ww1 }) -}
+093785be87e94c603cc92ed293753f3a
+  kr4 :: GHC.Num.Num a => GHC.Types.Int -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <L,U(A,A,A,A,A,A,C(U))><S(S),1*U(U)>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a (w :: GHC.Num.Num a) (w1 :: GHC.Types.Int) ->
+                 case w1 of ww { GHC.Types.I# ww1 ->
+                 Tensor.Restricted.$wkr4 @ a w ww1 }) -}
+1a716c33b96568ce7528e4359edff889
+  kr6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "k"#) -}
+0d15a972cb508b1a6a767c91cdb1f915
+  kr7 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "l"#) -}
+9a3f1ed1328c9e068e53c7e65a911b08
+  scalarVal :: Tensor.Restricted.Tensor a -> a
+  RecSel Left Tensor.Restricted.Tensor
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a (ds2 :: Tensor.Restricted.Tensor a) ->
+                 case ds2 of wild {
+                   Tensor.Restricted.Scalar ds3 -> ds3
+                   Tensor.Restricted.Tensor ipv ipv1
+                   -> Tensor.Restricted.scalarVal1 @ a }) -}
+56135c0a2d1b5b01d1f9bcc68785fa5b
+  scalarVal1 :: a
+  {- Strictness: x -}
+5ff1380ba366016cfbdc783d4e466091
+  switchInd ::
+    Tensor.Restricted.Tensor a
+    -> GHC.Base.Maybe GHC.Base.String -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <S,1*U><S,1*U> -}
+cab35feca86acb0b8e036b132091c584
+  switchInd' ::
+    Tensor.Restricted.Tensor a
+    -> GHC.Base.Maybe GHC.Base.String -> Tensor.Restricted.Tensor a
+  {- Arity: 2, Strictness: <S,1*U><S,1*U> -}
+1cfcb86e2fc11d8e50c9ac014b8b5977
+  tensorData ::
+    Tensor.Restricted.Tensor a
+    -> Data.Vector.Vector (Tensor.Restricted.Tensor a)
+  RecSel Left Tensor.Restricted.Tensor
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a (ds2 :: Tensor.Restricted.Tensor a) ->
+                 case ds2 of wild {
+                   Tensor.Restricted.Scalar ipv -> Tensor.Restricted.tensorData1 @ a
+                   Tensor.Restricted.Tensor ds3 ds4 -> ds4 }) -}
+66177cc1e8cb1b60c46aff14ab681737
+  tensorData1 :: Data.Vector.Vector (Tensor.Restricted.Tensor a)
+  {- Strictness: x -}
+9f3e4e159d19126e9b3fd7667db958e0
+  tensorIndex :: Tensor.Restricted.Tensor a -> Tensor.Index.TIndex
+  RecSel Left Tensor.Restricted.Tensor
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ a (ds2 :: Tensor.Restricted.Tensor a) ->
+                 case ds2 of wild {
+                   Tensor.Restricted.Scalar ipv -> Tensor.Restricted.tensorIndex1
+                   Tensor.Restricted.Tensor ds3 ds4 -> ds3 }) -}
+616403d3cb16b31662f9d36702ac2884
+  tensorIndex1 :: Tensor.Index.TIndex
+  {- Strictness: x -}
+instance Data.Binary.Class.Binary [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fBinaryTensor
+instance GHC.Classes.Eq [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fEqTensor
+instance GHC.Float.Floating [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fFloatingTensor
+instance GHC.Real.Fractional [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fFractionalTensor
+instance GHC.Base.Functor [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fFunctorTensor
+instance Tensor.Multilinear.Multilinear [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fMultilinearTensor
+instance GHC.Num.Num [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fNumTensor
+instance GHC.Show.Show [Tensor.Restricted.Tensor]
+  = Tensor.Restricted.$fShowTensor
+"SPEC/Tensor.Restricted $dm!==! @ Tensor" [ALWAYS] forall ($dMultilinear :: Tensor.Multilinear.Multilinear
+                                                                              Tensor.Restricted.Tensor)
+  Tensor.Multilinear.$dm!==! @ Tensor.Restricted.Tensor $dMultilinear
+  = Tensor.Restricted.$fMultilinearTensor_$s$dm!==!
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: none
+require own pkg trusted: False
+

@@ -1,0 +1,42 @@
+Configuring hslogger-1.2.10...
+Building hslogger-1.2.10...
+Preprocessing library hslogger-1.2.10...
+[1 of 8] Compiling System.Log       ( src\System\Log.hs, .stack-work\dist\b7fec021\build\System\Log.o )
+[2 of 8] Compiling System.Log.Formatter ( src\System\Log\Formatter.hs, .stack-work\dist\b7fec021\build\System\Log\Formatter.o )
+[3 of 8] Compiling System.Log.Handler ( src\System\Log\Handler.hs, .stack-work\dist\b7fec021\build\System\Log\Handler.o )
+[4 of 8] Compiling System.Log.Handler.Simple ( src\System\Log\Handler\Simple.hs, .stack-work\dist\b7fec021\build\System\Log\Handler\Simple.o )
+[5 of 8] Compiling System.Log.Handler.Syslog ( src\System\Log\Handler\Syslog.hs, .stack-work\dist\b7fec021\build\System\Log\Handler\Syslog.o )
+
+src\System\Log\Handler\Syslog.hs:260:33: warning: [-Wdeprecations]
+    In the use of `sendTo' (imported from Network.Socket):
+    "Use sendTo defined in "Network.Socket.ByteString""
+
+src\System\Log\Handler\Syslog.hs:261:33: warning: [-Wdeprecations]
+    In the use of `send' (imported from Network.Socket):
+    "Use send defined in "Network.Socket.ByteString""
+
+src\System\Log\Handler\Syslog.hs:278:16: warning: [-Wdeprecations]
+    In the use of `sClose' (imported from Network.Socket):
+    Deprecated: "use 'close'"
+[6 of 8] Compiling System.Log.Handler.Growl ( src\System\Log\Handler\Growl.hs, .stack-work\dist\b7fec021\build\System\Log\Handler\Growl.o )
+
+src\System\Log\Handler\Growl.hs:47:59: warning: [-Wdeprecations]
+    In the use of `sClose' (imported from Network.Socket):
+    Deprecated: "use 'close'"
+
+src\System\Log\Handler\Growl.hs:50:21: warning: [-Wdeprecations]
+    In the use of `sendTo' (imported from Network.Socket):
+    "Use sendTo defined in "Network.Socket.ByteString""
+
+src\System\Log\Handler\Growl.hs:109:32: warning: [-Wdeprecations]
+    In the use of `sendTo' (imported from Network.Socket):
+    "Use sendTo defined in "Network.Socket.ByteString""
+[7 of 8] Compiling System.Log.Handler.Log4jXML ( src\System\Log\Handler\Log4jXML.hs, .stack-work\dist\b7fec021\build\System\Log\Handler\Log4jXML.o )
+[8 of 8] Compiling System.Log.Logger ( src\System\Log\Logger.hs, .stack-work\dist\b7fec021\build\System\Log\Logger.o )
+
+src\System\Log\Logger.hs:201:1: warning: [-Wdeprecations]
+    Module `Control.Monad.Error' is deprecated:
+      Use Control.Monad.Except instead
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\hslogger-1.2.10-sT57JmCNO02KPQ07k0Jv6
+Registering hslogger-1.2.10...

@@ -1,0 +1,47 @@
+Configuring Win32-notify-0.3.0.1...
+Warning: 'ghc-options: -threaded' has no effect for libraries. It should only
+be used for executables.
+Building Win32-notify-0.3.0.1...
+Preprocessing library Win32-notify-0.3.0.1...
+[1 of 2] Compiling System.Win32.FileNotify ( .stack-work\dist\b7fec021\build\System\Win32\FileNotify.hs, .stack-work\dist\b7fec021\build\System\Win32\FileNotify.o )
+
+srcSystemWin32FileNotify.hsc:73:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_ACTION_ADDED'
+
+srcSystemWin32FileNotify.hsc:75:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_ACTION_REMOVED'
+
+srcSystemWin32FileNotify.hsc:77:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_ACTION_MODIFIED'
+
+srcSystemWin32FileNotify.hsc:79:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_ACTION_RENAMED_OLD_NAME'
+
+srcSystemWin32FileNotify.hsc:80:1: warning: [-Wunused-top-binds]
+    Defined but not used: type constructor or class `WCHAR'
+
+srcSystemWin32FileNotify.hsc:81:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_ACTION_RENAMED_NEW_NAME'
+
+srcSystemWin32FileNotify.hsc:125:1: warning: [-Wunsupported-calling-conventions]
+    * the 'stdcall' calling convention is unsupported on this platform,
+      treating as ccall
+    * When checking declaration:
+        foreign import stdcall interruptible "static windows.h ReadDirectoryChangesW" c_ReadDirectoryChangesW
+          :: Handle
+             -> LPVOID
+                -> DWORD
+                   -> BOOL
+                      -> DWORD
+                         -> LPDWORD
+                            -> LPOVERLAPPED -> LPOVERLAPPED_COMPLETION_ROUTINE -> IO BOOL
+
+srcSystemWin32FileNotify.hsc:149:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_NOTIFY_CHANGE_CREATION'
+
+srcSystemWin32FileNotify.hsc:151:1: warning: [-Wunused-top-binds]
+    Defined but not used: `fILE_NOTIFY_CHANGE_LAST_ACCESS'
+[2 of 2] Compiling System.Win32.Notify ( src\System\Win32\Notify.hs, .stack-work\dist\b7fec021\build\System\Win32\Notify.o )
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\Win32-notify-0.3.0.1-AGrS0Nrb8MfhMuKt3EE2B
+Registering Win32-notify-0.3.0.1...

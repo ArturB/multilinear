@@ -1,0 +1,19 @@
+Configuring vector-binary-instances-0.2.3.4...
+Building vector-binary-instances-0.2.3.4...
+Preprocessing library vector-binary-instances-0.2.3.4...
+[1 of 1] Compiling Data.Vector.Binary ( Data\Vector\Binary.hs, .stack-work\dist\b7fec021\build\Data\Vector\Binary.o )
+
+Data\Vector\Binary.hs:86:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Binary a
+    * In the type signature for:
+           genericGetVectorWith :: (G.Vector v a, Binary a) =>
+                                   Get Int -> Get a -> Get (v a)
+
+Data\Vector\Binary.hs:103:1: warning: [-Wredundant-constraints]
+    * Redundant constraint: Binary a
+    * In the type signature for:
+           genericPutVectorWith :: (G.Vector v a, Binary a) =>
+                                   (Int -> Put) -> (a -> Put) -> v a -> Put
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\vector-binary-instances-0.2.3.4-5cD0L2W335u9PwXg62l6tz
+Registering vector-binary-instances-0.2.3.4...

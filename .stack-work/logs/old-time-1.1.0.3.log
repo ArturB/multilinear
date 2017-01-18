@@ -1,0 +1,55 @@
+[1 of 1] Compiling Main             ( C:\Users\Artur\AppData\Local\Temp\stack8008\old-time-1.1.0.3\Setup.hs, C:\Users\Artur\AppData\Local\Temp\stack8008\old-time-1.1.0.3\.stack-work\dist\b7fec021\setup\Main.o )
+Linking C:\Users\Artur\AppData\Local\Temp\stack8008\old-time-1.1.0.3\.stack-work\dist\b7fec021\setup\setup.exe ...
+Configuring old-time-1.1.0.3...
+configure: WARNING: unrecognized options: --with-compiler
+checking for gcc... C:\PROGRA~1\HASKEL~1\802E01~1.1\mingw\bin\gcc.exe
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether C:\PROGRA~1\HASKEL~1\802E01~1.1\mingw\bin\gcc.exe accepts -g... yes
+checking for C:\PROGRA~1\HASKEL~1\802E01~1.1\mingw\bin\gcc.exe option to accept ISO C89... none needed
+checking how to run the C preprocessor... C:\PROGRA~1\HASKEL~1\802E01~1.1\mingw\bin\gcc.exe -E
+checking for grep that handles long lines and -e... /c/Leksah/bin//grep
+checking for egrep... /c/Leksah/bin//grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking sys/timeb.h usability... yes
+checking sys/timeb.h presence... yes
+checking for sys/timeb.h... yes
+checking time.h usability... yes
+checking time.h presence... yes
+checking for time.h... yes
+checking for ftime... yes
+checking for gmtime_r... no
+checking for localtime_r... no
+checking for gettimeofday... yes
+checking whether struct tm is in sys/time.h or time.h... time.h
+checking for struct tm.tm_zone... no
+checking whether tzname is declared... yes
+checking for tzname... yes
+checking whether time.h and sys/time.h may both be included... yes
+checking for sys/time.h... (cached) yes
+checking whether altzone is declared... no
+configure: creating ./config.status
+config.status: creating include/HsTimeConfig.h
+configure: WARNING: unrecognized options: --with-compiler
+Building old-time-1.1.0.3...
+Preprocessing library old-time-1.1.0.3...
+[1 of 1] Compiling System.Time      ( .stack-work\dist\b7fec021\build\System\Time.hs, .stack-work\dist\b7fec021\build\System\Time.o )
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\old-time-1.1.0.3-IcvdkJUsE9M8t3io8peAEp
+Registering old-time-1.1.0.3...

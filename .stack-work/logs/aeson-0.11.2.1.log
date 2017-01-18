@@ -1,0 +1,57 @@
+Configuring aeson-0.11.2.1...
+Building aeson-0.11.2.1...
+Preprocessing library aeson-0.11.2.1...
+[ 1 of 16] Compiling Data.Aeson.Functions ( Data\Aeson\Functions.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Functions.o )
+[ 2 of 16] Compiling Data.Aeson.Internal.Time ( Data\Aeson\Internal\Time.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Internal\Time.o )
+[ 3 of 16] Compiling Data.Aeson.Types.Internal ( Data\Aeson\Types\Internal.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Types\Internal.o )
+[ 4 of 16] Compiling Data.Aeson.Encode.Builder ( Data\Aeson\Encode\Builder.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Encode\Builder.o )
+[ 5 of 16] Compiling Data.Aeson.Types.Class ( Data\Aeson\Types\Class.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Types\Class.o )
+[ 6 of 16] Compiling Data.Aeson.Encode.Functions ( Data\Aeson\Encode\Functions.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Encode\Functions.o )
+[ 7 of 16] Compiling Data.Aeson.Parser.Time ( Data\Aeson\Parser\Time.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Parser\Time.o )
+[ 8 of 16] Compiling Data.Aeson.Types.Instances ( Data\Aeson\Types\Instances.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Types\Instances.o )
+[ 9 of 16] Compiling Data.Aeson.Internal ( Data\Aeson\Internal.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Internal.o )
+[10 of 16] Compiling Data.Aeson.Types.Generic ( Data\Aeson\Types\Generic.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Types\Generic.o )
+
+Data\Aeson\Types\Generic.hs:81:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: AllNullary (a :+: b) allNullary
+    * In the instance declaration for `GToJSON (a :+: b)'
+
+Data\Aeson\Types\Generic.hs:116:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: AllNullary (a :+: b) allNullary
+    * In the instance declaration for `GToEncoding (a :+: b)'
+
+Data\Aeson\Types\Generic.hs:510:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: AllNullary (a :+: b) allNullary
+    * In the instance declaration for `GFromJSON (a :+: b)'
+
+Data\Aeson\Types\Generic.hs:616:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: IsRecord f isRecord
+    * In the instance declaration for `FromTaggedObject' f'
+
+Data\Aeson\Types\Generic.hs:739:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: IsRecord f isRecord
+    * In the instance declaration for `IsRecord (f :*: g) isRecord'
+
+Data\Aeson\Types\Generic.hs:746:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: IsRecord f isRecord
+    * In the instance declaration for `IsRecord (M1 S c f) isRecord'
+
+Data\Aeson\Types\Generic.hs:755:10: warning: [-Wredundant-constraints]
+    * Redundant constraints: (AllNullary a allNullaryL,
+                              AllNullary b allNullaryR,
+                              And allNullaryL allNullaryR allNullary)
+    * In the instance declaration for `AllNullary (a :+: b) allNullary'
+
+Data\Aeson\Types\Generic.hs:759:10: warning: [-Wredundant-constraints]
+    * Redundant constraint: AllNullary a allNullary
+    * In the instance declaration for
+        `AllNullary (M1 i c a) allNullary'
+[11 of 16] Compiling Data.Aeson.Types ( Data\Aeson\Types.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Types.o )
+[12 of 16] Compiling Data.Aeson.Parser.Internal ( Data\Aeson\Parser\Internal.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Parser\Internal.o )
+[13 of 16] Compiling Data.Aeson.Parser ( Data\Aeson\Parser.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Parser.o )
+[14 of 16] Compiling Data.Aeson.Encode ( Data\Aeson\Encode.hs, .stack-work\dist\b7fec021\build\Data\Aeson\Encode.o )
+[15 of 16] Compiling Data.Aeson       ( Data\Aeson.hs, .stack-work\dist\b7fec021\build\Data\Aeson.o )
+[16 of 16] Compiling Data.Aeson.TH    ( Data\Aeson\TH.hs, .stack-work\dist\b7fec021\build\Data\Aeson\TH.o )
+Installing library in
+C:\Users\Artur\AppData\Roaming\stack\snapshots\3f5948c6\lib\x86_64-windows-ghc-8.0.1\aeson-0.11.2.1-EvvVy7RUk571N9rAPFuWeR
+Registering aeson-0.11.2.1...
