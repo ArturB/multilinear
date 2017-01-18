@@ -21,6 +21,41 @@
   (major1) == 0 && (major2) <  8 || \
   (major1) == 0 && (major2) == 8 && (minor) <= 3)
 
+/* package array-0.5.1.1 */
+#define VERSION_array "0.5.1.1"
+#define MIN_VERSION_array(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  5 || \
+  (major1) == 0 && (major2) == 5 && (minor) <= 1)
+
+/* package bytestring-0.10.8.1 */
+#define VERSION_bytestring "0.10.8.1"
+#define MIN_VERSION_bytestring(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  10 || \
+  (major1) == 0 && (major2) == 10 && (minor) <= 8)
+
+/* package containers-0.5.7.1 */
+#define VERSION_containers "0.5.7.1"
+#define MIN_VERSION_containers(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  5 || \
+  (major1) == 0 && (major2) == 5 && (minor) <= 7)
+
+/* package directory-1.2.6.2 */
+#define VERSION_directory "1.2.6.2"
+#define MIN_VERSION_directory(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 6)
+
+/* package zlib-0.6.1.2 */
+#define VERSION_zlib "0.6.1.2"
+#define MIN_VERSION_zlib(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  6 || \
+  (major1) == 0 && (major2) == 6 && (minor) <= 1)
+
 /* tool alex-3.1.7 */
 #define TOOL_VERSION_alex "3.1.7"
 #define MIN_TOOL_VERSION_alex(major1,major2,minor) (\

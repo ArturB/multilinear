@@ -22,16 +22,22 @@ library
                        Tensor.Restricted
   build-depends:
                        base >= 4.7 && < 5,
-                       binary -any
+                       binary
   default-language:    Haskell2010
   ghc-options:         -Wall
 
 executable Tensor-exe
   hs-source-dirs:      app
-  main-is:             Main.hs
+  main-is:             Parser.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
+                     , array
                      , Tensor
+                     , zlib
+                     , binary
+                     , bytestring
+                     , containers
+                     , directory
   default-language:    Haskell2010
 
 test-suite Tensor-test
@@ -45,4 +51,4 @@ test-suite Tensor-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/Tensor
+  location: https://bitbucket.org/ArturBrodzki/tensor/

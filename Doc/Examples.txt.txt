@@ -1,0 +1,60 @@
+learning synch Hebbian( n(t) ) {
+    W<i><j>(t) := W<i><j>(t – 1) * Y<i>(t – 1) * n(t);
+};
+
+learning synch HebbianNorm( n(t) ) {
+    W<i><j>(t) := euclidean(
+        W<i><j>(t – 1) * Y<i>(t – 1)
+    )<i><j>(t – 1);
+};
+
+//single line comment
+
+learning synch HebbianNorm( N(t), O<i>(t) ) {
+    W<i><j>(t) := W<i><j>(t – 1) + W<i><j>(t – 1) *
+    N(t) * ( O<i>(t - 1) - Y<i>(t – 1) );
+};
+
+
+/*
+multi
+line
+comment
+*/
+
+network N {
+    layer L1 100 {
+        Y<i>(t) := sgn( W<i>[j](t) X<j>(t) );
+    };
+    layer L2 100 {
+        Y<i>(t) := sgn( W<i>[j](t) X<j>(t) );
+    };
+    input(L1,L2);
+    L1 --> L2 | W<i><j>(0) := uniform(-1,1);
+};
+
+network N2 {
+    layer L1 100 {
+        Y<i>(t) := gauss( 2 * sgn(W<i>[j](t) X<j>(t)), 2 );
+    };
+    layer L2 100 {
+        Y<i>(t) := gauss( 2 * sgn(W<i>[j](t) X<j>(t)), 2 );
+    };
+    input(L1,L2);
+    L1 --> L2 | W<i><j>(0) := uniform(-1,1);
+};
+
+experiment Exp1 {
+    network N2;
+    learning Hebbian(2);
+    maxtime 10000;
+    input {
+        X<i>(t) := i;
+    }
+}
+
+GET Y<50>(234) FROM Exp1;
+
+GET FIRST Y<i>(t) FROM Exp1 | Y<i>(t) == Y<i>(t--1);
+
+GET FIRST Y<i>(t) FROM Exp1 WHERE Y<i>(t) == Y<i>(t - 1);
