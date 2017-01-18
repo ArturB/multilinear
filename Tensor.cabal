@@ -1,32 +1,32 @@
 name:                Tensor
 version:             0.1.0.0
-synopsis:            Initial project template from stack
+synopsis:            Calculations of tensors
 description:         Please see README.md
 homepage:            https://github.com/githubuser/Tensor#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2017 Author name here
-category:            Web
+author:              Artur M. Brodzki
+maintainer:          artur.brodzki@gmail.com
+copyright:           2017 Artur M. Brodzki
+category:            Numeric
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     
-        Tensor
-        Tensor.Index
-        Tensor.Lazy
-        Tensor.Multilinear
-        Tensor.Restricted
+  exposed-modules:     Tensor
+                       Tensor.Index
+                       Tensor.Lazy
+                       Tensor.Multilinear
+                       Tensor.Restricted
   build-depends:       
-        base >= 4.7 && < 5,
-        binary -any,
-        vector -any,
-        vector-binary-instances -any
+                       base >= 4.7 && < 5,
+                       binary -any,
+                       vector -any,
+                       vector-binary-instances -any
   default-language:    Haskell2010
+  ghc-options:         -Wall -Werror
 
 executable Tensor-exe
   hs-source-dirs:      app

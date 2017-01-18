@@ -17,8 +17,6 @@ module Tensor.Restricted (
 import           Control.Monad
 import           Data.List          as L
 import           Data.Maybe
-import           Data.Vector        as V
-import           Data.Vector.Binary
 import           Prelude            as P
 import           Tensor.Index
 import           Tensor.Multilinear as T
@@ -32,8 +30,6 @@ zeroElems :: String
 zeroElems = "Tensor must contain at leat one element!"
 incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
-noIndex :: String
-noIndex = "No such index in this tensor!"
 
 {- RESTRICTED TENSOR DATATYPE -}
 
@@ -41,12 +37,14 @@ data Tensor a =
     Scalar { scalarVal :: a } |
     Tensor {
         tensorIndex :: TIndex,
-        tensorData  :: Vector (Tensor a)
-    }
+        tensorData  :: [Tensor a]
+    } | 
+    Err { errMsg :: String }
     deriving Eq
 
 --makeLenses ''Tensor
 
+-- Tensor serialization and deserialization
 instance Binary a => Binary (Tensor a) where
     put (Scalar x) = do
         put (0 :: Word8)
@@ -55,24 +53,32 @@ instance Binary a => Binary (Tensor a) where
     put (Tensor ind ts) = do
         put (1 :: Word8)
         put ind
-        genericPutVector ts
+        put ts
+    
+    put (Err msg) = do
+        put (2 :: Word8)
+        put msg
 
     get = do
         f <- get :: Get Word8
-        if f == 0
-        then do
-            x <- get
-            return $ Scalar x
-        else do
-            ind <- get
-            ts <- genericGetVector
-            return $ Tensor ind ts
+        case f of
+            0 -> do
+                x <- get
+                return $ Scalar x
+            1 -> do
+                ind <- get
+                ts <- get
+                return $ Tensor ind ts
+            2 -> do
+                msg <- get
+                return $ Err msg
+            _ -> return $ Err "Cannot deserialize tensor!"
 
 
-_showVectorVertical :: Show a => V.Vector a -> String
-_showVectorVertical v =
-    "\n  " P.++ ((P.++) `V.foldl1` vShowed)
-        where vShowed = (\x -> "| " P.++ show x P.++ "\n  ") <$> v :: V.Vector String
+_showVertical :: Show a => [a] -> String
+_showVertical v =
+    "\n  " P.++ ((P.++) `foldl1` vShowed)
+        where vShowed = (\x -> "| " P.++ show x P.++ "\n  ") <$> v :: [String]
 
 _alignTo :: String -> Int -> String
 _alignTo s n = L.replicate (n - L.length s) ' ' P.++ s
@@ -86,12 +92,14 @@ instance Show a => Show (Tensor a) where
         show index P.++ " " P.++ _showVectorVertical ts
     show (Tensor index@(Indifferent _ _) ts) =
         show index P.++ " " P.++ show ts
+    show (Err msg) = show msg
 
 -- Tensor is a Functor
 instance Functor Tensor where
     fmap f (Scalar v_) = Scalar (f v_)
     fmap f (Tensor indexT ts) = Tensor indexT v2
         where v2 = fmap (fmap f) ts
+    fmap _ (Err msg) = Err msg
 
 {-
 instance Applicative Tensor where
@@ -107,25 +115,29 @@ instance Num a => Num (Tensor a) where
     Scalar x1 + Scalar x2 = Scalar $ x1 + x2
     Scalar x + t = (x+) <$> t
     t + Scalar x = (+x) <$> t
-    Tensor index1 v1 + Tensor index2 v2
-        | index1 Tensor.Index.!=! index2
-            = Tensor index1 $ V.zipWith (+) v1 v2
-        | otherwise = error $
-                "add: " P.++ incompatibleTypes P.++
-                " - index1 is " P.++ show index1 P.++
-                " and index2 is " P.++ show index2 P.++ "!"
+    Tensor index1 v1 + Tensor index2 v2 =
+        if index1 !=! index2
+        then Tensor index1 $ zipWith (+) v1 v2
+        else Err $ 
+            "add: " P.++ incompatibleTypes P.++ 
+            " - index1 is " P.++ show index1 P.++ 
+            " and index2 is " P.++ show index2
+    Err msg + _ = Err msg
+    _ + Err msg = Err msg
 
     -- Subtracting
     Scalar x1 - Scalar x2 = Scalar $ x1 - x2
     Scalar x - t = (\e -> x - e) <$> t
     t - Scalar x = (\e -> e - x) <$> t
-    Tensor index1 v1 - Tensor index2 v2
-        | index1 Tensor.Index.!=! index2 =
-            Tensor index1 $ V.zipWith (-) v1 v2
-        | otherwise = error $
+    Tensor index1 v1 - Tensor index2 v2 = 
+        if index1 !=! index2
+        then Tensor index1 $ zipWith (-) v1 v2
+        else Err $
             "subtract: " P.++ incompatibleTypes P.++
             " - index1 is " P.++ show index1 P.++
             " and index2 is " P.++ show index2
+    Err msg - _ = Err msg
+    _ - Err msg = Err msg
 
     Scalar x1 * Scalar x2 = Scalar $ x1 * x2
     Scalar x1 * t = (x1*) <$> t
@@ -135,10 +147,12 @@ instance Num a => Num (Tensor a) where
     -- Absolute value - elem by elem
     abs (Scalar x)        = Scalar $ abs x
     abs (Tensor index ts) = Tensor index (abs <$> ts)
+    abs (Err msg) = Err msg
 
     -- Signum operation - elem by elem
     signum (Scalar x)        = Scalar $ signum x
     signum (Tensor index ts) = Tensor index (signum <$> ts)
+    signum (Err msg) = Err msg
 
     -- Simple integer can be oonveted to Scalar
     fromInteger x = Scalar $ fromInteger x
@@ -148,12 +162,15 @@ instance Fractional a => Fractional (Tensor a) where
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
     Scalar x1 / t2 = (x1 /) <$> t2
     t1 / Scalar x2 = (/ x2) <$> t1
-    t1@(Tensor index1 ts1) / t2@(Tensor index2 ts2)
-        | index1 Tensor.Index.!=! index2 = Tensor index1 $ V.zipWith (/) ts1 ts2
-        | otherwise = error $
+    t1@(Tensor index1 ts1) / t2@(Tensor index2 ts2) = 
+        if index1 !=! index2
+        then Tensor index1 $ zipWith (/) ts1 ts2
+        else Err $
             "(/): " P.++ incompatibleTypes P.++
             " tensor1 has type " P.++ show (indices t1) P.++
             " and tensor2 has type " P.++ show (indices t2)
+    Err msg / _ = Err msg
+    _ / Err msg = Err msg
 
     fromRational x = Scalar $ fromRational x
 
@@ -165,48 +182,61 @@ instance Floating a => Floating (Tensor a) where
 
     exp (Scalar x)        = Scalar $ exp x
     exp (Tensor index ts) = Tensor index (exp <$> ts)
+    exp (Err msg) = Err msg
 
     log (Scalar x)        = Scalar $ log x
     log (Tensor index ts) = Tensor index (log <$> ts)
+    log (Err msg) = Err msg
 
     sin (Scalar x)        = Scalar $ sin x
     sin (Tensor index ts) = Tensor index (sin <$> ts)
+    sin (Err msg) = Err msg
 
     cos (Scalar x)        = Scalar $ cos x
     cos (Tensor index ts) = Tensor index (cos <$> ts)
+    cos (Err msg) = Err msg
 
     asin (Scalar x)        = Scalar $ asin x
     asin (Tensor index ts) = Tensor index (asin <$> ts)
+    asin (Err msg) = Err msg
 
     acos (Scalar x)        = Scalar $ acos x
     acos (Tensor index ts) = Tensor index (acos <$> ts)
+    acos (Err msg) = Err msg
 
     atan (Scalar x)        = Scalar $ atan x
     atan (Tensor index ts) = Tensor index (atan <$> ts)
+    atan (Err msg) = Err msg
 
     sinh (Scalar x)        = Scalar $ sinh x
     sinh (Tensor index ts) = Tensor index (sinh <$> ts)
+    sinh (Err msg) = Err msg
 
     cosh (Scalar x)        = Scalar $ cosh x
     cosh (Tensor index ts) = Tensor index (cosh <$> ts)
+    cosh (Err msg) = Err msg
 
     asinh (Scalar x)        = Scalar $ asinh x
     asinh (Tensor index ts) = Tensor index (asinh <$> ts)
+    asinh (Err msg) = Err msg
 
     acosh (Scalar x)        = Scalar $ acosh x
     acosh (Tensor index ts) = Tensor index (acosh <$> ts)
+    acosh (Err msg) = Err msg
 
     atanh (Scalar x)        = Scalar $ atanh x
     atanh (Tensor index ts) = Tensor index (atanh <$> ts)
+    atanh (Err msg) = Err msg
 
 -- Tensor operations
 instance Multilinear Tensor where
     -- Safe indexing
-    Scalar _ !? _ = error indexOutOfRange
+    Scalar _ !? _ = Err $ "(!?): " P.++ indexOutOfRange
     Tensor _ ts1 !? ind =
-        if isNothing (ts1 V.!? ind)
-        then error  $ "(!?): " P.++ indexOutOfRange
-        else Just $ ts1 V.! ind
+        if isNothing (ts1 !? ind)
+        then Err  $ "(!?): " P.++ indexOutOfRange
+        else ts1 ! ind
+    Err msg !? _ = Err msg
 {-
     -- Projection
     Scalar x !! [] = Just $ Scalar x
@@ -223,32 +253,37 @@ instance Multilinear Tensor where
     (Scalar x1) !* (Scalar x2) = Scalar $ x1 * x2
     (Scalar x) !* t2 = (x P.*) <$> t2
     t1 !* (Scalar x) = (P.* x) <$> t1
-    t1 !* t2 = switchInd' t1 (commonIndex t1 t2) !*! switchInd' t2 (commonIndex t1 t2)
-
+    t1@(Tensor _ _) !* t2@(Tensor _ _) = 
+        let cmi = commonIndex t1 t2
+        in switchInd' t1 cmi !*! switchInd' t2 cmi
+    Err msg !* _ = Err msg
+    _ !* Err msg = Err msg
+    
     -- Generate tensor from generator function of indices
-    generate index f
-        | indexCount index > 0 = Tensor index $ V.generate (indexCount index) f
-        | otherwise = error $ "generate: " P.++ zeroElems
+    generate index f = 
+        if indexCount index > 0
+        then Tensor index [f i | i <- [1 .. indexCount index]]
+        else Err $ "generate: " P.++ zeroElems
 
     -- Get tensor order [ (p,q)-type ]
     order (Scalar _) = (0,0)
     order (Tensor (Contravariant _ _) t) = (cnvr+1,covr)
-        where (cnvr,covr) = order $ V.head t
+        where (cnvr,covr) = order $ head t
     order (Tensor (Covariant _ _) t) = (cnvr,covr+1)
-        where (cnvr,covr) = order $ V.head t
+        where (cnvr,covr) = order $ head t
     order (Tensor (Indifferent _ _) t) = (cnvr,covr)
-        where (cnvr,covr) = order $ V.head t
+        where (cnvr,covr) = order $ head t
 
     -- Get number of elems in tensor
     elems (Scalar _)        = 1
-    elems (Tensor index ts) = indexCount index P.* elems (V.head ts)
+    elems (Tensor index ts) = indexCount index P.* elems (head ts)
 
     -- Get list of all tensor indices
     indices (Scalar _)        = []
-    indices (Tensor index ts) = index : indices (V.head ts)
+    indices (Tensor index ts) = index : indices (head ts)
 
     -- Check if two tensors are equivalent (so are the same type and size)
-    equiv t1 t2 = L.and $ P.zipWith (Tensor.Index.!=!) (indices t1) (indices t2)
+    equiv t1 t2 = and $ zipWith (!=!) (indices t1) (indices t2)
 
     -- Rename tensor index
     rename (Scalar x) _ _ = Scalar x
@@ -280,33 +315,13 @@ instance Multilinear Tensor where
     transpose1 (Tensor (Indifferent count name) ts) =
         Tensor (Indifferent count name) ts
 
-    -- Concatenation of tensor by given index or with creating a new one
-    concat (Covariant _ name) s1@(Scalar _) s2@(Scalar _) =
-        Tensor (Covariant 2 name) $ V.fromList [s1,s2]
-    concat (Contravariant _ name) s1@(Scalar _) s2@(Scalar _) =
-        Tensor (Contravariant 2 name) $ V.fromList [s1,s2]
-    concat index@(Covariant _ name) (Tensor index1 ts1) (Tensor index2 ts2)
-        | index1 == index && index2 == index =
-            Tensor (Covariant (indexCount index1 + indexCount index2) name) (ts1 V.++ ts2)
-        | index1 Tensor.Index.!=! index2 =
-            Tensor index1 $ V.generate (indexCount index1) (\i -> T.concat index (ts1 V.! i) (ts2 V.! i))
-    concat index@(Contravariant _ name) (Tensor index1 ts1) (Tensor index2 ts2)
-        | index1 == index && index2 == index =
-            Tensor (Contravariant (indexCount index1 + indexCount index2) name) (ts1 V.++ ts2)
-        | index1 Tensor.Index.!=! index2 =
-            Tensor index1 $ V.generate (indexCount index1) (\i -> T.concat index (ts1 V.! i) (ts2 V.! i))
-    concat _ t1 t2 = error $
-        "concat: " P.++ incompatibleTypes P.++
-        " tensor1 has type " P.++ show (indices t1) P.++
-        " and tensor2 has type " P.++ show (indices t2)
-
     -- Generate 1-rank tensor from a list
     fromList (Contravariant _ name) ls =
-        Tensor (Contravariant (P.length ls) name) $ V.fromList $ Scalar <$> ls
+        Tensor (Contravariant (P.length ls) name) $ Scalar <$> ls
     fromList (Covariant _ name) ls =
-        Tensor (Covariant (P.length ls) name) $ V.fromList $ Scalar <$> ls
+        Tensor (Covariant (P.length ls) name) $ Scalar <$> ls
     fromList (Indifferent _ name) ls =
-        Tensor (Indifferent (P.length ls) name) $ V.fromList $ Scalar <$> ls
+        Tensor (Indifferent (P.length ls) name) $ Scalar <$> ls
 
 -- Push index given as Maybe String one step deeper in recursion
 switchInd :: Tensor a -> Maybe String -> Tensor a
@@ -314,10 +329,10 @@ switchInd (Scalar x) _ = Scalar x
 switchInd t1 Nothing = t1
 switchInd t1@(Tensor index1 ts1) (Just ind)
     | P.length (indices t1) > 1 && indexName index1 == ind =
-        let index2 = tensorIndex (ts1 V.! 0)
-        in Tensor index2 $ V.generate (indexCount index2)
-            (\i -> Tensor index1 $ V.generate (indexCount index1)
-                (\j -> tensorData (ts1 V.! j) V.! i))
+        let index2 = tensorIndex (ts1 ! 0)
+        in Tensor index2 [Tensor index1 [tensorData (ts1 ! j) ! i 
+            | j <- [1 .. indexCount index1]] 
+            | i <- [1 .. indexCount index2]]
     | otherwise = t1
 
 -- Push index given as Maybe String into the deepest level of recursion
@@ -335,12 +350,12 @@ switchInd' t1@(Tensor index1 _) i@(Just ind)
 _dot :: Num a => Tensor a -> Tensor a -> Tensor a
 Scalar x1 `_dot` Scalar x2 =  Scalar $ x1 P.* x2
 Tensor i1@(Covariant count1 _) ts1 `_dot` Tensor i2@(Contravariant count2 _) ts2
-    | count1 == count2 = V.sum $ V.zipWith (*) ts1 ts2
-    | otherwise = error $
+    | count1 == count2 = sum $ zipWith (*) ts1 ts2
+    | otherwise = Err $
         "Tensor product: " P.++ incompatibleTypes P.++
         " - index1 is " P.++ show i1 P.++
         " and index2 is " P.++ show i2
-t1 `_dot` t2 = error $
+t1 `_dot` t2 = Err $
     "Tensor product: " P.++ incompatibleTypes P.++
     " - index1 is " P.++ show (tensorIndex t1) P.++
     " and index2 is " P.++ show (tensorIndex t2)
@@ -378,8 +393,8 @@ t1 !*! (Scalar x) = (P.* x) <$> t1
 t1@(Tensor index1 ts1) !*! t2@(Tensor index2 ts2)
     | indexName index1 == indexName index2 = t1 `Tensor.Restricted._dot` t2
     | indexName index1 `P.elem` (indexName <$> indices t2) =
-        T.generate index2 (\i -> t1 !*! (ts2 V.! i))
-    | otherwise = T.generate index1 (\i -> (ts1 V.! i) !*! t2)
+        T.generate index2 (\i -> t1 !*! (ts2 ! i))
+    | otherwise = T.generate index1 (\i -> (ts1 ! i) !*! t2)
 
 -- Find common index in two tensors, if any
 commonIndex :: Tensor a -> Tensor a -> Maybe String
@@ -389,3 +404,6 @@ commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
     let indicesNames1 = indexName <$> indices t1
         indicesNames2 = indexName <$> indices t2
     in msum $ (\i -> L.find (==i) indicesNames2) <$> indicesNames1
+
+
+
