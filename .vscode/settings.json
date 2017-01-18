@@ -1,5 +1,0 @@
-{
-    "files.autoSave": "afterDelay",
-    "haskell.ghcMod.onHover": "fallback",
-    "haskell.ghcMod.check": "onChange"
-}

@@ -1,18 +1,18 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 08:15:51.0298806 UTC
+2017-01-18 19:47:45.6643691 UTC
 
 interface Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Multilinear 8001
-  interface hash: e182811c38805f078f8b5d7fc49e3aae
-  ABI hash: e804dcdd8bcab18f25b2eb331b7bd79c
-  export-list hash: e49ee3c72622a4e8e3598ca8218de8c6
+  interface hash: 8ef4e5947138c255beb6a2fcfcd1debb
+  ABI hash: 6bc1692ae6aa026c85905ff7f31c1e09
+  export-list hash: fffde4799cec63d0ebedaa87a833690a
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 11c1d53d86ff1fc48fbbf191e9636203
   sig of: Nothing
   used TH splices: False
   where
 exports:
-  Tensor.Multilinear.Multilinear{Tensor.Multilinear.!* Tensor.Multilinear.!==! Tensor.Multilinear.!? Tensor.Multilinear.++ Tensor.Multilinear.concat Tensor.Multilinear.elems Tensor.Multilinear.equiv Tensor.Multilinear.fromList Tensor.Multilinear.generate Tensor.Multilinear.indices Tensor.Multilinear.order Tensor.Multilinear.rename Tensor.Multilinear.transpose Tensor.Multilinear.transpose1}
+  Tensor.Multilinear.Multilinear{Tensor.Multilinear.!! Tensor.Multilinear.!* Tensor.Multilinear.!==! Tensor.Multilinear.++ Tensor.Multilinear.concat Tensor.Multilinear.elems Tensor.Multilinear.equiv Tensor.Multilinear.fromList Tensor.Multilinear.generate Tensor.Multilinear.indices Tensor.Multilinear.order Tensor.Multilinear.rename Tensor.Multilinear.transpose Tensor.Multilinear.transpose1}
 module dependencies: Tensor.Index
 package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.0.0*
                       binary-0.8.3.0@binary-0.8.3.0
@@ -43,7 +43,7 @@ import  -/  base-4.9.0.0:GHC.Base dd8044a8d640eee51828c17c476a6ba7
 import  -/  base-4.9.0.0:GHC.Num f0aed3315b3ed1b330b71fc4148a5581
 import  -/  base-4.9.0.0:Prelude 2d9cd8b0ec3d728f62b734df888d2e34
 fixities infixl 8 !*, infixl 6 !==!, infixl 3 ++
-57d6f7de998c98c503478cc828b9de96
+10f137bd1225175ceb4ea2378da17412
   $dm!==! ::
     Tensor.Multilinear.Multilinear t =>
     forall a. t a -> t a -> GHC.Types.Bool
@@ -58,7 +58,7 @@ fixities infixl 8 !*, infixl 6 !==!, infixl 3 ++
                  case t1 of t4 { DEFAULT ->
                  case t2 of t5 { DEFAULT ->
                  Tensor.Multilinear.equiv @ t $dMultilinear @ a t4 t5 } }) -}
-09bf3dcfaabed77accb879243cc295e2
+e4d0b8837d6ae39f488e77ec32b4c3bd
   $dm++ ::
     Tensor.Multilinear.Multilinear t =>
     forall a. Tensor.Index.TIndex -> t a -> t a -> t a
@@ -104,9 +104,9 @@ acebdbf035c9ff1ce1efabfcc49a6f2f
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"#) -}
-d8b955e1c4876d342b96642893829a80
+88e5c689338f269a4d054bf6318c6dde
   class GHC.Base.Functor t => Multilinear (t :: * -> *) where
-    (!?) :: t a -> GHC.Types.Int -> GHC.Base.Maybe (t a)
+    (!!) :: t a -> GHC.Types.Int -> t a
     (!*) :: GHC.Num.Num a => t a -> t a -> t a
     generate :: Tensor.Index.TIndex -> (GHC.Types.Int -> t a) -> t a
     fromList :: Tensor.Index.TIndex -> [a] -> t a
@@ -120,7 +120,7 @@ d8b955e1c4876d342b96642893829a80
     transpose1 :: t a -> t a
     concat :: Tensor.Index.TIndex -> t a -> t a -> t a
     (++) :: Tensor.Index.TIndex -> t a -> t a -> t a
-    {-# MINIMAL (!?), (!*), generate, fromList, order, elems, indices,
+    {-# MINIMAL (!!), (!*), generate, fromList, order, elems, indices,
                 rename, equiv, transpose, transpose1, concat #-}
 vectorised variables:
 vectorised tycons:

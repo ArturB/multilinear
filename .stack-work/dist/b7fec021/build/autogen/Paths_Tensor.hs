@@ -30,7 +30,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "C:\\Users\\Artur\\Downloads\\Tensor\\.stack-work\\install\\93264ba9\\bin"
-libdir     = "C:\\Users\\Artur\\Downloads\\Tensor\\.stack-work\\install\\93264ba9\\lib\\x86_64-windows-ghc-8.0.1\\Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"
+libdir     = "C:\\Users\\Artur\\Downloads\\Tensor\\.stack-work\\install\\93264ba9\\lib\\x86_64-windows-ghc-8.0.1\\Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh"
 datadir    = "C:\\Users\\Artur\\Downloads\\Tensor\\.stack-work\\install\\93264ba9\\share\\x86_64-windows-ghc-8.0.1\\Tensor-0.1.0.0"
 libexecdir = "C:\\Users\\Artur\\Downloads\\Tensor\\.stack-work\\install\\93264ba9\\libexec"
 sysconfdir = "C:\\Users\\Artur\\Downloads\\Tensor\\.stack-work\\install\\93264ba9\\etc"

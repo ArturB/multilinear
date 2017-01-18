@@ -21,20 +21,6 @@
   (major1) == 0 && (major2) <  8 || \
   (major1) == 0 && (major2) == 8 && (minor) <= 3)
 
-/* package vector-0.11.0.0 */
-#define VERSION_vector "0.11.0.0"
-#define MIN_VERSION_vector(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  11 || \
-  (major1) == 0 && (major2) == 11 && (minor) <= 0)
-
-/* package vector-binary-instances-0.2.3.4 */
-#define VERSION_vector_binary_instances "0.2.3.4"
-#define MIN_VERSION_vector_binary_instances(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  2 || \
-  (major1) == 0 && (major2) == 2 && (minor) <= 3)
-
 /* tool alex-3.1.7 */
 #define TOOL_VERSION_alex "3.1.7"
 #define MIN_TOOL_VERSION_alex(major1,major2,minor) (\
@@ -119,7 +105,7 @@
   (major1) == 2 && (major2) <  25 || \
   (major1) == 2 && (major2) == 25 && (minor) <= 0)
 
-#define CURRENT_COMPONENT_ID "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"
+#define CURRENT_COMPONENT_ID "Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh"
 
-#define CURRENT_PACKAGE_KEY "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"
+#define CURRENT_PACKAGE_KEY "Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh"
 

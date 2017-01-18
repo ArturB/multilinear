@@ -275,16 +275,15 @@ instance Multilinear Tensor where
         where (cnvr,covr) = order $ head t
     order (Err _) = (-1,-1)
 
-
     -- Get number of elems in tensor
     elems (Scalar _)        = 1
     elems (Tensor index ts) = indexCount index P.* elems (head ts)
-    elems (Err _) = -1
+    elems (Err _)           = -1
 
     -- Get list of all tensor indices
     indices (Scalar _)        = []
     indices (Tensor index ts) = index : indices (head ts)
-    indices (Err _) = []
+    indices (Err _)           = []
 
     -- Check if two tensors are equivalent (so are the same type and size)
     equiv t1 t2 = and $ zipWith (!=!) (indices t1) (indices t2)
@@ -418,3 +417,5 @@ commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
         indicesNames2 = indexName <$> indices t2
     in msum $ (\i -> L.find (==i) indicesNames2) <$> indicesNames1
 commonIndex _ _ = Nothing
+
+

@@ -1,11 +1,11 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 08:59:02.0819523 UTC
+2017-01-18 19:47:48.2489893 UTC
 
 interface main@main:Main 8001
-  interface hash: 8d1091b83cff7850e7dd50ff031b37ae
-  ABI hash: 821c0da5622c3f989c40bbc040e91c79
-  export-list hash: fc0e47d37088a203fe0b5599b88b7530
+  interface hash: 60da72a72e322499bb2f4b54349b0c1f
+  ABI hash: 898d56f44acc371e45d8f7b9b2952d8a
+  export-list hash: 380c737eef9f813d2bd558c66e351287
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 30cdd9b478807df5ac4970d255b33165
   sig of: Nothing
@@ -24,14 +24,11 @@ package dependencies: Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl
                       primitive-0.6.1.0@primitive-0.6.1.0-Ip44DqhfCp21tTUYbecwa
                       transformers-0.5.2.0@transformers-0.5.2.0
                       vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6
-                      vector-binary-instances-0.2.3.4@vector-binary-instances-0.2.3.4-5cD0L2W335u9PwXg62l6tz
 orphans: base-4.9.0.0:GHC.Base base-4.9.0.0:GHC.Float
          binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Generic
          bytestring-0.10.8.1@bytestring-0.10.8.1:Data.ByteString.Builder
          transformers-0.5.2.0@transformers-0.5.2.0:Control.Monad.Trans.Error
          vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Fusion.Bundle
-         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Unboxed
-         vector-binary-instances-0.2.3.4@vector-binary-instances-0.2.3.4-5cD0L2W335u9PwXg62l6tz:Data.Vector.Binary
 family instance modules: base-4.9.0.0:Control.Applicative
                          base-4.9.0.0:Data.Complex base-4.9.0.0:Data.Either
                          base-4.9.0.0:Data.Functor.Const base-4.9.0.0:Data.Functor.Identity
@@ -47,14 +44,10 @@ family instance modules: base-4.9.0.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
                          primitive-0.6.1.0@primitive-0.6.1.0-Ip44DqhfCp21tTUYbecwa:Control.Monad.Primitive
                          vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector
-                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Primitive
-                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Storable
-                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Unboxed
-                         vector-0.11.0.0@vector-0.11.0.0-BEDZb5o2QOhGbIm6ky7rl6:Data.Vector.Unboxed.Base
-import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor b9f9fd05f386900fca597e4e03a6af6e
+import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor 6a4ba83385f8298d1804ce761af282bf
 import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Index 769fc71ede0f3c521fe8f01a59c93ce2
-import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Multilinear e804dcdd8bcab18f25b2eb331b7bd79c
-import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Restricted 874b0b4031888e427dfbcae7c9bb8a5b
+import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Multilinear 6bc1692ae6aa026c85905ff7f31c1e09
+import  -/  Tensor-0.1.0.0@Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Restricted 0dc5ce7ec2b7af015c2c81ee2930c8cb
 import  -/  base-4.9.0.0:Data.Bits c954f6297e2203ba924b7d4bb91aa2cf
 import  -/  base-4.9.0.0:Data.Foldable 3cbed01c922be29649c33015287c82ca
 import  -/  base-4.9.0.0:GHC.List 47d436dfb7454bb1883fb4d943e3f389
