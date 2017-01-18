@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 20:34:16.6446034 UTC
+2017-01-18 20:52:09.5612604 UTC
 
 interface main@main:Main 8001
-  interface hash: 91df1f906aa80555b964e94d0c267e78
-  ABI hash: e6d7c304e40bfca241f77462251afcd6
+  interface hash: 380927b72fb9c2013afc3d990afd245a
+  ABI hash: 40750bf2bf62b1f323719147bc66fc24
   export-list hash: e8c6812349f86c89b1a4217c26f10f98
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 30cdd9b478807df5ac4970d255b33165
@@ -58,12 +58,12 @@ d6831ef04cb9301b090dfae6f7bb7ec7
   $trModule2 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "main"#) -}
-b96135964092184c36be9a9398010639
+3df93207df73a115f40bedf551124d95
   main :: GHC.Types.IO ()
   {- Arity: 1, Strictness: <S,U>,
      Unfolding: InlineRule (0, True, True)
                 Main.main1 `cast` (Sym (GHC.Types.N:IO[0] <()>_R)) -}
-b97e896db4046785635778bbcf939337
+30c92c6b3a7298bb6960abb5177d23d1
   main1 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
@@ -103,13 +103,13 @@ b97e896db4046785635778bbcf939337
 32c71630d381f64c72f8129d0cf48c86
   main13 :: GHC.Base.String
   {- Unfolding: (GHC.CString.unpackCString# "j"#) -}
-985f27dc561aba326523bd258eefef73
+455d94f07fa14e4530e349d7b377533f
   main14 :: Tensor.Restricted.Tensor GHC.Types.Int
   {- Unfolding: (Tensor.Restricted.$fMultilinearTensor_$cgenerate
                    @ GHC.Types.Int
                    Main.main17
                    Main.main15) -}
-e5280cc9ace87ccd0c67a3bf6e4e0f53
+5dab0d2b17917d9f8a9af183c51825c0
   main15 :: GHC.Types.Int -> Tensor.Restricted.Tensor GHC.Types.Int
   {- Arity: 1,
      Unfolding: (\ (i :: GHC.Types.Int) ->
@@ -123,10 +123,10 @@ e5280cc9ace87ccd0c67a3bf6e4e0f53
                     Tensor.Restricted.Scalar
                       @ GHC.Types.Int
                       (GHC.Types.I# (GHC.Prim.+# x ww2)) } } })) -}
-58dc634814aefa4816d384fd83e3f769
+e61ead85c8fdd625c9f4497f5bc6994f
   main16 :: Tensor.Index.TIndex
   {- Strictness: m1,
-     Unfolding: (Tensor.Index.Covariant 50# Main.main13) -}
+     Unfolding: (Tensor.Index.Covariant 500# Main.main13) -}
 84882a1d3d981689251cdf57503bca09
   main17 :: Tensor.Index.TIndex
   {- Unfolding: (Tensor.Index.Contravariant 500# Main.main18) -}
@@ -136,13 +136,13 @@ f464f2addffd05e58b3d052dfabb904e
 402a8ad5aac812109a0d25602010cf53
   main19 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "Starting..."#) -}
-6a124f6e445bc30764f7361d97ae2be8
+7a0bf2c332683a4504498b2fcca332a2
   main2 :: GHC.Base.String
   {- Unfolding: (Tensor.Restricted.$fShowTensor2
                    @ GHC.Types.Int
                    GHC.Show.$fShowInt
                    Main.main3) -}
-06f09fc4bd09c45300862378d3d2e7f6
+16566a4e7a8eb7a48658654001429420
   main20 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
@@ -150,14 +150,14 @@ f464f2addffd05e58b3d052dfabb904e
      Unfolding: (GHC.TopHandler.runMainIO1
                    @ ()
                    Main.main1 `cast` (Sym (GHC.Types.N:IO[0] <()>_R))) -}
-1543d1c3a9db66498190a51b91e60d97
+905b0f2543c8fdc316a5eef397dfc76a
   main3 :: Tensor.Restricted.Tensor GHC.Types.Int
   {- Unfolding: (Tensor.Restricted.$fFloatingTensor26
                    @ GHC.Types.Int
                    GHC.Num.$fNumInt
                    Main.main8
                    Main.main4) -}
-2dea17909c169179abcb16ab43bacff4
+5bd10a3013e8041e2c7889f875722e1e
   main4 :: Tensor.Restricted.Tensor GHC.Types.Int
   {- Unfolding: (Tensor.Restricted.$fMultilinearTensor_$cgenerate
                    @ GHC.Types.Int
@@ -170,13 +170,13 @@ bf0db799ffb21314317a2861a925dba3
                  case i of wild1 { GHC.Types.I# x ->
                  case GHC.Classes.modInt# x 10# of ww2 { DEFAULT ->
                  Tensor.Restricted.Scalar @ GHC.Types.Int (GHC.Types.I# ww2) } }) -}
-ef9cd0cdc5be46e3fe05c04518009483
+2bc7120d1905333354421f191d9b8e95
   main6 :: Tensor.Index.TIndex
-  {- Unfolding: (Tensor.Index.Contravariant 50# Main.main7) -}
+  {- Unfolding: (Tensor.Index.Contravariant 500# Main.main7) -}
 41b8496650e0a1b1a34d88d6e8ffacda
   main7 :: GHC.Base.String
   {- Unfolding: (GHC.CString.unpackCString# "k"#) -}
-61dcff3b845d2f373886e92fe8f8f02e
+4113c2302892b9380f5dee42b692390e
   main8 :: Tensor.Restricted.Tensor GHC.Types.Int
   {- Unfolding: (Tensor.Restricted.$fFloatingTensor26
                    @ GHC.Types.Int

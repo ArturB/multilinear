@@ -86,15 +86,16 @@ _alignTo s n = L.replicate (n - L.length s) ' ' P.++ s
 -- return True if tensor is an error
 _isErrTensor :: Tensor a -> Bool
 _isErrTensor (Err _) = True
-_isErrTensor _ = False
+_isErrTensor _       = False
 
 -- collapse many errors in tensor to the first one
 _collapseErr :: Tensor a -> Tensor a
-_collapseErr t1@(Tensor _ ts) = 
+_collapseErr t1@(Tensor _ ts) =
     let err = find _isErrTensor (_collapseErr <$> ts)
     in fromMaybe t1 err
 _collapseErr t = t
 
+-- Show tensor without collapsing
 show' :: Show a => Tensor a -> String
 show' (Scalar x) = show x
 show' (Tensor index@(Covariant _ _) ts) =
