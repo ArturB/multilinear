@@ -19,7 +19,7 @@ import Tensor.Index
 
 class Functor t => Multilinear t where
     -- Indexing
-    (!?) :: t a -> Int -> t a
+    (!!) :: t a -> Int -> t a
     -- Projection
     --(!!) :: t a -> [(String,Int)] -> Maybe (t a)
     -- Tensor product with Einstein summation convention

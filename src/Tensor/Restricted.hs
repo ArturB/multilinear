@@ -89,7 +89,7 @@ instance Show a => Show (Tensor a) where
     show (Tensor index@(Covariant _ _) ts) =
         show index P.++ " " P.++ show ts
     show (Tensor index@(Contravariant _ _) ts)=
-        show index P.++ " " P.++ _showVectorVertical ts
+        show index P.++ " " P.++ _showVertical ts
     show (Tensor index@(Indifferent _ _) ts) =
         show index P.++ " " P.++ show ts
     show (Err msg) = show msg
@@ -231,12 +231,12 @@ instance Floating a => Floating (Tensor a) where
 -- Tensor operations
 instance Multilinear Tensor where
     -- Safe indexing
-    Scalar _ !? _ = Err $ "(!?): " P.++ indexOutOfRange
-    Tensor _ ts1 !? ind =
-        if isNothing (ts1 !? ind)
-        then Err  $ "(!?): " P.++ indexOutOfRange
-        else ts1 ! ind
-    Err msg !? _ = Err msg
+    Scalar _ !! _ = Err $ "(!): " P.++ indexOutOfRange
+    Tensor _ ts1 !! ind =
+        if isNothing (ts1 P.!! ind)
+        then Err $ "(!): " P.++ indexOutOfRange
+        else ts1 P.!! ind
+    Err msg !! _ = Err msg
 {-
     -- Projection
     Scalar x !! [] = Just $ Scalar x
@@ -329,8 +329,8 @@ switchInd (Scalar x) _ = Scalar x
 switchInd t1 Nothing = t1
 switchInd t1@(Tensor index1 ts1) (Just ind)
     | P.length (indices t1) > 1 && indexName index1 == ind =
-        let index2 = tensorIndex (ts1 ! 0)
-        in Tensor index2 [Tensor index1 [tensorData (ts1 ! j) ! i 
+        let index2 = tensorIndex (head ts1)
+        in Tensor index2 [Tensor index1 [tensorData (ts1 P.!! j) P.!! i 
             | j <- [1 .. indexCount index1]] 
             | i <- [1 .. indexCount index2]]
     | otherwise = t1
@@ -391,10 +391,11 @@ kr4 size =
 (Scalar x) !*! t2 = (x P.*) <$> t2
 t1 !*! (Scalar x) = (P.* x) <$> t1
 t1@(Tensor index1 ts1) !*! t2@(Tensor index2 ts2)
-    | indexName index1 == indexName index2 = t1 `Tensor.Restricted._dot` t2
+    | indexName index1 == indexName index2 = t1 `_dot` t2
     | indexName index1 `P.elem` (indexName <$> indices t2) =
-        T.generate index2 (\i -> t1 !*! (ts2 ! i))
-    | otherwise = T.generate index1 (\i -> (ts1 ! i) !*! t2)
+        T.generate index2 (\i -> t1 !*! (ts2 P.!! i))
+    | otherwise = T.generate index1 (\i -> (ts1 P.!! i) !*! t2)
+
 
 -- Find common index in two tensors, if any
 commonIndex :: Tensor a -> Tensor a -> Maybe String
@@ -404,6 +405,4 @@ commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
     let indicesNames1 = indexName <$> indices t1
         indicesNames2 = indexName <$> indices t2
     in msum $ (\i -> L.find (==i) indicesNames2) <$> indicesNames1
-
-
 
