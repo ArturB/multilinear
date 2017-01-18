@@ -83,16 +83,32 @@ _showVertical v =
 _alignTo :: String -> Int -> String
 _alignTo s n = L.replicate (n - L.length s) ' ' P.++ s
 
+-- return True if tensor is an error
+_isErrTensor :: Tensor a -> Bool
+_isErrTensor (Err _) = True
+_isErrTensor _ = False
+
+-- collapse many errors in tensor to the first one
+_collapseErr :: Tensor a -> Tensor a
+_collapseErr t1@(Tensor _ ts) = 
+    let err = find _isErrTensor (_collapseErr <$> ts)
+    in fromMaybe t1 err
+_collapseErr t = t
+
+show' :: Show a => Tensor a -> String
+show' (Scalar x) = show x
+show' (Tensor index@(Covariant _ _) ts) =
+    show index P.++ " " P.++ show ts
+show' (Tensor index@(Contravariant _ _) ts)=
+    show index P.++ " " P.++ _showVertical ts
+show' (Tensor index@(Indifferent _ _) ts) =
+    show index P.++ " " P.++ show ts
+show' (Err msg) = show msg
+
 -- Print tensor
 instance Show a => Show (Tensor a) where
-    show (Scalar x) = show x
-    show (Tensor index@(Covariant _ _) ts) =
-        show index P.++ " " P.++ show ts
-    show (Tensor index@(Contravariant _ _) ts)=
-        show index P.++ " " P.++ _showVertical ts
-    show (Tensor index@(Indifferent _ _) ts) =
-        show index P.++ " " P.++ show ts
-    show (Err msg) = show msg
+    show t = show' $ _collapseErr t
+
 
 -- Tensor is a Functor
 instance Functor Tensor where

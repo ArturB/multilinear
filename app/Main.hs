@@ -15,10 +15,10 @@ import           Tensor.Multilinear as T
 
 m1 :: Tensor Int
 m1 = T.generate (Contravariant 500 "i")
-        (\i -> T.generate (Covariant 500 "j") (\j -> Scalar $ i + j `mod` 10))
+        (\i -> T.generate (Covariant 50 "j") (\j -> Scalar $ i + j `mod` 10))
 
 m2 :: Tensor Int
-m2 = T.generate (Contravariant 50 "j")
+m2 = T.generate (Contravariant 500 "j")
         (\i -> T.generate (Covariant 500 "k") (\j -> Scalar $ i + j `mod` 10))
 
 m3 :: Tensor Int
