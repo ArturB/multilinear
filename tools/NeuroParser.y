@@ -317,7 +317,7 @@ repl ts = do
 
 main :: IO a
 main = do
-	putStrLn "Welcome to Glorious NeuroL Interpreter 0.1!\nPlease type a command now..."
+	putStrLn "Welcome to Glorious NeuroL Interpreter 0.1!"
 	hFlush stdout
 	isSession <- doesFileExist "~neurol.tmp"
 	if isSession
@@ -328,11 +328,11 @@ main = do
 		let decoded = decodeOrFail (decompress (seq (B.length bs) bs))
 		either 
 			(\(_,_,msg) -> do
-				putStrLn $ msg P.++ " Starting from clear session.\n"
+				putStrLn $ msg P.++ " Starting from clear session.\nPlease type a command now..."
 				repl M.empty
 			)
 			(\(_,_,ts) -> do
-				putStrLn "Session read!"
+				putStrLn "Session read!\nPlease type a command now..."
 				repl ts)
 			decoded
 	else repl M.empty

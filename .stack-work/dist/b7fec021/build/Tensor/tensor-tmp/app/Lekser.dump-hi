@@ -1,0 +1,1176 @@
+
+==================== FINAL INTERFACE ====================
+2017-01-18 22:15:28.8729097 UTC
+
+interface main@main:Lekser 8001
+  interface hash: 6fafc599de821e0a17b5012d437949e7
+  ABI hash: 09e5f9e41d812e741fe16be2a574336f
+  export-list hash: 63ec72f37d94669abd9f174c9a3a8696
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: 6b4f12d9ad203a325946b15f27de521a
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Lekser.alexScanTokens
+  Lekser.Token{Lekser.All Lekser.As Lekser.AssignOperator Lekser.Binds Lekser.Boolean Lekser.Clear Lekser.CloseBlock Lekser.ClosingBracket Lekser.Colon Lekser.Comma Lekser.ConnectOperator Lekser.ContravariantClose Lekser.ContravariantOpen Lekser.CovariantClose Lekser.CovariantOpen Lekser.Dot Lekser.Else Lekser.Exit Lekser.Experiment Lekser.FilePath Lekser.First Lekser.From Lekser.Get Lekser.Guard Lekser.If Lekser.Import Lekser.Index Lekser.InfiksAddBool Lekser.InfiksAddNum Lekser.InfiksComp Lekser.InfiksMultBool Lekser.InfiksMultNum Lekser.InfiksPowNum Lekser.Input Lekser.Integer Lekser.Interpolation Lekser.Layer Lekser.Learn Lekser.Learning Lekser.LearningType Lekser.Maxtime Lekser.Module Lekser.Name Lekser.Natural Lekser.Negate Lekser.Network Lekser.NormBinary Lekser.NormUnary Lekser.OpenBlock Lekser.OpeningBracket Lekser.PrefiksBinary Lekser.PrefiksBoolNeg Lekser.PrefiksUnary Lekser.Quantifier Lekser.Real Lekser.Semicolon Lekser.TensUnary Lekser.TensorProduct Lekser.Then Lekser.Time}
+module dependencies:
+package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.0.0
+                      ghc-prim-0.5.0.0 integer-gmp-1.0.0.1
+orphans: base-4.9.0.0:GHC.Base base-4.9.0.0:GHC.Float
+family instance modules: base-4.9.0.0:Control.Applicative
+                         base-4.9.0.0:Data.Either base-4.9.0.0:Data.Functor.Const
+                         base-4.9.0.0:Data.Monoid base-4.9.0.0:Data.Type.Equality
+                         base-4.9.0.0:Data.Version base-4.9.0.0:GHC.Exts
+                         base-4.9.0.0:GHC.Generics base-4.9.0.0:GHC.IO.Exception
+                         base-4.9.0.0:GHC.TypeLits
+import  -/  array-0.5.1.1@array-0.5.1.1:Data.Array 01310623526f8acc73d1bb69e9d9530a
+import  -/  array-0.5.1.1@array-0.5.1.1:Data.Array.Base 4ef72729276b10ae08cf56ce3818cecd
+import  -/  base-4.9.0.0:Data.Bits c954f6297e2203ba924b7d4bb91aa2cf
+import  -/  base-4.9.0.0:Data.Char 793b969914b1622fef8ab278ed0a2b7f
+import  -/  base-4.9.0.0:Data.Word cf9c7419e077bbdd2be059981bfe778f
+import  -/  base-4.9.0.0:GHC.Arr 5b2eaa2ae8ea7c2b81f0c13a6f0fb75d
+import  -/  base-4.9.0.0:GHC.Base dd8044a8d640eee51828c17c476a6ba7
+import  -/  base-4.9.0.0:GHC.Err 20faef8829fd13c027d0ee2213637534
+import  -/  base-4.9.0.0:GHC.List 47d436dfb7454bb1883fb4d943e3f389
+import  -/  base-4.9.0.0:GHC.Num f0aed3315b3ed1b330b71fc4148a5581
+import  -/  base-4.9.0.0:GHC.Real 011de9ca3282ad24a84e4e15f974f98e
+import  -/  base-4.9.0.0:GHC.Show 0b5845243cb2ec62b57dd6963d276ec6
+import  -/  base-4.9.0.0:Prelude 2d9cd8b0ec3d728f62b734df888d2e34
+import  -/  base-4.9.0.0:Text.Read 575a1becf4a56881b7def2de5a4c3776
+import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
+addDependentFile "C:\Program Files\Haskell Platform\8.0.1\lib\include\ghcconfig.h"
+addDependentFile "C:\Program Files\Haskell Platform\8.0.1\lib\include\ghcplatform.h"
+addDependentFile "C:\Program Files\Haskell Platform\8.0.1\lib\include\ghcautoconf.h"
+addDependentFile "C:\Program Files\Haskell Platform\8.0.1\lib\include\ghcversion.h"
+addDependentFile ".stack-work\dist\b7fec021\build\autogen\cabal_macros.h"
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fEqToken :: GHC.Classes.Eq Lekser.Token
+  DFunId
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Lekser.Token Lekser.$fEqToken_$c== Lekser.$fEqToken_$c/= -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fEqToken_$c/= :: Lekser.Token -> Lekser.Token -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ (a :: Lekser.Token) (b :: Lekser.Token) ->
+                 case Lekser.$fEqToken_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fEqToken_$c== :: Lekser.Token -> Lekser.Token -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U> -}
+c5ebfa74aa037ccc90109baaa36bbae4
+  $fFunctorAlexLastAcc :: GHC.Base.Functor Lekser.AlexLastAcc
+  DFunId
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Lekser.AlexLastAcc
+                  Lekser.$fFunctorAlexLastAcc_$cfmap
+                  Lekser.$fFunctorAlexLastAcc_$c<$ -}
+c5ebfa74aa037ccc90109baaa36bbae4
+  $fFunctorAlexLastAcc_$c<$ ::
+    a -> Lekser.AlexLastAcc b -> Lekser.AlexLastAcc a
+  {- Arity: 2, HasNoCafRefs, Strictness: <L,U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a @ b (eta :: a) (ds :: Lekser.AlexLastAcc b) ->
+                 case ds of wild {
+                   Lekser.AlexNone -> Lekser.AlexNone @ a
+                   Lekser.AlexLastAcc x y dt -> Lekser.AlexLastAcc @ a eta y dt
+                   Lekser.AlexLastSkip x dt -> Lekser.AlexLastSkip @ a x dt }) -}
+c5ebfa74aa037ccc90109baaa36bbae4
+  $fFunctorAlexLastAcc_$cfmap ::
+    (a -> b) -> Lekser.AlexLastAcc a -> Lekser.AlexLastAcc b
+  {- Arity: 2, HasNoCafRefs, Strictness: <L,1*C1(U)><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a @ b (ds :: a -> b) (ds1 :: Lekser.AlexLastAcc a) ->
+                 case ds1 of wild {
+                   Lekser.AlexNone -> Lekser.AlexNone @ b
+                   Lekser.AlexLastAcc x y dt -> Lekser.AlexLastAcc @ b (ds x) y dt
+                   Lekser.AlexLastSkip x dt -> Lekser.AlexLastSkip @ b x dt }) -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fShowToken :: GHC.Show.Show Lekser.Token
+  DFunId
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Lekser.Token
+                  Lekser.$fShowToken_$cshowsPrec
+                  Lekser.$fShowToken_$cshow
+                  Lekser.$fShowToken_$cshowList -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fShowToken1 :: Lekser.Token -> GHC.Show.ShowS
+  {- Arity: 1,
+     Unfolding: (Lekser.$fShowToken_$cshowsPrec Lekser.$fShowToken2) -}
+fb591468769bc4db57049f434db78b5c
+  $fShowToken2 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 0#) -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fShowToken_$cshow :: Lekser.Token -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ (x :: Lekser.Token) ->
+                 Lekser.$fShowToken_$cshowsPrec
+                   GHC.Show.shows22
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fShowToken_$cshowList :: [Lekser.Token] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ Lekser.Token
+                   Lekser.$fShowToken1) -}
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  $fShowToken_$cshowsPrec ::
+    GHC.Types.Int -> Lekser.Token -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <L,1*U(U)><S,1*U> -}
+d47bd2a8a944a62c1cc09b7b0b10fe72
+  $tc'AlexAcc :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11993462712168640755##
+                   2551879647308803058##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexAcc1) -}
+dd580e6a0c9f7f77268e2055cf5f5d3c
+  $tc'AlexAcc1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexAcc"#) -}
+0ad62fa500793aad76d6079de91a24eb
+  $tc'AlexAccNone :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   18317959113682254601##
+                   6344130633630281536##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexAccNone1) -}
+4f729aeb92804e0d6db7c908ce6b94c0
+  $tc'AlexAccNone1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexAccNone"#) -}
+4fa93ac5fb799579a61ef54b61764977
+  $tc'AlexAccPred :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11260297333723142866##
+                   12464270010808458113##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexAccPred1) -}
+4eba19bdedc7740d98f5c83bdf172655
+  $tc'AlexAccPred1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexAccPred"#) -}
+a259bbccea4b669676c09edd89700e64
+  $tc'AlexAccSkip :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   15435837651542384479##
+                   983808507687756889##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexAccSkip1) -}
+97b2d346ea58cc2da94744166bea106b
+  $tc'AlexAccSkip1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexAccSkip"#) -}
+93f35295c06d34ba3f6c7f104fef8e61
+  $tc'AlexAccSkipPred :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   3954419058872142842##
+                   9078804231125975880##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexAccSkipPred1) -}
+3aba1693fe96dc60aa2b61a50dc3e70c
+  $tc'AlexAccSkipPred1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexAccSkipPred"#) -}
+cf96f896b52aa64c60ff00a98fd086ad
+  $tc'AlexEOF :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6396279676899946640##
+                   2701783223526540472##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexEOF1) -}
+e5f1c5895aed9a7206930aabdeeec5ba
+  $tc'AlexEOF1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexEOF"#) -}
+cb8a3dfccc0c961d5fc7c6f321bf30e9
+  $tc'AlexError :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9728380876561232943##
+                   7588225187229992066##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexError1) -}
+621d0cc945d79e3d123d2b2c31a53dc7
+  $tc'AlexError1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexError"#) -}
+a0f1cced956aef1ca0a2dc9c896ef151
+  $tc'AlexLastAcc :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9026936607358714589##
+                   17759123272280277115##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexLastAcc1) -}
+9fcaee1a44ba47a9550614aea5b3a467
+  $tc'AlexLastAcc1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexLastAcc"#) -}
+46482f81a6a7632531235a2654a39b9b
+  $tc'AlexLastSkip :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9671634024774652119##
+                   8468639289888825579##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexLastSkip1) -}
+f83ad7439d4802f46a5553563d929af7
+  $tc'AlexLastSkip1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexLastSkip"#) -}
+74cbcbd63c0b28e127ffa51cbb1450a8
+  $tc'AlexNone :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1169280795281177469##
+                   18429210174920805557##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexNone1) -}
+c814b76ea655303e578167b1c093279b
+  $tc'AlexNone1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexNone"#) -}
+bbfb279013590bb5e0dd050446a6ae18
+  $tc'AlexSkip :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1790400765643120367##
+                   14805891886831857303##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexSkip1) -}
+012d267de1be98c09e0921d4950345cc
+  $tc'AlexSkip1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexSkip"#) -}
+6e40fab46371485f7d9fb325d8bf87b7
+  $tc'AlexToken :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11696513311721671923##
+                   15086420090532357246##
+                   Lekser.$trModule
+                   Lekser.$tc'AlexToken1) -}
+8388b15823b6002580cfde4c9c166173
+  $tc'AlexToken1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AlexToken"#) -}
+4f70384602088b24c9e049c4b2a54c64
+  $tc'All :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11034128816809076342##
+                   9785855725715986776##
+                   Lekser.$trModule
+                   Lekser.$tc'All1) -}
+182729e007a8125eaffe8e511202a415
+  $tc'All1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'All"#) -}
+4ac769b7def9433376efecd4ddae1c7a
+  $tc'As :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   15039221942304582268##
+                   13324541994523919313##
+                   Lekser.$trModule
+                   Lekser.$tc'As1) -}
+c494a53c51f4c5fd1dae1bf359eecde5
+  $tc'As1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'As"#) -}
+e811eee7e413f42394e120fd95a66079
+  $tc'AssignOperator :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11330878112474232657##
+                   381390073679904515##
+                   Lekser.$trModule
+                   Lekser.$tc'AssignOperator1) -}
+c1073487d6de8fecd08f452385a9c34f
+  $tc'AssignOperator1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'AssignOperator"#) -}
+ea341d08547b279fb603d18ddcde6d0c
+  $tc'Binds :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6955097429191654812##
+                   12091586935587190282##
+                   Lekser.$trModule
+                   Lekser.$tc'Binds1) -}
+f6bb95a9b5a5d32c8327b18f08c2224f
+  $tc'Binds1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Binds"#) -}
+78076b35e6640631c09f529268bb9fcc
+  $tc'Boolean :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   4976788249008607351##
+                   12296980212117541815##
+                   Lekser.$trModule
+                   Lekser.$tc'Boolean1) -}
+226604874ab3653bcfde8c6ddff04a18
+  $tc'Boolean1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Boolean"#) -}
+bcd27f29112990f9b8f9b6f20f530547
+  $tc'Clear :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13777414773827823521##
+                   15988386611085896553##
+                   Lekser.$trModule
+                   Lekser.$tc'Clear1) -}
+f7902d9ecd11144e2cff3a348b24ddf1
+  $tc'Clear1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Clear"#) -}
+cc76ecdfbe0d2f9f63cd8aed7f5e50df
+  $tc'CloseBlock :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13775172113430093388##
+                   9899940028063557297##
+                   Lekser.$trModule
+                   Lekser.$tc'CloseBlock1) -}
+ee666056d00ed532573d8f4943b8c81b
+  $tc'CloseBlock1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'CloseBlock"#) -}
+f5e9345e1df9e18bbbbb2580f615689e
+  $tc'ClosingBracket :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   14810210607394431621##
+                   11439197444155242517##
+                   Lekser.$trModule
+                   Lekser.$tc'ClosingBracket1) -}
+280040d368c1aec6e6effabc271f5db3
+  $tc'ClosingBracket1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'ClosingBracket"#) -}
+77ccf2b269a4e791dd456757ca9225b2
+  $tc'Colon :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   3939739102097226553##
+                   5093871873172929925##
+                   Lekser.$trModule
+                   Lekser.$tc'Colon1) -}
+176e2591ffaf9f87e2a139853af7a9ff
+  $tc'Colon1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Colon"#) -}
+43e76eb693d6336ec3882f19e258cacb
+  $tc'Comma :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   10877946322479388869##
+                   7484311348513748525##
+                   Lekser.$trModule
+                   Lekser.$tc'Comma1) -}
+b8d9fed8943951aef156a3cd791884e6
+  $tc'Comma1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Comma"#) -}
+ef4a495e7c90a9cee4ff97dc3aaabf68
+  $tc'ConnectOperator :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   2557550365894273509##
+                   4273067230249358621##
+                   Lekser.$trModule
+                   Lekser.$tc'ConnectOperator1) -}
+3e3e0f1fcab4a14ba24e10709fd6e1b1
+  $tc'ConnectOperator1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'ConnectOperator"#) -}
+ea039966ab060ac2ffb98426a6e2c833
+  $tc'ContravariantClose :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6033059982645281355##
+                   13735761918999994370##
+                   Lekser.$trModule
+                   Lekser.$tc'ContravariantClose1) -}
+36f6b17a4ed99f22b1792ad8b397753c
+  $tc'ContravariantClose1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'ContravariantClose"#) -}
+192e23a61b7bd2b1aaa703d042cb4297
+  $tc'ContravariantOpen :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1122709696802101327##
+                   17935614248180311861##
+                   Lekser.$trModule
+                   Lekser.$tc'ContravariantOpen1) -}
+f61fa7cebc9b7e6850b295d5c846cd99
+  $tc'ContravariantOpen1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'ContravariantOpen"#) -}
+8ac1ac0be38b4ad8b28ccc1c7d6fc9d6
+  $tc'CovariantClose :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1785974248497446843##
+                   6205052660584586476##
+                   Lekser.$trModule
+                   Lekser.$tc'CovariantClose1) -}
+fb283ab9253a0e242d0ea9dfb863f161
+  $tc'CovariantClose1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'CovariantClose"#) -}
+730bd00fef71eae8f37229d3299c5a16
+  $tc'CovariantOpen :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1399319193020485011##
+                   6894299673718574316##
+                   Lekser.$trModule
+                   Lekser.$tc'CovariantOpen1) -}
+55a69e69aa34201d1d82c14525bb24f1
+  $tc'CovariantOpen1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'CovariantOpen"#) -}
+fe1a07a6a7c48ec4afd2bdcf92233e44
+  $tc'Dot :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   3514028229785547151##
+                   3213662242543357661##
+                   Lekser.$trModule
+                   Lekser.$tc'Dot1) -}
+a909a0d4531419aadd7a87ad9151550f
+  $tc'Dot1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Dot"#) -}
+5b8791636e2a0fe2494b3be991ef8958
+  $tc'Else :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6222820452626706799##
+                   13480569786959060153##
+                   Lekser.$trModule
+                   Lekser.$tc'Else1) -}
+ce6b2d1f4b0984acbf13be0e5264021d
+  $tc'Else1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Else"#) -}
+cff00bde6ae54af10a79e00184dc7c0e
+  $tc'Exit :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   10197105254259505318##
+                   5448379890310877413##
+                   Lekser.$trModule
+                   Lekser.$tc'Exit1) -}
+ccd5dbe3be534b9d655fcc7bda732e1b
+  $tc'Exit1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Exit"#) -}
+fb1fda69987d7aed197a0234ac52933c
+  $tc'Experiment :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   4462830751260493448##
+                   14604734152187771425##
+                   Lekser.$trModule
+                   Lekser.$tc'Experiment1) -}
+3164feb863f4989607cb97e9543d81db
+  $tc'Experiment1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Experiment"#) -}
+8025a8f238ba50ddbf2312ad76510653
+  $tc'FilePath :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13927747090430129261##
+                   7419060140438547961##
+                   Lekser.$trModule
+                   Lekser.$tc'FilePath1) -}
+d0bf3c2d6ce279868e21daf8a24d58b1
+  $tc'FilePath1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'FilePath"#) -}
+78043288583250c2072933eecd1f34c0
+  $tc'First :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   15858379823773431928##
+                   482240885502376205##
+                   Lekser.$trModule
+                   Lekser.$tc'First1) -}
+62dd0869f84b05e74f14d45e32773490
+  $tc'First1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'First"#) -}
+70e9c36a05954231c034ae2010538d63
+  $tc'From :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   2962312844985183840##
+                   16616377672657615762##
+                   Lekser.$trModule
+                   Lekser.$tc'From1) -}
+8070e5b743cd97bdeb9870db0209832f
+  $tc'From1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'From"#) -}
+59e805abdc7aad2dd8fef8c36b7aefaa
+  $tc'Get :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   8257576103729484735##
+                   7792514673496165579##
+                   Lekser.$trModule
+                   Lekser.$tc'Get1) -}
+d884b244d5fe90f7b6ab2501d496077c
+  $tc'Get1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Get"#) -}
+e0aa856a948774ce40cc1b260b318e96
+  $tc'Guard :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   5369729142516699835##
+                   9287428088910981595##
+                   Lekser.$trModule
+                   Lekser.$tc'Guard1) -}
+ef8aeda16d1dbeb8800a2d070cd3666a
+  $tc'Guard1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Guard"#) -}
+da99b40deeb52152a5c7359a93f4e406
+  $tc'If :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9639252782367640559##
+                   774833753421222127##
+                   Lekser.$trModule
+                   Lekser.$tc'If1) -}
+679627c33d064ac1ec63d3dd349a07c8
+  $tc'If1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'If"#) -}
+c23e06e11dc9ed78f44fa0f83d26549d
+  $tc'Import :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   15956764966730931297##
+                   16248192609189034831##
+                   Lekser.$trModule
+                   Lekser.$tc'Import1) -}
+ffa2639132a8ae0800b6a2e85321519f
+  $tc'Import1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Import"#) -}
+d06eb1870c06365a255765d39ed3f83c
+  $tc'Index :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6697581860656205498##
+                   16657090104870625597##
+                   Lekser.$trModule
+                   Lekser.$tc'Index1) -}
+4b338056f79d2562279633b2f5d821fe
+  $tc'Index1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Index"#) -}
+4b5882579a8d68f1d66139056f7bb7d7
+  $tc'InfiksAddBool :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6882422859732783532##
+                   5717907227996729163##
+                   Lekser.$trModule
+                   Lekser.$tc'InfiksAddBool1) -}
+ce051f371c9c4824c7ecf81ea6f11b0d
+  $tc'InfiksAddBool1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'InfiksAddBool"#) -}
+54b372c2a49fcd8aae16ff5712640cad
+  $tc'InfiksAddNum :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   2165211073865286779##
+                   5582899858935080275##
+                   Lekser.$trModule
+                   Lekser.$tc'InfiksAddNum1) -}
+0ea832cd507e7bb0c1470f35eda0a1b0
+  $tc'InfiksAddNum1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'InfiksAddNum"#) -}
+a13c0571723c3f9638a1d7847c6385ed
+  $tc'InfiksComp :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   3236559822255492269##
+                   7272861277553678337##
+                   Lekser.$trModule
+                   Lekser.$tc'InfiksComp1) -}
+07de9983eb24a2302955e0f30d95043e
+  $tc'InfiksComp1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'InfiksComp"#) -}
+d442dc9118f616c6b9c6e6d8768bb471
+  $tc'InfiksMultBool :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9209676125407753156##
+                   1842728695242576448##
+                   Lekser.$trModule
+                   Lekser.$tc'InfiksMultBool1) -}
+5e1b1fb7112a71e155e5450d5de431a8
+  $tc'InfiksMultBool1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'InfiksMultBool"#) -}
+38c81803c9d160ff5f255c133b5aefb3
+  $tc'InfiksMultNum :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9420034900035036686##
+                   14999022188144219691##
+                   Lekser.$trModule
+                   Lekser.$tc'InfiksMultNum1) -}
+8001a0b36ed34b50763edc8c9d1fa71e
+  $tc'InfiksMultNum1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'InfiksMultNum"#) -}
+591d2fd12425f171f732755dd9e17853
+  $tc'InfiksPowNum :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   5602433254979056548##
+                   3662212089301609615##
+                   Lekser.$trModule
+                   Lekser.$tc'InfiksPowNum1) -}
+65e6c68b3806e9ec570e3721e2ea4af2
+  $tc'InfiksPowNum1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'InfiksPowNum"#) -}
+52d732cc09e14a8d7d1ccbba25ef3283
+  $tc'Input :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   7624819469111898197##
+                   4677646215850334177##
+                   Lekser.$trModule
+                   Lekser.$tc'Input1) -}
+849907bdafbfffcf738603ff33124695
+  $tc'Input1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Input"#) -}
+54c8d1fa5818cb7459cf016c3cc5c45e
+  $tc'Integer :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   4187508497398917733##
+                   1108088308120673389##
+                   Lekser.$trModule
+                   Lekser.$tc'Integer1) -}
+76f8f3fe9f15dcfe0a0ca3c443d9ef42
+  $tc'Integer1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Integer"#) -}
+1387364887df9a103ea5584376a829f1
+  $tc'Interpolation :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6700577132710050220##
+                   11545931955099453870##
+                   Lekser.$trModule
+                   Lekser.$tc'Interpolation1) -}
+725b71fbea3447d25f5cff58db966e01
+  $tc'Interpolation1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Interpolation"#) -}
+b4c9416ae8782d9a5db5ecbf5fdb6426
+  $tc'Layer :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   362748995642806564##
+                   16254626907260825552##
+                   Lekser.$trModule
+                   Lekser.$tc'Layer1) -}
+72a41a8b6e9d748759b1846052175967
+  $tc'Layer1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Layer"#) -}
+75c92ce9faaf907b143527199c3efce1
+  $tc'Learn :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11593502645526440907##
+                   14552409204912219952##
+                   Lekser.$trModule
+                   Lekser.$tc'Learn1) -}
+f18ba519b7e14ddfc5c0baa900f57f08
+  $tc'Learn1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Learn"#) -}
+88169d181816bd08d9a6790ece15a0d0
+  $tc'Learning :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   4258012456405126010##
+                   2019300956686206338##
+                   Lekser.$trModule
+                   Lekser.$tc'Learning1) -}
+dee9b2b36b0c4a9cea957a5611eb178e
+  $tc'Learning1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Learning"#) -}
+c6e45a70aa2d86a7d45ce2c66871869e
+  $tc'LearningType :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   10397781186333207261##
+                   11803718969944494388##
+                   Lekser.$trModule
+                   Lekser.$tc'LearningType1) -}
+d3b826f5b35e158f19e33fb6ba812852
+  $tc'LearningType1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'LearningType"#) -}
+eaccf036d76e9e3b161a3a3d1ebf4fc9
+  $tc'Maxtime :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9976487407045160597##
+                   217930358937326089##
+                   Lekser.$trModule
+                   Lekser.$tc'Maxtime1) -}
+a5f74f6899695dbc5da93c4acf84e0bc
+  $tc'Maxtime1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Maxtime"#) -}
+096ac80b755dd9eeb64f655fc5eb3455
+  $tc'Module :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11740924010710098442##
+                   17447801241501421640##
+                   Lekser.$trModule
+                   Lekser.$tc'Module1) -}
+e2f98c12a7141a2114576d25d521802e
+  $tc'Module1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Module"#) -}
+6a652f39a2aaf4ca9d563d8a5d31fea7
+  $tc'Name :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   3393642041964634434##
+                   867994390220995740##
+                   Lekser.$trModule
+                   Lekser.$tc'Name1) -}
+b6bbef9afee51dfffd2917cf058d2d35
+  $tc'Name1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Name"#) -}
+f5bc2516d34847d506bc07c8b140af04
+  $tc'Natural :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   5283254864002050181##
+                   9757226421711387833##
+                   Lekser.$trModule
+                   Lekser.$tc'Natural1) -}
+ceb4e927dcb17e84d52169143a036a62
+  $tc'Natural1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Natural"#) -}
+1ca899a5ae36d951665ce4b1d222942a
+  $tc'Negate :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13696561680722986292##
+                   617265149072740633##
+                   Lekser.$trModule
+                   Lekser.$tc'Negate1) -}
+e4a732870541aebc6dae58565cf1aa31
+  $tc'Negate1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Negate"#) -}
+6dabbe95ffd292217c70f97f53a54a5a
+  $tc'Network :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1868256427781227539##
+                   3500267650931556183##
+                   Lekser.$trModule
+                   Lekser.$tc'Network1) -}
+19ceb1dda88e0fce6a3343d0c3fdc9ef
+  $tc'Network1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Network"#) -}
+370b38f84a9f587bda670379425bbbfa
+  $tc'NormBinary :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9477799190786958827##
+                   6186961179524239290##
+                   Lekser.$trModule
+                   Lekser.$tc'NormBinary1) -}
+47a18b24f402c9018a39596ed1ce9d9a
+  $tc'NormBinary1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'NormBinary"#) -}
+6159adc7ddb4cfcb4b70c47c34d10d93
+  $tc'NormUnary :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   6856361471583210451##
+                   9138758642132013345##
+                   Lekser.$trModule
+                   Lekser.$tc'NormUnary1) -}
+e6dfd360776d5eda30822ca1df35d708
+  $tc'NormUnary1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'NormUnary"#) -}
+d8f9104fc4f4d1175b8f86482f55c1b8
+  $tc'OpenBlock :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13724119945595363629##
+                   5509933360474164002##
+                   Lekser.$trModule
+                   Lekser.$tc'OpenBlock1) -}
+93a2b02ac61b69aff484afad332f4e2c
+  $tc'OpenBlock1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'OpenBlock"#) -}
+5dba3c021207796d3dd7606f3a397d0b
+  $tc'OpeningBracket :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   15027523758488981641##
+                   5584788714844531714##
+                   Lekser.$trModule
+                   Lekser.$tc'OpeningBracket1) -}
+8c92bc3a1a62b06cd68aa432a61b46a3
+  $tc'OpeningBracket1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'OpeningBracket"#) -}
+596f76cae9fe38efec4089321343b070
+  $tc'PrefiksBinary :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   12100486563413500350##
+                   17131127743475595362##
+                   Lekser.$trModule
+                   Lekser.$tc'PrefiksBinary1) -}
+baa5671a39d03e1e1d57750153d40907
+  $tc'PrefiksBinary1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'PrefiksBinary"#) -}
+98bccbec74e9e97650544b39c773430b
+  $tc'PrefiksBoolNeg :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   8156076861398433215##
+                   7481422887482066326##
+                   Lekser.$trModule
+                   Lekser.$tc'PrefiksBoolNeg1) -}
+9baf19497915847b4acdbee5cd907f7d
+  $tc'PrefiksBoolNeg1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'PrefiksBoolNeg"#) -}
+d2615da9cc06b9ca188657318bf88146
+  $tc'PrefiksUnary :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   1051207054129553393##
+                   12881342250329345179##
+                   Lekser.$trModule
+                   Lekser.$tc'PrefiksUnary1) -}
+c744297d46856aebce2a71441f13d58a
+  $tc'PrefiksUnary1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'PrefiksUnary"#) -}
+fdfb505ed165bd4a74242cc8ede1f934
+  $tc'Quantifier :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   16028396788702870710##
+                   12102435277358979140##
+                   Lekser.$trModule
+                   Lekser.$tc'Quantifier1) -}
+ca920981f915f2e4bb0c61682065d2b2
+  $tc'Quantifier1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Quantifier"#) -}
+9fb0489eb060b90c0ea81247064d5eb2
+  $tc'Real :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   4054116396814962541##
+                   14192185525029176323##
+                   Lekser.$trModule
+                   Lekser.$tc'Real1) -}
+206a1763607efe0d444f24e99179cee3
+  $tc'Real1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Real"#) -}
+a5ac9790e1469fe283aa0d3b01eed35c
+  $tc'Semicolon :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   9087270687515099166##
+                   3851877798316377518##
+                   Lekser.$trModule
+                   Lekser.$tc'Semicolon1) -}
+89f36382f752e5c72d4325c19b69e2d0
+  $tc'Semicolon1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Semicolon"#) -}
+7e8ee97ae03db9929afc5a03b98c7353
+  $tc'TensUnary :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   15433255830451777941##
+                   5544900163976396255##
+                   Lekser.$trModule
+                   Lekser.$tc'TensUnary1) -}
+b2f6098430948704d4285e12f40920c8
+  $tc'TensUnary1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'TensUnary"#) -}
+ad5fe752aa577235e60abbb70309dd08
+  $tc'TensorProduct :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11260009914562199149##
+                   12049478179146204787##
+                   Lekser.$trModule
+                   Lekser.$tc'TensorProduct1) -}
+c3a2106abe6bea3abe4fc5b91642a47e
+  $tc'TensorProduct1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'TensorProduct"#) -}
+cb90e2f83f6714762679149cb48eb3b1
+  $tc'Then :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   7529913978529934576##
+                   1853494890468301956##
+                   Lekser.$trModule
+                   Lekser.$tc'Then1) -}
+e84402c43b94cf0bdf96fd81b40b416f
+  $tc'Then1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Then"#) -}
+db7bd0a4c1b6efe39a38b94506449607
+  $tc'Time :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   202752799844466462##
+                   3906885296532686497##
+                   Lekser.$trModule
+                   Lekser.$tc'Time1) -}
+2ba1a4c43a4d1d6b8c50da22f7dfb187
+  $tc'Time1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Time"#) -}
+ea8ce4a63ee8ce23ad759ac57303458b
+  $tcAlexAcc :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   7040068166469632706##
+                   13155361918356162515##
+                   Lekser.$trModule
+                   Lekser.$tcAlexAcc1) -}
+0f1b6504a98a8ae8703d7b99134ee993
+  $tcAlexAcc1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "AlexAcc"#) -}
+86dd82abffe133e48263a5c779b4fd49
+  $tcAlexLastAcc :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13795819687934638518##
+                   12614209489951783795##
+                   Lekser.$trModule
+                   Lekser.$tcAlexLastAcc1) -}
+b6dda6c788988046ae65fd9114705ece
+  $tcAlexLastAcc1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "AlexLastAcc"#) -}
+5e1dd0fa17e50efdacdfe6275f799b15
+  $tcAlexReturn :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   3687647178597929756##
+                   8553673898970798276##
+                   Lekser.$trModule
+                   Lekser.$tcAlexReturn1) -}
+fb2f6919851e003fa05c09eb6d29a279
+  $tcAlexReturn1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "AlexReturn"#) -}
+5b5191595ab27801f061b6863184e70d
+  $tcToken :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13571777593385384367##
+                   18075103478660632397##
+                   Lekser.$trModule
+                   Lekser.$tcToken1) -}
+bf3dd7d6e110fdbde640793c3352d72a
+  $tcToken1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Token"#) -}
+f5481c90cf83000b34848742ee3320b3
+  $trModule :: GHC.Types.Module
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.Module
+                   Lekser.$trModule2
+                   Lekser.$trModule1) -}
+a7ef529ebeb6f590f6244b6cf250b962
+  $trModule1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Lekser"#) -}
+9a3c9f4452ea5d368fed10b096c001f8
+  $trModule2 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "main"#) -}
+d2ab576ab023825fd6009ec36c38e3f7
+  $wgo ::
+    GHC.Types.Char
+    -> [Lekser.Byte] -> GHC.Base.String -> [Lekser.Token]
+  {- Arity: 3, Strictness: <L,U><S,U><L,U>, Inline: [0] -}
+eef64347df8c583774ab1f8dfb6927fa
+  data AlexAcc a user
+    = AlexAccNone
+    | AlexAcc a
+    | AlexAccSkip
+    | AlexAccPred a (Lekser.AlexAccPred user) (Lekser.AlexAcc a user)
+    | AlexAccSkipPred (Lekser.AlexAccPred user) (Lekser.AlexAcc a user)
+acfd30c6842bded9acebb19c86906126
+  type AlexAccPred user =
+    user
+    -> Lekser.AlexInput
+    -> GHC.Types.Int
+    -> Lekser.AlexInput
+    -> GHC.Types.Bool
+cc51331266d062b19c84e409830ab0d9
+  type AlexInput = (GHC.Types.Char, [Lekser.Byte], GHC.Base.String)
+c5ebfa74aa037ccc90109baaa36bbae4
+  data AlexLastAcc a
+    = AlexNone
+    | AlexLastAcc a !Lekser.AlexInput {-# UNPACK #-}GHC.Types.Int
+    | AlexLastSkip !Lekser.AlexInput {-# UNPACK #-}GHC.Types.Int
+b78549c8e5dedd7f7ffd56723291c05f
+  data AlexReturn a
+    = AlexEOF
+    | AlexError !Lekser.AlexInput
+    | AlexSkip !Lekser.AlexInput {-# UNPACK #-}GHC.Types.Int
+    | AlexToken !Lekser.AlexInput {-# UNPACK #-}GHC.Types.Int a
+91d89414e709aad5d2e06898d6251eb6
+  type Byte = GHC.Word.Word8
+80ec8abd7ecd5bfa04be43f61c84ea3a
+  data Token
+    = OpeningBracket
+    | ClosingBracket
+    | ContravariantOpen
+    | ContravariantClose
+    | CovariantOpen
+    | CovariantClose
+    | OpenBlock
+    | CloseBlock
+    | Semicolon
+    | Dot
+    | Comma
+    | Colon
+    | Natural GHC.Types.Int
+    | Integer GHC.Types.Int
+    | Real GHC.Types.Double
+    | Name GHC.Base.String
+    | Index GHC.Base.String
+    | Time
+    | Boolean GHC.Types.Bool
+    | FilePath GHC.Base.String
+    | Negate
+    | InfiksAddNum GHC.Base.String
+    | InfiksMultNum GHC.Base.String
+    | InfiksPowNum GHC.Base.String
+    | InfiksMultBool GHC.Base.String
+    | InfiksAddBool GHC.Base.String
+    | PrefiksBoolNeg
+    | TensorProduct
+    | PrefiksUnary GHC.Base.String
+    | PrefiksBinary GHC.Base.String
+    | NormUnary GHC.Base.String
+    | NormBinary GHC.Base.String
+    | TensUnary GHC.Base.String
+    | InfiksComp GHC.Base.String
+    | AssignOperator
+    | ConnectOperator
+    | Quantifier GHC.Base.String
+    | If
+    | Then
+    | Else
+    | Import
+    | Interpolation GHC.Base.String
+    | Get
+    | From
+    | Guard
+    | All
+    | First
+    | Maxtime
+    | Module
+    | As
+    | Learning
+    | LearningType GHC.Base.String
+    | Learn
+    | Input
+    | Layer
+    | Network
+    | Experiment
+    | Exit
+    | Binds
+    | Clear
+ebdcc711871ef625069e0115c8ae20fb
+  alexScanTokens :: GHC.Base.String -> [Lekser.Token]
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ (str :: GHC.Base.String) ->
+                 Lekser.alexScanTokens_go
+                   (Lekser.alexScanTokens1, GHC.Types.[] @ Lekser.Byte, str)) -}
+683d346d68a36dc8160bda7ec2936f0a
+  alexScanTokens1 :: GHC.Types.Char
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.C# '\n'#) -}
+a15a51a7c1b2e770f622aec53a4e8873
+  alexScanTokens_go :: Lekser.AlexInput -> [Lekser.Token]
+  {- Arity: 1, Strictness: <S(LSL),1*U(U,U,U)>, Inline: INLINE[0],
+     Unfolding: InlineRule (1, True, False)
+                (\ (w :: Lekser.AlexInput) ->
+                 case w of ww { (,,) ww1 ww2 ww3 -> Lekser.$wgo ww1 ww2 ww3 }) -}
+instance GHC.Classes.Eq [Lekser.Token] = Lekser.$fEqToken
+instance GHC.Base.Functor [Lekser.AlexLastAcc]
+  = Lekser.$fFunctorAlexLastAcc
+instance GHC.Show.Show [Lekser.Token] = Lekser.$fShowToken
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: none
+require own pkg trusted: False
+

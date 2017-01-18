@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 22:00:53.3414654 UTC
+2017-01-18 22:10:54.81554 UTC
 
 interface main@main:Main 8001
-  interface hash: 90bf10e389575ffbf604c0d629c2b72b
-  ABI hash: 5a7c0db89f9db0c61c97343dadaef573
+  interface hash: 4f737c9dc1a3170e7aaad2a9d3e0cd14
+  ABI hash: d546fb44654007d7e204ba6788d5a11c
   export-list hash: 2ed5975a5f0984820ef73a8f8b4efb82
   orphan hash: 4bda42b802a9964cdf4a1e2755134db4
   flag hash: 63b3c401241f06d03e09eaf7cbf6ce25
@@ -4061,14 +4061,14 @@ f39f7fd06780f9d5ab886b3200f21f63
                             (GHC.Prim.int2Word# (GHC.Prim.ord# wild2))
                             8#)
                          (GHC.Prim.int2Word# (GHC.Prim.ord# wild1)))) } } }) -}
-77416c5b9d0c6a5f7ea03fd9c3dd9eee
+6592e5f1ee59ae875857b2e97c22340e
   main :: forall a. GHC.Types.IO a
   {- Arity: 1, Strictness: <S,U>,
      Unfolding: InlineRule (0, True, True)
                 Main.main1
                   `cast`
                 (forall (a :: <*>_N). Sym (GHC.Types.N:IO[0] <a>_R)) -}
-05e8c2b47e71f7820e043f04106649b0
+e92d9f5f3180f92b89ad81b82fbab521
   main1 ::
     forall {a}.
     GHC.Prim.State# GHC.Prim.RealWorld
@@ -4158,12 +4158,11 @@ f39f7fd06780f9d5ab886b3200f21f63
                                   GHC.Types.True
                                   ipv12 of ds9 { (#,#) ipv14 ipv15 ->
                            Main.happyError'2 @ a ts ipv14 } } } } } } } } } } }) -}
-42b9705c32a709150f7b85f079a63751
+1ad93ae78e909aa655e35b7bc755a6d7
   main10 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString#
-                   "Welcome to Glorious NeuroL Interpreter 0.1!\n\
-                   \Please type a command now..."#) -}
-adb76ba4a4865cc7049d7c78e5d04b60
+                   "Welcome to Glorious NeuroL Interpreter 0.1!"#) -}
+efae1cef52ea5eacb0ac80b17557bf44
   main11 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, GHC.Prim.Any #)
@@ -4173,13 +4172,16 @@ adb76ba4a4865cc7049d7c78e5d04b60
                    (Main.main1 @ GHC.Prim.Any)
                      `cast`
                    (Sym (GHC.Types.N:IO[0] <GHC.Prim.Any>_R))) -}
-ef64f8168ebc9b0605ae0ff516c589c8
+7b5b47a985a7f71797f312c2e36dff0b
   main2 :: [GHC.Types.Char]
-  {- Unfolding: (GHC.CString.unpackCString# "Session read!"#) -}
-3df344a01904208bcb2566d5645e1e0d
+  {- Unfolding: (GHC.CString.unpackCString#
+                   "Session read!\n\
+                   \Please type a command now..."#) -}
+e087c7339649bb890e6e5668000d929a
   main3 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString#
-                   " Starting from clear session.\n"#) -}
+                   " Starting from clear session.\n\
+                   \Please type a command now..."#) -}
 4bfa7a16950902ca62dcdeee3a778a13
   main4 ::
     Data.Binary.Get.Decoder
