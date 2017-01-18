@@ -1,11 +1,11 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 19:47:47.1175951 UTC
+2017-01-18 20:16:58.2951317 UTC
 
-interface Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor 8001
-  interface hash: 564c06cfa919eb6babe752bc7ba8f3e2
-  ABI hash: 6a4ba83385f8298d1804ce761af282bf
-  export-list hash: 529bbc781dc7849ca06e6144515c04fe
+interface Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh:Tensor 8001
+  interface hash: 5c7cd0e5c2c1edd8243023dec1fb5b47
+  ABI hash: 254e68f7279f60998a78ead71fab707f
+  export-list hash: 7488851c522c073b25748edad575fe11
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 365edb496d38399416a64131c77130e2
   sig of: Nothing
@@ -48,66 +48,66 @@ family instance modules: base-4.9.0.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Tensor.Index 769fc71ede0f3c521fe8f01a59c93ce2
-  exports: 930656b70af87576c7a90bf4d49280ce
-  !=! 9096a8a158b1a821f37b5f7a103175f6
-  Contravariant 95abc25e82ccd5aa632597d8abc168d6
-  Covariant 48737a6f916c7e33799bcffe9bcb42c9
-  Indifferent d026770809a3eb33bf559767e8eafac7
-  TIndex 2753f84c83e056ab8ce78b76a493bc70
-  equivI 8971031659451eb972b708abbf9f6cb6
-  indexCount e6361dd771af0e7f5641972cfbd02207
-  indexName a632d0855c89d2b841a50231d46ba9b4
-import  -/  Tensor.Multilinear 6bc1692ae6aa026c85905ff7f31c1e09
-  exports: fffde4799cec63d0ebedaa87a833690a
-  !! f2b0c7d316db47628c3c5e33ef2f2f7f
-  !* 3f380e1131b511a59c47308607f0d646
-  !==! 8e0342c330372c40b1c4e54123da64ff
-  ++ 706a32a6412f0e458221898039197813
-  Multilinear 88e5c689338f269a4d054bf6318c6dde
-  concat 4584b1dd4af1d3d9f524b503aa0f02cc
-  elems 67a832f3be00f5e3ab856ded13e9d44a
-  equiv 4baaa5b8e17807e3b924227c334cb0a4
-  fromList 1ecb1fc7ac35f497794e3cb64cae2749
-  generate c1b0da9689f898798b5b493694d14f2b
-  indices 709154e860108f506af7543275c6257a
-  order e010e8e47d7d28c1b8cda920b37ac87f
-  rename 85f5cacddbcbac16716d3739199411ae
-  transpose 36a6326b0535c26432a2fa2af35b4a8c
-  transpose1 d0d142522801f6a34e560f4bc0ad436e
-import  -/  Tensor.Restricted 0dc5ce7ec2b7af015c2c81ee2930c8cb
-  exports: 265c4ff84182d84bd2768c32f715f804
-  Err 20d9fd2b47134a2f7c4330d5c9efd6d4
-  Scalar 1b2650401f5961651cca7ce18cbe2603
-  Tensor 568ea757d775d79f79aad656fa7bf6d8
-  Tensor d87e154ad7edb21544b399cf1c30a76d
-  _dot 21d0aa482f1c00c21aadf2dae52e4af9
-  commonIndex d87e154ad7edb21544b399cf1c30a76d
-  errMsg 046cc338a19d2df1d9638f5fc8789301
-  kr 541a631b8027dd31de748fa743eb8ef7
-  kr3 3e7f9d72e399a65ba83efe88684b7b13
-  kr4 a779532632ae381684a219c2f37ef0f7
-  scalarVal 31f3aad378d31d643093a5fc9cad3bf4
-  switchInd ff9af7a484dd83133475eea35895113e
-  switchInd' d87e154ad7edb21544b399cf1c30a76d
-  tensorData 7ac99451781b4e47a785f6bb0a9dc8af
-  tensorIndex 3eef713cf9ba7d6985f0ca0f97659d32
+import  -/  Tensor.Index 6bdc44f3d1849d0934612a9de4da6cc7
+  exports: 3e404e500ff97a25d44a7567729a4ffe
+  !=! 21cbcdd3bcb65f4efd82eb790d1c7ae5
+  Contravariant 8c9c623965a045d09a43ac66045ac543
+  Covariant 67a937141d096efbea881e08092a4c8e
+  Indifferent db8f02b2f4eb753a9673f59305d7e370
+  TIndex 2caa73acff6840ac777cf2a549dfd2e0
+  equivI 5cb54fb912d9c078df182e26b0a47ea0
+  indexCount 8c1a7fd557f5a4bf923f8ae431425619
+  indexName e29c6ed4fb462258344a89fd7fd1bc42
+import  -/  Tensor.Multilinear 300bb48a7ab08cf6176b08c588ef5d7b
+  exports: 26f481e4d611bea5f7dc5876a98cf5e8
+  !! dbf8f79b1b99597ec7ccb2bbd63a1fd7
+  !* 3ba90cb600a38b880e103cfc7992afca
+  !==! f73bf15412cbe6e3a567f629a90921f7
+  ++ 1e7e51ea3f82af7402e2bb5aa79d9d26
+  Multilinear 188043c18cfd402ee9da44ff088dc397
+  concat b530ee53810e7a631ae43d5c14822b40
+  elems 42d9fec06bb2ceeb6921463afd692e57
+  equiv 53f3d0f6d9ad0db4cfe9930c27ec337b
+  fromList feb0916fa4be96cc62e7243d0c6c481c
+  generate 63a9582ae8cfef046a4e9a3f445dcd8b
+  indices b4552ed7c262962fe78e4ec3cd7feddd
+  order fef52b02ff43631029562fb267247b7b
+  rename 6831e2b2fb8932f6b769c10e8c62557c
+  transpose e9a48daf622abc1b841dc35db7be170b
+  transpose1 4ddfd0f73d2dfd66e483691165868f77
+import  -/  Tensor.Restricted 77c62fd08cbd093b6fbf31f6d01553ff
+  exports: 5577c0352c81e85e54556bf6635ffc29
+  Err 313c1e47291bb83bc87d21170a05057e
+  Scalar 7172f06920b667782c9da91a6dd854b4
+  Tensor f5992a7c8020909f804c9c46871e41b4
+  Tensor c597b80271b7834390e27f13cb520dc7
+  _dot 541f35c24eaa3cbba92807174fadfe47
+  commonIndex c597b80271b7834390e27f13cb520dc7
+  errMsg 4da3c6dcafd2d2e4fe001ebd53463502
+  kr 1874f31579655244b7f339414f84cc10
+  kr3 1dd4591a1897f80843e346119af769ed
+  kr4 7e3254873368ab89dbf9f5be1500e976
+  scalarVal 1640783331e694b94828e266dd899e3b
+  switchInd 8833f7094d172a6995ae86b1399bb394
+  switchInd' c597b80271b7834390e27f13cb520dc7
+  tensorData 134a94b789f3d1ce2ed30ac5315e0da3
+  tensorIndex f93f88ca312846901bc7c89ed31874bc
 import  -/  base-4.9.0.0:Prelude 2d9cd8b0ec3d728f62b734df888d2e34
-1e6f859b4d11c5db1505e342708f0bb9
+09ade66d4083f310d9464065ec5b4197
   $trModule :: GHC.Types.Module
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.Module
                    Tensor.$trModule2
                    Tensor.$trModule1) -}
-04d308d50dc1923de2d6808d76fae3a6
+674115215b3b2379ff6ccf04ea232101
   $trModule1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "Tensor"#) -}
-26d9aae3910d67fb8df88bf89ecd9182
+a560a0f6c69315362d80a28b2f5eaf03
   $trModule2 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
-                   "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"#) -}
+                   "Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh"#) -}
 vectorised variables:
 vectorised tycons:
 vectorised reused tycons:

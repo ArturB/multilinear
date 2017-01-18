@@ -9,33 +9,29 @@ module Main (
     main
 ) where
 
-import           Data.Bits
 import           Prelude            as P
 import           Tensor
 import           Tensor.Multilinear as T
 
 m1 :: Tensor Int
-m1 = T.generate (Covariant 1000 "j")
-        (\i -> T.generate (Contravariant 1000 "i") (\j -> Scalar $ i - j `mod` 10))
+m1 = T.generate (Contravariant 500 "i")
+        (\i -> T.generate (Covariant 500 "j") (\j -> Scalar $ i + j `mod` 10))
 
 m2 :: Tensor Int
-m2 = T.generate (Contravariant 1000 "j")
-        (\i -> T.generate (Covariant 1000 "k") (\j -> Scalar $ i - j `mod` 10))
+m2 = T.generate (Contravariant 50 "j")
+        (\i -> T.generate (Covariant 500 "k") (\j -> Scalar $ i + j `mod` 10))
 
 m3 :: Tensor Int
 m3 = m1 !* m2
 
 v :: Tensor Int
-v = T.generate (Contravariant 1000 "k") (\i -> Scalar $ i `mod` 10)
+v = T.generate (Contravariant 50 "k") (\i -> Scalar $ i `mod` 10)
 
 v2 :: Tensor Int
 v2 = m3 !* v
 
 main :: IO ()
 main = do
-    let v1 = [x .|. complement 3 | x <- [1..100000000]] :: [Int]
-    let v2 = [x .|. complement 3 | x <- [1..100000000]] :: [Int]
-    putStrLn "generated..."
-    print $ P.sum $ P.zipWith (*) v1 v2
-
+        putStrLn "Starting..."
+        print $ v2
 

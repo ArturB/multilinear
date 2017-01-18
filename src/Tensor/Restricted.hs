@@ -262,7 +262,7 @@ instance Multilinear Tensor where
     -- Generate tensor from generator function of indices
     generate index f =
         if indexCount index > 0
-        then Tensor index [f i | i <- [1 .. indexCount index]]
+        then Tensor index [f i | i <- [0 .. indexCount index - 1]]
         else Err $ "generate: " P.++ zeroElems
 
     -- Get tensor order [ (p,q)-type ]
@@ -340,8 +340,8 @@ switchInd t1@(Tensor index1 ts1) (Just ind)
     | P.length (indices t1) > 1 && indexName index1 == ind =
         let index2 = tensorIndex (head ts1)
         in Tensor index2 [Tensor index1 [tensorData (ts1 P.!! j) P.!! i
-            | j <- [1 .. indexCount index1]]
-            | i <- [1 .. indexCount index2]]
+            | j <- [0 .. indexCount index1 - 1]]
+            | i <- [0 .. indexCount index2 - 1]]
     | otherwise = t1
 switchInd (Err msg) _ = Err msg
 

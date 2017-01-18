@@ -1,11 +1,11 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 08:15:50.8747774 UTC
+2017-01-18 20:05:34.7984605 UTC
 
-interface Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Index 8001
-  interface hash: c63f6002d75b4241a38225d1ec6aeeb5
-  ABI hash: 769fc71ede0f3c521fe8f01a59c93ce2
-  export-list hash: 930656b70af87576c7a90bf4d49280ce
+interface Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh:Tensor.Index 8001
+  interface hash: 32eae28fe81078d2770dc79312d00bdb
+  ABI hash: 6bdc44f3d1849d0934612a9de4da6cc7
+  export-list hash: 3e404e500ff97a25d44a7567729a4ffe
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 11c1d53d86ff1fc48fbbf191e9636203
   sig of: Nothing
@@ -46,12 +46,12 @@ import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Class 8597f8b1c2ab4e127272
 import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Get.Internal 2e7605525151d1d4905dbc0c729d189c
 import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
 fixities infixl 6 !=!
-9096a8a158b1a821f37b5f7a103175f6
+21cbcdd3bcb65f4efd82eb790d1c7ae5
   (!=!) ::
     Tensor.Index.TIndex -> Tensor.Index.TIndex -> GHC.Types.Bool
   {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True) Tensor.Index.equivI -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fBinaryTIndex :: Data.Binary.Class.Binary Tensor.Index.TIndex
   DFunId
   {- Strictness: m,
@@ -60,10 +60,10 @@ fixities infixl 6 !=!
                   Tensor.Index.$fBinaryTIndex_$cput
                   Tensor.Index.$fBinaryTIndex_$cget
                   Tensor.Index.$fBinaryTIndex1 -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fBinaryTIndex1 :: [Tensor.Index.TIndex] -> Data.Binary.Put.Put
   {- Arity: 1 -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fBinaryTIndex2 ::
     Data.ByteString.Internal.ByteString
     -> Data.Binary.Get.Internal.Success Tensor.Index.TIndex r
@@ -76,7 +76,7 @@ fixities infixl 6 !=!
                    (w1 :: Data.Binary.Get.Internal.Success Tensor.Index.TIndex r) ->
                  case w of ww { Data.ByteString.Internal.PS ww1 ww2 ww3 ww4 ->
                  Tensor.Index.$w$cget @ r ww1 ww2 ww3 ww4 w1 }) -}
-fb442756f392a5069647a3ed5ba20309
+1a9096d2c19b3948081dd0b2822c0d55
   $fBinaryTIndex3 ::
     [Data.ByteString.Internal.ByteString]
     -> forall r1.
@@ -96,10 +96,10 @@ fb442756f392a5069647a3ed5ba20309
                    @ r1
                    dt4
                    Tensor.Index.$fBinaryTIndex4 }) -}
-9d967d24c9d16940d460b9c18d79cdcc
+881f4d771c4387df18d1ff4dfa77798b
   $fBinaryTIndex4 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "not enough bytes"#) -}
-851724141242a37ec1e7c3fdb9d6e643
+f1baccdabf8ff52a8c1500bb1ca1b4d2
   $fBinaryTIndex5 ::
     GHC.Types.Int
     -> Data.ByteString.Internal.ByteString
@@ -127,10 +127,10 @@ fb442756f392a5069647a3ed5ba20309
                         @ (Data.ByteString.Internal.ByteString,
                            Data.ByteString.Internal.ByteString)
                         (wild2, Data.ByteString.empty) } } }) -}
-b69f0c636e6cd55a343fc95d260b1244
+c29c5125aaf25a5f64c798fcfd8754ad
   $fBinaryTIndex6 :: GHC.Types.Int
   {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 1#) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fBinaryTIndex_$cget ::
     Data.Binary.Get.Internal.Get Tensor.Index.TIndex
   {- Arity: 2, Strictness: <S(LLLS),1*U(U,U,U,U)><L,C(C1(U))>,
@@ -139,7 +139,7 @@ b69f0c636e6cd55a343fc95d260b1244
                   `cast`
                 (Sym (Data.Binary.Get.Internal.N:Get[0]
                           <Tensor.Index.TIndex>_R)) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fBinaryTIndex_$cput :: Tensor.Index.TIndex -> Data.Binary.Put.Put
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>m, Inline: INLINE[0],
      Unfolding: InlineRule (1, True, False)
@@ -148,7 +148,7 @@ b69f0c636e6cd55a343fc95d260b1244
                  (Data.Binary.Put.PairS @ () ww1 ww2)
                    `cast`
                  (Sym (Data.Binary.Put.N:PutM[0]) <()>_N) }) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fEqTIndex :: GHC.Classes.Eq Tensor.Index.TIndex
   DFunId
   {- HasNoCafRefs, Strictness: m,
@@ -156,7 +156,7 @@ b69f0c636e6cd55a343fc95d260b1244
                   @ Tensor.Index.TIndex
                   Tensor.Index.$fEqTIndex_$c==
                   Tensor.Index.$fEqTIndex1 -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fEqTIndex1 ::
     Tensor.Index.TIndex -> Tensor.Index.TIndex -> GHC.Types.Bool
   {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
@@ -199,7 +199,7 @@ b69f0c636e6cd55a343fc95d260b1244
                              -> case GHC.Base.eqString a2 b2 of wild3 {
                                   GHC.Types.False -> GHC.Types.True
                                   GHC.Types.True -> GHC.Types.False } } } }) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fEqTIndex_$c== ::
     Tensor.Index.TIndex -> Tensor.Index.TIndex -> GHC.Types.Bool
   {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
@@ -233,7 +233,7 @@ b69f0c636e6cd55a343fc95d260b1244
                                   (GHC.Prim.==# dt dt1) of wild2 {
                              GHC.Types.False -> GHC.Types.False
                              GHC.Types.True -> GHC.Base.eqString a2 b2 } } }) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fShowTIndex :: GHC.Show.Show Tensor.Index.TIndex
   DFunId
   {- Strictness: m,
@@ -242,7 +242,7 @@ b69f0c636e6cd55a343fc95d260b1244
                   Tensor.Index.$fShowTIndex6
                   Tensor.Index.$fShowTIndex_$cshow
                   Tensor.Index.$fShowTIndex1 -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fShowTIndex1 :: [Tensor.Index.TIndex] -> GHC.Show.ShowS
   {- Arity: 2, Strictness: <S,1*U><L,U>,
      Unfolding: (\ (ls :: [Tensor.Index.TIndex])
@@ -252,7 +252,7 @@ b69f0c636e6cd55a343fc95d260b1244
                    Tensor.Index.$fShowTIndex2
                    ls
                    s) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fShowTIndex2 ::
     Tensor.Index.TIndex -> GHC.Base.String -> [GHC.Types.Char]
   {- Arity: 2,
@@ -262,16 +262,16 @@ b69f0c636e6cd55a343fc95d260b1244
                    @ GHC.Types.Char
                    (Tensor.Index.$fShowTIndex_$cshow x)
                    s) -}
-0f5a07bdbfacb3a808c31810e63916dd
+ef122b08b0a7dc003c7e28ca7f13623c
   $fShowTIndex3 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# ")"#) -}
-88fde0369367a3d450b353bd16f2bfc4
+6a4d66758d92547e460740d12929f946
   $fShowTIndex4 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# ">"#) -}
-78da597a7d27617623c0090969cbe12a
+4c0129f076d068c21c2f4e4b3be14fb9
   $fShowTIndex5 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "]"#) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fShowTIndex6 ::
     GHC.Types.Int -> Tensor.Index.TIndex -> GHC.Show.ShowS
   {- Arity: 3, Strictness: <L,A><S,1*U><L,1*U>,
@@ -291,7 +291,7 @@ b69f0c636e6cd55a343fc95d260b1244
                       n
                       (Tensor.Index.$fShowTIndex_$cshow x))
                    s) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $fShowTIndex_$cshow :: Tensor.Index.TIndex -> GHC.Base.String
   {- Arity: 1, Strictness: <S,1*U>,
      Unfolding: (\ (ds1 :: Tensor.Index.TIndex) ->
@@ -344,70 +344,70 @@ b69f0c636e6cd55a343fc95d260b1244
                                  @ GHC.Types.Char
                                  (GHC.Types.: @ GHC.Types.Char ww5 ww6)
                                  Tensor.Index.$fShowTIndex3 }))) }) -}
-b7d5afbafc602a7defea0f0ae6d31a71
+5a4b73048d8d116d0d6b3e4dd2bf22aa
   $tc'Contravariant :: GHC.Types.TyCon
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.TyCon
-                   6580156549529111872##
-                   1931192996158404135##
+                   6928298310663293580##
+                   8228533990421324627##
                    Tensor.Index.$trModule
                    Tensor.Index.$tc'Contravariant1) -}
-dbd201165e35bc5e61a49a6e657bbc13
+138f3c30451f4ae91f7b9379b9f0c850
   $tc'Contravariant1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "'Contravariant"#) -}
-fc4bbadd6850b2bffe03251a094d4326
+4f0a691fac81d264631266945e6740d8
   $tc'Covariant :: GHC.Types.TyCon
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.TyCon
-                   14738524066214812809##
-                   11778884896106516910##
+                   16891384111967450814##
+                   16968557033313571113##
                    Tensor.Index.$trModule
                    Tensor.Index.$tc'Covariant1) -}
-063527107040a890ca33105a4b83cb74
+d12df7c7cfebf0843b452d39ba2e6698
   $tc'Covariant1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "'Covariant"#) -}
-2448ca51fddc4c5d0a12c004ee71b263
+2b6b19f0381c4cebc5a4fbe70f11c61e
   $tc'Indifferent :: GHC.Types.TyCon
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.TyCon
-                   9115151844469337161##
-                   4044354487035283326##
+                   8895539339676561956##
+                   1376407559151598303##
                    Tensor.Index.$trModule
                    Tensor.Index.$tc'Indifferent1) -}
-06c42705a7863ea54c501a7c4c4e9b39
+6488687b2110ea28db2a9d2b8c3a44e2
   $tc'Indifferent1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "'Indifferent"#) -}
-890717777d7df543d3bc089977cd54c4
+7366f3e4a494225c9cbeb59c1be3f53f
   $tcTIndex :: GHC.Types.TyCon
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.TyCon
-                   9671005393492939783##
-                   11136587215702960420##
+                   6532425082951295546##
+                   7096619072625308010##
                    Tensor.Index.$trModule
                    Tensor.Index.$tcTIndex1) -}
-ccf08681a5614101a9788f6281ba8ce8
+00897643bb661c99d9c40aa381a10d2f
   $tcTIndex1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "TIndex"#) -}
-41e04db248d1b2fd9088ad4742b1991b
+426f8a70d3f0bace8436218ec3a54f0a
   $trModule :: GHC.Types.Module
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.Module
                    Tensor.Index.$trModule2
                    Tensor.Index.$trModule1) -}
-a6c00a406841b5e7724b9a6967786e26
+5e4c86cf32d87cb2be8eb410d4427e42
   $trModule1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "Tensor.Index"#) -}
-98f7dd99811414c37df452254cb3eee0
+fa29626887f03fd1c92f94ec60e13227
   $trModule2 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
-                   "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"#) -}
-2753f84c83e056ab8ce78b76a493bc70
+                   "Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh"#) -}
+2caa73acff6840ac777cf2a549dfd2e0
   $w$cget ::
     GHC.Prim.Addr#
     -> GHC.ForeignPtr.ForeignPtrContents
@@ -509,12 +509,12 @@ a6c00a406841b5e7724b9a6967786e26
                         (GHC.Prim.+# ww2 1#)
                         (GHC.Prim.-# ww3 1#)
                         ipv1 } } }) -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   $w$cput ::
     Tensor.Index.TIndex
     -> (# (), Data.ByteString.Builder.Internal.Builder #)
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>, Inline: [0] -}
-2753f84c83e056ab8ce78b76a493bc70
+2caa73acff6840ac777cf2a549dfd2e0
   data TIndex
     = Covariant {indexCount :: {-# UNPACK #-}GHC.Types.Int,
                  indexName :: !GHC.Base.String}
@@ -522,7 +522,7 @@ a6c00a406841b5e7724b9a6967786e26
                      indexName :: !GHC.Base.String}
     | Indifferent {indexCount :: {-# UNPACK #-}GHC.Types.Int,
                    indexName :: !GHC.Base.String}
-8971031659451eb972b708abbf9f6cb6
+5cb54fb912d9c078df182e26b0a47ea0
   equivI ::
     Tensor.Index.TIndex -> Tensor.Index.TIndex -> GHC.Types.Bool
   {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
@@ -546,7 +546,7 @@ a6c00a406841b5e7724b9a6967786e26
                         -> GHC.Prim.tagToEnum#
                              @ GHC.Types.Bool
                              (GHC.Prim.==# dt dt1) } }) -}
-e6361dd771af0e7f5641972cfbd02207
+8c1a7fd557f5a4bf923f8ae431425619
   indexCount :: Tensor.Index.TIndex -> GHC.Types.Int
   RecSel Left Tensor.Index.TIndex
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>m,
@@ -556,7 +556,7 @@ e6361dd771af0e7f5641972cfbd02207
                    Tensor.Index.Covariant dt ds2 -> GHC.Types.I# dt
                    Tensor.Index.Contravariant dt ds2 -> GHC.Types.I# dt
                    Tensor.Index.Indifferent dt ds2 -> GHC.Types.I# dt }) -}
-a632d0855c89d2b841a50231d46ba9b4
+e29c6ed4fb462258344a89fd7fd1bc42
   indexName :: Tensor.Index.TIndex -> GHC.Base.String
   RecSel Left Tensor.Index.TIndex
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>,

@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-01-18 08:15:50.2543631 UTC
+2017-01-18 20:05:34.363431 UTC
 
-interface Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl:Tensor.Lazy 8001
-  interface hash: 01883535328391760b686f22cd00688f
-  ABI hash: 60e9bb761af5ac5b0648d7ecebc32281
+interface Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh:Tensor.Lazy 8001
+  interface hash: df91979a91bcd97728b1296170bbb681
+  ABI hash: 6f21e4adfdef198c2d9816c06b12a411
   export-list hash: 1e51e1ca10f94a1b3ad5308e659c77d6
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: a51b8977e895f99654f19db338620f25
@@ -22,21 +22,21 @@ family instance modules: base-4.9.0.0:Control.Applicative
                          base-4.9.0.0:GHC.Generics base-4.9.0.0:GHC.IO.Exception
                          base-4.9.0.0:GHC.TypeLits
 import  -/  base-4.9.0.0:Prelude 2d9cd8b0ec3d728f62b734df888d2e34
-2ae122d9daeccf308cb2e668bfa9ec00
+d5a4b86f267ae51d54f2f74d63422d0a
   $trModule :: GHC.Types.Module
   {- HasNoCafRefs, Strictness: m,
      Unfolding: (GHC.Types.Module
                    Tensor.Lazy.$trModule2
                    Tensor.Lazy.$trModule1) -}
-ac8a1b92484838635f0eaae2a0383a6d
+7e3253d934cb056c5fc1beb0e0ec366c
   $trModule1 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "Tensor.Lazy"#) -}
-d5e529eefc82a697805e79ce22390ab1
+5cb5324fc186843d87ec918c322d5974
   $trModule2 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
-                   "Tensor-0.1.0.0-1EOex3vvt9xIu9Nz1rXDxl"#) -}
+                   "Tensor-0.1.0.0-K5QdifOX00t2w9C27ImRWh"#) -}
 vectorised variables:
 vectorised tycons:
 vectorised reused tycons:
