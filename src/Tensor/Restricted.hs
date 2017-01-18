@@ -389,6 +389,3 @@ commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
     let indicesNames1 = indexName <$> indices t1
         indicesNames2 = indexName <$> indices t2
     in msum $ (\i -> L.find (==i) indicesNames2) <$> indicesNames1
-
-
-mean = "hh"
