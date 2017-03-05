@@ -12,5 +12,5 @@ module Tensor (
 
 import Tensor.Multilinear as X
 import Tensor.Index as X
-import Tensor.Restricted as X
+--import Tensor.Restricted as X
 

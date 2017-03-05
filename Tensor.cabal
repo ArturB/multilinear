@@ -24,12 +24,14 @@ library
                        base >= 4.7 && < 5,
                        binary
   default-language:    Haskell2010
-  ghc-options:         -Wall
+  ghc-options:         -Wall -fno-warn-orphan-instances
+  default-extensions:  FlexibleInstances
+                     , MultiParamTypeClasses
 
 executable Tensor
   hs-source-dirs:      app
   main-is:             Parser.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -fno-warn-orphan-instances
   build-depends:       base
                      , array
                      , Tensor
@@ -39,6 +41,8 @@ executable Tensor
                      , containers
                      , directory
   default-language:    Haskell2010
+  default-extensions:  FlexibleInstances
+                     , MultiParamTypeClasses
 
 test-suite Tensor-test
   type:                exitcode-stdio-1.0
@@ -46,8 +50,10 @@ test-suite Tensor-test
   main-is:             Spec.hs
   build-depends:       base
                      , Tensor
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -fno-warn-orphan-instances
   default-language:    Haskell2010
+  default-extensions:  FlexibleInstances
+                     , MultiParamTypeClasses
 
 source-repository head
   type:     git

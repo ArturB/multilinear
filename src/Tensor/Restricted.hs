@@ -32,7 +32,7 @@ incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
 
 {- RESTRICTED TENSOR DATATYPE -}
-
+{-
 data Tensor a =
     Scalar { scalarVal :: a } |
     Tensor {
@@ -435,4 +435,6 @@ commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
     in msum $ (\i -> L.find (==i) indicesNames2) <$> indicesNames1
 commonIndex _ _ = Nothing
 
+
+-}
 

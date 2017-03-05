@@ -10,8 +10,8 @@
 {-# OPTIONS_GHC -O2 #-}
 
 module Tensor.Index (
-    TIndex(..),
-    equivI, (!=!)
+    TIndex(..), 
+    equivI, (!=!), 
 ) where
 
 import Data.Binary
@@ -32,6 +32,7 @@ data TIndex =
         indexName :: String
     }
     deriving Eq
+
 
 --makeLenses ''TIndex
 
