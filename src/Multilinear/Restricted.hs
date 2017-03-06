@@ -9,17 +9,15 @@
 {-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
-module Tensor.Restricted (
-    Tensor(..),
-    kr, kr3, kr4, switchInd, switchInd', commonIndex, _dot
+module Multilinear.Restricted (
+    {-Tensor(..),
+    kr, kr3, kr4, switchInd, switchInd', commonIndex, _dot-}
 ) where
-
+{-}
 import           Control.Monad
 import           Data.List          as L
 import           Data.Maybe
 import           Prelude            as P
-import           Tensor.Index
-import           Tensor.Multilinear as T
 --import Control.Lens
 import           Data.Binary
 
@@ -30,7 +28,7 @@ zeroElems :: String
 zeroElems = "Tensor must contain at leat one element!"
 incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
-
+-}
 {- RESTRICTED TENSOR DATATYPE -}
 {-
 data Tensor a =

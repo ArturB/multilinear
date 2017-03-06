@@ -1,0 +1,163 @@
+
+==================== FINAL INTERFACE ====================
+2017-03-06 10:45:32.189898 UTC
+
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear 8002
+  interface hash: 388a4a4cd27415ed1a4ae0187e96a055
+  ABI hash: 63d56e2ea8faba015f6a8b981ca94e74
+  export-list hash: b5eb6a52abe0ac629d1d601f5870acec
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: 874f7c92c1be8b4f00f500b3e3a2bdae
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Multilinear.Index.!=!
+  Multilinear.Index.equivI
+  Multilinear.Tensor.el
+  Multilinear.Tensor.ind
+  Multilinear.Multilinear{Multilinear.!* Multilinear.!+ Multilinear.!-}
+  Multilinear.Tensor{Multilinear.concat Multilinear.elems Multilinear.equiv Multilinear.fromList Multilinear.generate Multilinear.indices Multilinear.order Multilinear.rename Multilinear.transpose Multilinear.transpose1}
+  Multilinear.Covector.T_{Multilinear.Covector.T_}
+  Multilinear.Index.TIndex{Multilinear.Index.Contravariant Multilinear.Index.Covariant Multilinear.Index.Indifferent indexCount indexName}
+  Multilinear.Tensor.T{Multilinear.Tensor.T}
+  Multilinear.Vector.V{Multilinear.Vector.V}
+module dependencies: Multilinear.Covector Multilinear.Index
+                     Multilinear.Tensor Multilinear.Vector
+package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.1.0*
+                      binary-0.8.3.0@binary-0.8.3.0
+                      bytestring-0.10.8.1@bytestring-0.10.8.1
+                      containers-0.5.7.1@containers-0.5.7.1
+                      deepseq-1.4.2.0@deepseq-1.4.2.0 ghc-prim-0.5.0.0
+                      integer-gmp-1.0.0.1
+orphans: base-4.9.1.0:GHC.Base base-4.9.1.0:GHC.Float
+         binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Generic
+         bytestring-0.10.8.1@bytestring-0.10.8.1:Data.ByteString.Builder
+family instance modules: base-4.9.1.0:Control.Applicative
+                         base-4.9.1.0:Data.Complex base-4.9.1.0:Data.Either
+                         base-4.9.1.0:Data.Functor.Const base-4.9.1.0:Data.Functor.Identity
+                         base-4.9.1.0:Data.List.NonEmpty base-4.9.1.0:Data.Monoid
+                         base-4.9.1.0:Data.Semigroup base-4.9.1.0:Data.Type.Equality
+                         base-4.9.1.0:Data.Version base-4.9.1.0:Data.Void
+                         base-4.9.1.0:GHC.Exts base-4.9.1.0:GHC.Generics
+                         base-4.9.1.0:GHC.IO.Exception base-4.9.1.0:GHC.TypeLits
+                         containers-0.5.7.1@containers-0.5.7.1:Data.IntMap.Base
+                         containers-0.5.7.1@containers-0.5.7.1:Data.IntSet.Base
+                         containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
+                         containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
+                         containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
+import  -/  Multilinear.Covector 26508dbd8b3c7d41dbe92408e5892480
+  exports: af839045312f261a64a03901e17e7db2
+  T_ d7c7a5b2968e1ca04b933c3e9510dae8
+  T_ baa1a6d1c796039bdc18ef392bc25d6a
+import  -/  Multilinear.Index 6b74f99d0b1eae81d6b9713aea48329e
+  exports: 480060e0b08455ffef717b127d57d7f9
+  !=! 0a57746d1700d35dcb3b0c5f371d75bf
+  Contravariant d6333ec1666cac45303e0a10b22ef507
+  Covariant 61b0b8f99d3e1c02814d72096a559931
+  Indifferent 25143d1afe66ae924daf613a62b7c482
+  TIndex c25d5a990f007668cc984a5c013dda4a
+  equivI 5a135a62dd97ff9120c000c9cd0a5960
+  indexCount c9a78087cb1b749fa03ff7c399c0b5e4
+  indexName 0a9d105218ffa51f72a0d7ddbe136701
+import  -/  Multilinear.Tensor 75e11aad3eea5bcf8293fe821ccd8ecf
+  exports: 8af8c38bff9a54c2d3a9a5684c00ef9e
+  T b16e769b79a753d5e0547c431a13d6f7
+  T fa4462091453093449bc613b9c2009b5
+  el d9f74ee195933395a67aef197cd0cbad
+  ind 8995e7a9abc7224523ee799944cf3dd7
+import  -/  Multilinear.Vector 81d05da17a549f9e0b4e2e8432be0449
+  exports: 4b4a3a63a63509f3a82f90b1f25935f0
+  V 89b07a45fae0bba8da4ad3bb85b82863
+  V 4ba482397e4d54282857702159c0b382
+import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
+import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
+import  -/  base-4.9.1.0:Prelude 74b3e204395920329f6de9d97206abe9
+fixities infixl 8 !*, infixl 7 !+, infixl 7 !-
+df68ff57358cf98e935e4cdb5f2f0752
+  $tc'C:Multilinear :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   12802967759508875135##
+                   10914283436736815981##
+                   Multilinear.$trModule
+                   Multilinear.$tc'C:Multilinear1) -}
+c3eb43ac31be60da25ec3c424b62f600
+  $tc'C:Multilinear1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'C:Multilinear"#) -}
+7445f9b663decb6c7e599cd9d88f1709
+  $tc'C:Tensor :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   12893099514355969057##
+                   9528964645787405472##
+                   Multilinear.$trModule
+                   Multilinear.$tc'C:Tensor1) -}
+6f53caefb87efd3c1579b73940cb4206
+  $tc'C:Tensor1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'C:Tensor"#) -}
+843250fad2fa92a19c02590c13b6ffa0
+  $tcMultilinear :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   5995655185864941103##
+                   11601805338625126410##
+                   Multilinear.$trModule
+                   Multilinear.$trModule1) -}
+441af88eca392754c79e048601918f4c
+  $tcTensor :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   13507780154268932632##
+                   10437009348749742396##
+                   Multilinear.$trModule
+                   Multilinear.$tcTensor1) -}
+06db1f276af601763670bc2a7aa10b2d
+  $tcTensor1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Tensor"#) -}
+92b1be387178a08ece12bd53f2d9bce2
+  $trModule :: GHC.Types.Module
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.Module
+                   Multilinear.$trModule2
+                   Multilinear.$trModule1) -}
+8f9eb5973daaeb19eeb6742fd91ae4e0
+  $trModule1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Multilinear"#) -}
+0397c838a557ab76630d3d8f37b24f68
+  $trModule2 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS
+                   "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
+913160c6996827f31489e14c40d7345e
+  class Multilinear t where
+    (!+) :: t -> t -> t
+    (!-) :: t -> t -> t
+    (!*) :: t -> t -> t
+    {-# MINIMAL (!+), (!-), (!*) #-}
+b95254389d661e16846424bb3b5e78e3
+  class GHC.Num.Num t => Tensor t where
+    generate :: Multilinear.Index.TIndex -> (GHC.Types.Int -> t) -> t
+    fromList :: Multilinear.Index.TIndex -> [a] -> t
+    order :: t -> (GHC.Types.Int, GHC.Types.Int)
+    elems :: t -> GHC.Types.Int
+    indices :: t -> [Multilinear.Index.TIndex]
+    rename :: t -> GHC.Base.String -> GHC.Base.String -> t
+    equiv :: t -> t -> GHC.Types.Bool
+    transpose :: t -> t
+    transpose1 :: t -> t
+    concat :: Multilinear.Index.TIndex -> t -> t -> t
+    {-# MINIMAL generate, fromList, order, elems, indices, rename,
+                equiv, transpose, transpose1, concat #-}
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: safe
+require own pkg trusted: False
+

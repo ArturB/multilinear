@@ -1,15 +1,18 @@
------------------------------------------------------------------------------
---
--- Package     :  Tensor
--- Module      :  Tensor.Index
--- Description :  Defines index of tensor - covariant or contravariant
--- Author      :  Artur M. Brodzki, Warsaw 2016
------------------------------------------------------------------------------
+{-|
+Module      : Index
+Description : Implements tensor index.
+Copyright   : (c) Artur M. Brodzki, 2017
+License     : 3-clause BSD
+Maintainer  : artur.brodzki@gmail.com
+Stability   : experimental
+Portability : Windows/POSIX
+
+-}
 
 {-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC -O2 #-}
 
-module Tensor.Index (
+module Multilinear.Index (
     TIndex(..), 
     equivI, (!=!), 
 ) where
@@ -17,7 +20,7 @@ module Tensor.Index (
 import Data.Binary
 --import Control.Lens
 
-{- TENSOR INDEX -}
+{-| TENSOR INDEX -}
 data TIndex =
     Covariant {
         indexCount :: Int,
@@ -36,7 +39,7 @@ data TIndex =
 
 --makeLenses ''TIndex
 
--- Serialization instance
+{-| Serialization instance -}
 instance Binary TIndex where
     put (Covariant c n) = do
         put (0 :: Word8)
@@ -62,13 +65,13 @@ instance Binary TIndex where
         else
             return $ Contravariant c n
 
--- Show instance of TIndex
+{-| Show instance of TIndex -}
 instance Show TIndex where
     show (Covariant c n) = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
     show (Indifferent c n) = "(" ++ n ++ ":" ++ show c ++ ")"
 
--- Returns true if two indices are quivalent, i.e. differs only by name
+{-| Returns true if two indices are quivalent, i.e. differs only by name -}
 equivI :: TIndex -> TIndex -> Bool
 equivI (Covariant count1 _) (Covariant count2 _)
     | count1 == count2 = True
@@ -81,7 +84,7 @@ equivI (Indifferent count1 _) (Indifferent count2 _)
     | otherwise = False
 equivI _ _ = False
 
--- Infix equivalent of equiv
+{-| Infix equivalent of equiv -}
 infixl 6 !=!
 (!=!) :: TIndex -> TIndex -> Bool
 (!=!) = equivI
