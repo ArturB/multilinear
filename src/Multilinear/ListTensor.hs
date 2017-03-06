@@ -9,7 +9,7 @@
 {-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
-module Multilinear.Restricted (
+module Multilinear.ListTensor (
     {-Tensor(..),
     kr, kr3, kr4, switchInd, switchInd', commonIndex, _dot-}
 ) where

@@ -11,67 +11,70 @@ Defines main tyclasses to deal with multilinear algebra and re-exports content o
 
 -}
 
-{-# LANGUAGE Strict, FlexibleInstances, FlexibleContexts, GADTs #-}
+{-# LANGUAGE Strict, GADTs #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear (
     -- * Classes
     Multilinear(..),
-    Tensor(..),
-    -- * Other library modules
+    -- * Re-export other library modules
     module X
 ) where
 
+-- Re-export other library modules
 import Multilinear.Index as X
 import Multilinear.Covector as X
 import Multilinear.Vector as X
 import Multilinear.Tensor as X
 
-{-| MULTILINEAR CLASS - TENSOR DEFINED AS MULTILINEAR MAP -}
-class Multilinear t where 
-    {-| Tensor sum -}
-    infixl 7 !+
-    (!+) :: t -> t -> t
+{-| Multidimensional arrays are trated as tensors - multilinear maps. -}
+class Num t=> Multilinear t where 
+    {-| Add scalar left -}
+    infixl 7 .+
+    (.+) :: Num a => a -> t -> t
 
-    {-| Tensor difference -}
-    infixl 7 !-
-    (!-) :: t -> t -> t
+    {-| Subtract scalar left -}
+    infixl 7 .-
+    (.-) :: Num a => a -> t -> t
 
-    {-| Tensor product satisfying Einstein summation convention -}
-    infixl 8 !*
-    (!*) :: t -> t -> t
+    {-| Multiply by scalar left-}
+    infixl 8 .*
+    (.*) :: Num a => a -> t -> t
 
-{-| TENSOR CLASS - TENSOR AS MULTIDIMENSIONAL ARRAY -}
-class Num t => Tensor t where
-    {-| Generate tensor elements as a function of indices -}
-    generate :: TIndex -> (Int -> t) -> t
-    {-| generate rank tensor from a list -}
-    fromList :: TIndex -> [a] -> t
+    {-| Add scalar right -}
+    infixl 7 +.
+    (+.) :: Num a => t -> a -> t
+
+    {-| Subtract scalar right -}
+    infixl 7 -.
+    (-.) :: Num a => t -> a -> t
+
+    {-| Multiply by scalar right-}
+    infixl 8 *.
+    (*.) :: Num a => t -> a -> t
+
     {-| Tensor order (contravariant, covariant) -}
     order :: t -> (Int,Int)
-    {-| Number of tensor elements -}
-    elems :: t -> Int
+
     {-| List of tensor indices -}
     indices :: t -> [TIndex]
+
     {-| Rename tensor index -}
-    rename :: t -> String -> String -> t
+    rename :: t -> Char -> Char -> t
+
+    {-| Switch all indices type -}
+    transpose :: t -> t
+
+    {-| Inverse tensor -}
+    inverse :: t -> t
+
+    {-| Concatenation of two tensor with given index or by creating a new one -}
+    concat ::  Char -> t -> t -> t
+
     {-| Check if tensors are equivalent (are of the same type and size) -}
     equiv :: t -> t -> Bool
-    {-| switch all indices type -}
-    transpose :: t -> t
-    {-| switch only one index type -}
-    transpose1 :: t -> t
-    {-| concatenation of two tensor with given index or by creating a new one -}
-    concat ::  TIndex -> t -> t -> t
 
-
-{-}
-instance Num b => Num (a -> b) where
-    (f1 + f2) x = f1 x + f2 x
-    (f1 * f2) x = f1 x * f2 x
-    (abs f) x = abs (f x)
-    (signum f) x = signum (f x)
-    (negate f) x = negate (f x)
--}
-
+    {-| Number of tensor elements -}
+    elems :: t -> Int
+    
 

@@ -9,6 +9,8 @@ Portability : Windows/POSIX
 
 -}
 
+{-# LANGUAGE Strict, GADTs #-}
+
 module Multilinear.Vector (
   V(..)
 ) where

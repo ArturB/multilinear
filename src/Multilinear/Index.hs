@@ -10,7 +10,6 @@ Portability : Windows/POSIX
 -}
 
 {-# LANGUAGE Strict #-}
-{-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.Index (
     TIndex(..), 
