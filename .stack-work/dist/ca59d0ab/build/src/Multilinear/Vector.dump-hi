@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-06 10:45:31.2734125 UTC
+2017-03-06 22:11:46.4686084 UTC
 
 interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Vector 8002
-  interface hash: 5bb87469689bc665127e39804ce92368
-  ABI hash: 81d05da17a549f9e0b4e2e8432be0449
+  interface hash: 6eaf56b868e25d53558b2474c941279b
+  ABI hash: 15927d831e6aa81b736cc4d17802ffc3
   export-list hash: 4b4a3a63a63509f3a82f90b1f25935f0
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: 0a867a4eb71687b8f77180a0cef6e55a
+  flag hash: d421a442bac5348a67fd3f91398c6034
   sig of: Nothing
   used TH splices: False
   where
@@ -63,9 +63,9 @@ ae3b2013de873231ea718e6e86ddf7ae
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-4ba482397e4d54282857702159c0b382
+b07b4a4cc3f9064071ffb43acfab7272
   data V a where
-    V :: GHC.Base.String -> ([GHC.Types.Int] -> a) -> V a
+    V :: !GHC.Base.String -> !([GHC.Types.Int] -> a) -> V a
 vectorised variables:
 vectorised tycons:
 vectorised reused tycons:

@@ -16,11 +16,26 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Multilinear
-                       Multilinear.Index
-                       Multilinear.Restricted
-                       Multilinear.Tensor
-                       Multilinear.Covector
-                       Multilinear.Vector
+                    ,  Multilinear.Covector
+                    ,  Multilinear.Covector.Seq
+                    ,  Multilinear.Covector.Field
+                    ,  Multilinear.Index
+                    ,  Multilinear.ListTensor
+                    ,  Multilinear.Matrix
+                    ,  Multilinear.Matrix.Seq
+                    ,  Multilinear.Matrix.Field
+                    ,  Multilinear.NForm
+                    ,  Multilinear.NForm.Seq
+                    ,  Multilinear.NForm.Field
+                    ,  Multilinear.NVector
+                    ,  Multilinear.NVector.Seq
+                    ,  Multilinear.NVector.Field
+                    ,  Multilinear.Tensor
+                    ,  Multilinear.Tensor.Seq
+                    ,  Multilinear.Tensor.Field
+                    ,  Multilinear.Vector
+                    ,  Multilinear.Vector.Seq
+                    ,  Multilinear.Vector.Field
   build-depends:
                        base >= 4.7 && < 5,
                        binary

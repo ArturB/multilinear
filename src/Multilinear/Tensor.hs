@@ -12,30 +12,12 @@ Portability : Windows/POSIX
 {-# LANGUAGE Strict, GADTs #-}
 
 module Multilinear.Tensor (
-  T(..), el, upIndices, lowIndices, els
+  T(..), el, upIndices, lowIndices
 ) where
 
 {-| Tensor datatype -}
 data T a i where
     T :: Integral i => (String,[i]) -> (String,[i]) -> ([i] -> [i] -> a) -> T a i
-
-els' :: T a i -> [a] -> [a]
--- End of recursion when tensor is empty
-els' (T ([],[]) ([],[]) _) l = l
--- When one index is empty, go to next index
-els' (T ([],[]) (_:ds,0:dsize) f) l = 
-    els' (T ([],[]) (ds,dsize) f) l
---When current index is not-empty, add function-generated element to result list
-els' (T ([],[]) (d:ds,s:dsize) f) l = 
-    els' (T ([],[]) (d:ds,s - 1:dsize) f) (f [0] (s:dsize) : l)
-
-
-els :: T a i -> [a]
-els t = els' t []
-
-
-instance (Eq a, Eq i) => Eq (T a i) where
-    t1@(T us1 ds1 _) == t2@(T us2 ds2 _) = us1 == us2 && ds1 == ds2 && els t1 == els t2
 
 {-| Tensors can be added, subtracted and multiplicated -}
 instance (Num a, Integral i) => Num (T a i) where

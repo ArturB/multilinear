@@ -1,0 +1,47 @@
+
+==================== FINAL INTERFACE ====================
+2017-03-06 22:11:46.6757465 UTC
+
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Tensor.Field 8002
+  interface hash: 2c6e2b4fd9d68d6868ccd74e32b34ee1
+  ABI hash: c313c5811f504b96bbc21671cbd2eb23
+  export-list hash: 1e51e1ca10f94a1b3ad5308e659c77d6
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: 506f581ea28af7f6c92ba26b60b6ec7b
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+module dependencies:
+package dependencies: base-4.9.1.0* ghc-prim-0.5.0.0
+                      integer-gmp-1.0.0.1
+orphans: base-4.9.1.0:GHC.Base base-4.9.1.0:GHC.Float
+family instance modules: base-4.9.1.0:Control.Applicative
+                         base-4.9.1.0:Data.Either base-4.9.1.0:Data.Functor.Const
+                         base-4.9.1.0:Data.Monoid base-4.9.1.0:Data.Type.Equality
+                         base-4.9.1.0:GHC.Generics base-4.9.1.0:GHC.IO.Exception
+                         base-4.9.1.0:GHC.TypeLits
+import  -/  base-4.9.1.0:Prelude 74b3e204395920329f6de9d97206abe9
+901c301182a52cfd475fff5848a58e23
+  $trModule :: GHC.Types.Module
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.Module
+                   Multilinear.Tensor.Field.$trModule2
+                   Multilinear.Tensor.Field.$trModule1) -}
+9165a7977cff035b0dbcca86fe3fb128
+  $trModule1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Multilinear.Tensor.Field"#) -}
+1b29d4e8877efd4f0bffd74c551a5859
+  $trModule2 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS
+                   "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: safe
+require own pkg trusted: False
+

@@ -17,7 +17,6 @@ module Multilinear.Index (
 ) where
 
 import Data.Binary
---import Control.Lens
 
 {-| TENSOR INDEX -}
 data TIndex =
@@ -35,10 +34,7 @@ data TIndex =
     }
     deriving Eq
 
-
---makeLenses ''TIndex
-
-{-| Serialization instance -}
+{-| Serialization -}
 instance Binary TIndex where
     put (Covariant c n) = do
         put (0 :: Word8)
@@ -83,7 +79,7 @@ equivI (Indifferent count1 _) (Indifferent count2 _)
     | otherwise = False
 equivI _ _ = False
 
-{-| Infix equivalent of equiv -}
+{-| Infix operator equivalent of equiv -}
 infixl 6 !=!
 (!=!) :: TIndex -> TIndex -> Bool
 (!=!) = equivI

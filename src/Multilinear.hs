@@ -28,53 +28,59 @@ import Multilinear.Vector as X
 import Multilinear.Tensor as X
 
 {-| Multidimensional arrays are trated as tensors - multilinear maps. -}
-class Num t=> Multilinear t where 
+class Multilinear t where 
     {-| Add scalar left -}
     infixl 7 .+
-    (.+) :: Num a => a -> t -> t
+    (.+) :: Num a => a -> t a -> t a
 
     {-| Subtract scalar left -}
     infixl 7 .-
-    (.-) :: Num a => a -> t -> t
+    (.-) :: Num a => a -> t a -> t a
 
     {-| Multiply by scalar left-}
     infixl 8 .*
-    (.*) :: Num a => a -> t -> t
+    (.*) :: Num a => a -> t a -> t a
+
+    {-| Divide by scalar left -}
+    (./) :: Fractional a => a -> t a -> t a
 
     {-| Add scalar right -}
     infixl 7 +.
-    (+.) :: Num a => t -> a -> t
+    (+.) :: Num a => t a -> a -> t a
 
     {-| Subtract scalar right -}
     infixl 7 -.
-    (-.) :: Num a => t -> a -> t
+    (-.) :: Num a => t a -> a -> t a
 
     {-| Multiply by scalar right-}
     infixl 8 *.
-    (*.) :: Num a => t -> a -> t
+    (*.) :: Num a => t a -> a -> t a
+
+    {-| Divide by scalar right -}
+    (/.) :: Fractional a => t a -> a -> t a
 
     {-| Tensor order (contravariant, covariant) -}
-    order :: t -> (Int,Int)
+    order :: t a -> (Int,Int)
 
     {-| List of tensor indices -}
-    indices :: t -> [TIndex]
+    indices :: t a -> [TIndex]
 
     {-| Rename tensor index -}
-    rename :: t -> Char -> Char -> t
+    rename :: t a -> String -> String -> t a
 
     {-| Switch all indices type -}
-    transpose :: t -> t
+    transpose :: t a -> t a
 
     {-| Inverse tensor -}
-    inverse :: t -> t
+    inverse :: t a -> t a
 
     {-| Concatenation of two tensor with given index or by creating a new one -}
-    concat ::  Char -> t -> t -> t
+    concat ::  Char -> t a -> t a -> t a
 
     {-| Check if tensors are equivalent (are of the same type and size) -}
-    equiv :: t -> t -> Bool
+    equiv :: t a -> t a -> Bool
 
     {-| Number of tensor elements -}
-    elems :: t -> Int
+    elems :: t a -> Int
     
 
