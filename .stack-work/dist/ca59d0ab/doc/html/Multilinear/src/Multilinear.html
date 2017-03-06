@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : Multilinear
+Description : Provides efficient and generic implementation of linear algebra operation using Ricci - Einstein tensor formalism
+Copyright   : (c) Artur M. Brodzki, 2017
+License     : 3-clause BSD
+Maintainer  : artur.brodzki@gmail.com
+Stability   : experimental
+Portability : Windows/POSIX
+
+Defines main tyclasses to deal with multilinear algebra and re-exports content of other library modules. 
+
+-}</span><span>
+</span><a name="line-13"></a><span>
+</span><a name="line-14"></a><span class="hs-pragma">{-# LANGUAGE Strict, FlexibleInstances, FlexibleContexts, GADTs #-}</span><span>
+</span><a name="line-15"></a><span class="hs-pragma">{-# OPTIONS_GHC -O2 #-}</span><span>
+</span><a name="line-16"></a><span>
+</span><a name="line-17"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Multilinear</span><span> </span><span class="hs-special">(</span><span>
+</span><a name="line-18"></a><span>    </span><span class="hs-comment">-- * Classes</span><span>
+</span><a name="line-19"></a><span>    </span><a href="Multilinear.html#Multilinear"><span class="hs-identifier hs-type">Multilinear</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><a name="line-20"></a><span>    </span><a href="Multilinear.html#Tensor"><span class="hs-identifier hs-type">Tensor</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><a name="line-21"></a><span>    </span><span class="hs-comment">-- * Other library modules</span><span>
+</span><a name="line-22"></a><span>    </span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">X</span><span>
+</span><a name="line-23"></a><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-24"></a><span>
+</span><a name="line-25"></a><span class="hs-keyword">import</span><span> </span><a href="Multilinear.Index.html"><span class="hs-identifier">Multilinear</span><span class="hs-operator">.</span><span class="hs-identifier">Index</span></a><span> </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">X</span><span>
+</span><a name="line-26"></a><span class="hs-keyword">import</span><span> </span><a href="Multilinear.Covector.html"><span class="hs-identifier">Multilinear</span><span class="hs-operator">.</span><span class="hs-identifier">Covector</span></a><span> </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">X</span><span>
+</span><a name="line-27"></a><span class="hs-keyword">import</span><span> </span><a href="Multilinear.Vector.html"><span class="hs-identifier">Multilinear</span><span class="hs-operator">.</span><span class="hs-identifier">Vector</span></a><span> </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">X</span><span>
+</span><a name="line-28"></a><span class="hs-keyword">import</span><span> </span><a href="Multilinear.Tensor.html"><span class="hs-identifier">Multilinear</span><span class="hs-operator">.</span><span class="hs-identifier">Tensor</span></a><span> </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">X</span><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-comment">{-| MULTILINEAR CLASS - TENSOR DEFINED AS MULTILINEAR MAP -}</span><span>
+</span><a name="line-31"></a><span class="hs-keyword">class</span><span> </span><a name="Multilinear"><a href="Multilinear.html#Multilinear"><span class="hs-identifier">Multilinear</span></a></a><span> </span><a name="local-6989586621679029275"><a href="#local-6989586621679029275"><span class="hs-identifier">t</span></a></a><span> </span><span class="hs-keyword">where</span><span> </span><span>
+</span><a name="line-32"></a><span>    </span><span class="hs-comment">{-| Tensor sum -}</span><span>
+</span><a name="line-33"></a><span>    </span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">7</span><span> </span><span class="hs-operator">!+</span><span>
+</span><a name="line-34"></a><span>    </span><span class="hs-special">(</span><span class="hs-operator">!+</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-35"></a><span>
+</span><a name="line-36"></a><span>    </span><span class="hs-comment">{-| Tensor difference -}</span><span>
+</span><a name="line-37"></a><span>    </span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">7</span><span> </span><span class="hs-operator">!-</span><span>
+</span><a name="line-38"></a><span>    </span><span class="hs-special">(</span><span class="hs-operator">!-</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-39"></a><span>
+</span><a name="line-40"></a><span>    </span><span class="hs-comment">{-| Tensor product satisfying Einstein summation convention -}</span><span>
+</span><a name="line-41"></a><span>    </span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">8</span><span> </span><span class="hs-operator">!*</span><span>
+</span><a name="line-42"></a><span>    </span><span class="hs-special">(</span><span class="hs-operator">!*</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029275"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-43"></a><span>
+</span><a name="line-44"></a><span class="hs-comment">{-| TENSOR CLASS - TENSOR AS MULTIDIMENSIONAL ARRAY -}</span><span>
+</span><a name="line-45"></a><span class="hs-keyword">class</span><span> </span><span class="hs-identifier hs-type">Num</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">=&gt;</span><span> </span><a name="Tensor"><a href="Multilinear.html#Tensor"><span class="hs-identifier">Tensor</span></a></a><span> </span><a name="local-6989586621679029273"><a href="#local-6989586621679029273"><span class="hs-identifier">t</span></a></a><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-46"></a><span>    </span><span class="hs-comment">{-| Generate tensor elements as a function of indices -}</span><span>
+</span><a name="line-47"></a><span>    </span><span class="hs-identifier">generate</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Multilinear.Index.html#TIndex"><span class="hs-identifier hs-type">TIndex</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Int</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-48"></a><span>    </span><span class="hs-comment">{-| generate rank tensor from a list -}</span><span>
+</span><a name="line-49"></a><span>    </span><span class="hs-identifier">fromList</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="Multilinear.Index.html#TIndex"><span class="hs-identifier hs-type">TIndex</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><a href="#local-6989586621679029274"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-50"></a><span>    </span><span class="hs-comment">{-| Tensor order (contravariant, covariant) -}</span><span>
+</span><a name="line-51"></a><span>    </span><span class="hs-identifier">order</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Int</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Int</span><span class="hs-special">)</span><span>
+</span><a name="line-52"></a><span>    </span><span class="hs-comment">{-| Number of tensor elements -}</span><span>
+</span><a name="line-53"></a><span>    </span><span class="hs-identifier">elems</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">Int</span><span>
+</span><a name="line-54"></a><span>    </span><span class="hs-comment">{-| List of tensor indices -}</span><span>
+</span><a name="line-55"></a><span>    </span><span class="hs-identifier">indices</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><a href="Multilinear.Index.html#TIndex"><span class="hs-identifier hs-type">TIndex</span></a><span class="hs-special">]</span><span>
+</span><a name="line-56"></a><span>    </span><span class="hs-comment">{-| Rename tensor index -}</span><span>
+</span><a name="line-57"></a><span>    </span><span class="hs-identifier">rename</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-58"></a><span>    </span><span class="hs-comment">{-| Check if tensors are equivalent (are of the same type and size) -}</span><span>
+</span><a name="line-59"></a><span>    </span><span class="hs-identifier">equiv</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">Bool</span><span>
+</span><a name="line-60"></a><span>    </span><span class="hs-comment">{-| switch all indices type -}</span><span>
+</span><a name="line-61"></a><span>    </span><span class="hs-identifier">transpose</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-62"></a><span>    </span><span class="hs-comment">{-| switch only one index type -}</span><span>
+</span><a name="line-63"></a><span>    </span><span class="hs-identifier">transpose1</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-64"></a><span>    </span><span class="hs-comment">{-| concatenation of two tensor with given index or by creating a new one -}</span><span>
+</span><a name="line-65"></a><span>    </span><span class="hs-identifier">concat</span><span> </span><span class="hs-glyph">::</span><span>  </span><a href="Multilinear.Index.html#TIndex"><span class="hs-identifier hs-type">TIndex</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679029273"><span class="hs-identifier hs-type">t</span></a><span>
+</span><a name="line-66"></a><span>
+</span><a name="line-67"></a><span>
+</span><a name="line-68"></a><span class="hs-comment">{-}
+instance Num b =&gt; Num (a -&gt; b) where
+    (f1 + f2) x = f1 x + f2 x
+    (f1 * f2) x = f1 x * f2 x
+    (abs f) x = abs (f x)
+    (signum f) x = signum (f x)
+    (negate f) x = negate (f x)
+-}</span><span>
+</span><a name="line-76"></a><span>
+</span><a name="line-77"></a><span>
+</span><a name="line-78"></a></pre></body></html>
