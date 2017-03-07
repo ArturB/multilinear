@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-06 22:11:49.4288054 UTC
+2017-03-07 10:03:11.2484066 UTC
 
 interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.ListTensor 8002
-  interface hash: c392cfb400fa192f20e273427247f2e7
-  ABI hash: 34026a9c33a86b91757ad1558ea32528
+  interface hash: df84b1869599bc2e220d0988fa8b8d63
+  ABI hash: f9c72b92aae4f2d9c93cd15e5b7101a9
   export-list hash: 2f214c80064bbe68480e1094bcea70a4
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: d421a442bac5348a67fd3f91398c6034
@@ -17,8 +17,7 @@ exports:
   Multilinear.ListTensor.switchInd
   Multilinear.ListTensor.switchInd'
   Multilinear.ListTensor.Tensor{Multilinear.ListTensor.Err Multilinear.ListTensor.Scalar Multilinear.ListTensor.Tensor errMessage scalarVal tensorData tensorIndex}
-module dependencies: Multilinear Multilinear.Covector
-                     Multilinear.Index Multilinear.Tensor Multilinear.Vector
+module dependencies: Multilinear.Index Multilinear.Operations
 package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.1.0*
                       binary-0.8.3.0@binary-0.8.3.0*
                       bytestring-0.10.8.1@bytestring-0.10.8.1
@@ -41,15 +40,8 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear 7b5e7bced7ce0c03616f06c89a32d0a9
-  exports: 80e350189d81f91ad87623902c4bd757
-  Multilinear 8469c9569c854c1ba5d54c6a4208bd70
-  elems c6485b17fcc5bd131a1059f7ccd85b37
-  indices 748a70f1e4d2e8d7d004e33b489922fb
-  order c30998cab042793172336f6c27959922
-  rename 2a04f29076cdd53afa90d8007cd4b6b3
-  transpose f2ceff3fcbdf98b82afe5ec5bfaaf618
 import  -/  Multilinear.Index 6b74f99d0b1eae81d6b9713aea48329e
+  exports: 480060e0b08455ffef717b127d57d7f9
   !=! 0a57746d1700d35dcb3b0c5f371d75bf
   Contravariant d6333ec1666cac45303e0a10b22ef507
   Covariant 61b0b8f99d3e1c02814d72096a559931
@@ -57,6 +49,14 @@ import  -/  Multilinear.Index 6b74f99d0b1eae81d6b9713aea48329e
   TIndex c25d5a990f007668cc984a5c013dda4a
   indexCount c9a78087cb1b749fa03ff7c399c0b5e4
   indexName 0a9d105218ffa51f72a0d7ddbe136701
+import  -/  Multilinear.Operations f1bdfd2c1843b4c367b9ecb4e819d086
+  exports: 0256d389d11297b144ccf71dffaa2450
+  Multilinear 5bb6d239f939d025b80dd0486dc1b2f2
+  elems 3596ecf0f60661393f90976737a7fcfa
+  indices 57ffad822e0d880b389d790f55c424a2
+  order a2c0bcc33852bd4a846132b31093bc59
+  rename f7e4f38be3e397502d482d11e7493c39
+  transpose 4ca177e5fa9436818a82deb27539ff7c
 import  -/  base-4.9.1.0:Control.Monad f915f187cea611986ebb12dbc69279ab
 import  -/  base-4.9.1.0:Data.Foldable 254e836c2d813d34e47feb29bb8d40ed
 import  -/  base-4.9.1.0:Data.Functor 682cc832c233b71cec70179490a08631
@@ -73,7 +73,7 @@ import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary 471a6fe52b2904efddd28a463c
 import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Class 26b921856884ebf3fa980365efaa2264
 import  -/  binary-0.8.3.0@binary-0.8.3.0:Data.Binary.Get.Internal 8b5079286a0c6818c089632e1030a3ea
 import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   (!*!) ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -81,7 +81,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 3,
      Strictness: <L,U(C(U),A,C(U),A,A,A,C(U))><S,1*U><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fBinaryTensor ::
     Data.Binary.Class.Binary a =>
     Data.Binary.Class.Binary (Multilinear.ListTensor.Tensor a)
@@ -92,24 +92,24 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                   (Multilinear.ListTensor.$fBinaryTensor_$cput @ a $dBinary)
                   (Multilinear.ListTensor.$fBinaryTensor_$cget @ a $dBinary)
                   (Multilinear.ListTensor.$fBinaryTensor_$cputList @ a $dBinary) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fBinaryTensor1 ::
     Data.Binary.Class.Binary a =>
     [Multilinear.ListTensor.Tensor a] -> Data.Binary.Put.Put
   {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fBinaryTensor2 ::
     Data.Binary.Class.Binary a =>
     Data.Binary.Get.Internal.Get (Multilinear.ListTensor.Tensor a)
   {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fBinaryTensor_$cget ::
     Data.Binary.Class.Binary a =>
     Data.Binary.Get.Internal.Get (Multilinear.ListTensor.Tensor a)
   {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fBinaryTensor2 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fBinaryTensor_$cput ::
     Data.Binary.Class.Binary a =>
     Multilinear.ListTensor.Tensor a -> Data.Binary.Put.Put
@@ -126,14 +126,14 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                  (Data.Binary.Put.PairS @ () ww1 ww2)
                    `cast`
                  (Sym (Data.Binary.Put.N:PutM[0]) <()>_N) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fBinaryTensor_$cputList ::
     Data.Binary.Class.Binary a =>
     [Multilinear.ListTensor.Tensor a] -> Data.Binary.Put.Put
   {- Arity: 1, Strictness: <L,U(C(U(U,U)),U,A)>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fBinaryTensor1 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fEqTensor ::
     GHC.Classes.Eq a =>
     GHC.Classes.Eq (Multilinear.ListTensor.Tensor a)
@@ -143,20 +143,20 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                   @ (Multilinear.ListTensor.Tensor a)
                   (Multilinear.ListTensor.$fEqTensor_$c== @ a $dEq)
                   (Multilinear.ListTensor.$fEqTensor_$c/= @ a $dEq) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fEqTensor1 ::
     GHC.Classes.Eq a =>
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a -> GHC.Types.Bool
   {- Arity: 3, HasNoCafRefs,
      Strictness: <L,U(C(C1(U)),A)><S,1*U><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fEqTensor2 ::
     GHC.Classes.Eq a =>
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a -> GHC.Types.Bool
   {- Arity: 1, HasNoCafRefs, Strictness: <L,U(C(C1(U)),A)> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fEqTensor_$c/= ::
     GHC.Classes.Eq a =>
     Multilinear.ListTensor.Tensor a
@@ -165,7 +165,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
      Strictness: <L,U(C(C1(U)),A)><S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fEqTensor1 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fEqTensor_$c== ::
     GHC.Classes.Eq a =>
     Multilinear.ListTensor.Tensor a
@@ -173,7 +173,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
   {- Arity: 1, HasNoCafRefs, Strictness: <L,U(C(C1(U)),A)>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fEqTensor2 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor ::
     GHC.Float.Floating a =>
     GHC.Float.Floating (Multilinear.ListTensor.Tensor a)
@@ -207,7 +207,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                   (Multilinear.ListTensor.$fFloatingTensor_$clog1mexp
                      @ a
                      $dFloating) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor1 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -238,7 +238,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                          @ a
                          $dFloating
                          eta)) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor10 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -263,25 +263,25 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                    $dNum
                    (Multilinear.ListTensor.$fFloatingTensor2 @ a $dFloating eta)
                    (Multilinear.ListTensor.Scalar @ a dt1) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor11 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor12 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor13 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor14 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -295,50 +295,50 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                    (GHC.Float.$p1Floating @ a $dFloating)
                    (Multilinear.ListTensor.$fFloatingTensor16 @ a $dFloating eta)
                    (Multilinear.ListTensor.$fFloatingTensor15 @ a $dFloating eta)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor15 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor16 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor17 ::
     GHC.Real.Fractional a =>
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 3, Strictness: <L,U(A,C(U),A,A)><S,1*U><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor18 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor19 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor2 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor20 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor21 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -352,19 +352,19 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                    (GHC.Float.$p1Floating @ a $dFloating)
                    (Multilinear.ListTensor.$fFloatingTensor23 @ a $dFloating eta)
                    (Multilinear.ListTensor.$fFloatingTensor22 @ a $dFloating eta)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor22 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor23 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor24 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a
@@ -381,7 +381,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                    (GHC.Float.$p1Floating @ a $dFloating)
                    (Multilinear.ListTensor.$fFloatingTensor6 @ a $dFloating eta1)
                    (Multilinear.ListTensor.$fFloatingTensor6 @ a $dFloating eta)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor25 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a
@@ -401,7 +401,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                       (GHC.Real.$p1Fractional @ a (GHC.Float.$p1Floating @ a $dFloating))
                       (Multilinear.ListTensor.$fFloatingTensor6 @ a $dFloating eta)
                       eta1)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor26 ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -449,17 +449,17 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                         Multilinear.ListTensor.Scalar x2
                         -> case GHC.Num.* @ a $dNum x1 x2 of dt1 { DEFAULT ->
                            Multilinear.ListTensor.Scalar @ a dt1 } } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor27 ::
     (a -> b)
     -> Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor b
   {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor28 ::
     Multilinear.ListTensor.Tensor a -> [Multilinear.Index.TIndex]
   {- Arity: 1, Strictness: <S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor29 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -477,7 +477,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                    $dFloating
                    eta
                    (Multilinear.ListTensor.Scalar @ a dt1) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor3 ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -495,7 +495,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
 17c4259988c92ac9c5f0dda473acb39d
   $fFloatingTensor31 :: GHC.Integer.Type.Integer
   {- HasNoCafRefs, Unfolding: (2) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor32 ::
     GHC.Float.Floating a => Multilinear.ListTensor.Tensor a
   {- Arity: 1, HasNoCafRefs,
@@ -504,7 +504,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                 (\ @ a ($dFloating :: GHC.Float.Floating a) ->
                  case GHC.Float.pi @ a $dFloating of dt1 { DEFAULT ->
                  Multilinear.ListTensor.Scalar @ a dt1 }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor33 ::
     GHC.Float.Floating a =>
     GHC.Real.Fractional (Multilinear.ListTensor.Tensor a)
@@ -515,7 +515,7 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                  Multilinear.ListTensor.$fFractionalTensor
                    @ a
                    (GHC.Float.$p1Floating @ a $dFloating)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor4 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -543,14 +543,14 @@ import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
                       $dNum
                       (Multilinear.ListTensor.Scalar @ a dt1)
                       eta) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor5 ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 3, Strictness: <L,U(C(U),A,A,A,A,A,A)><S,1*U><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor6 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -562,7 +562,7 @@ b5c76da201c36836ebbd9bb1e2d87d64
 a33652ecc1956c362f29330e05eaaef9
   $fFloatingTensor8 :: GHC.Integer.Type.Integer
   {- HasNoCafRefs, Unfolding: (0) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor9 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -576,7 +576,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    $dFloating
                    (Multilinear.ListTensor.$fFloatingTensor2 @ a $dFloating eta)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$c** ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a
@@ -586,7 +586,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(1*U(1*U(C(U),A,C(U),A,A,A,C(U)),A,A,A),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor25 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$cacos ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -594,7 +594,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor19 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$cacosh ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -602,7 +602,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor12 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$casin ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -610,7 +610,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor20 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$casinh ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -618,7 +618,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor13 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$catan ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -626,7 +626,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor18 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$catanh ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -634,7 +634,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor11 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$ccos ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -642,7 +642,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor22 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$ccosh ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -650,7 +650,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor15 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$cexp ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -658,7 +658,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor2 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$cexpm1 ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -666,7 +666,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(1*U,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor10 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$clog ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -674,7 +674,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor6 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$clog1mexp ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -682,7 +682,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <S(S(S(LLLLLLC(S))LLL)LLLLLLLLLLLLLLLLLLLLLL),U(U(U(U,U,U,U,U,U,U),U,U,U),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor1 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$clog1p ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -690,7 +690,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(1*U,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor4 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$clog1pexp ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -698,7 +698,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <S(SLLLLLLLLLLLLLLLLLLLLLL),U(U,A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor9 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$clogBase ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a
@@ -708,7 +708,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(1*U(A,C(U),A,A),A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor24 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$csin ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -716,7 +716,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor23 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$csinh ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -724,7 +724,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(A,A,A,A,A,A,A,A,A,A,A,A,A,C(U),A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor16 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$csqrt ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -732,7 +732,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <S(S(LLLC(S))LLLLLLLLLLLLLLLLLLLLLL),U(U(U(C(U),A,C(U),A,A,A,C(U)),A,A,1*C1(U)),A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor29 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$ctan ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -740,7 +740,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(1*U(A,C(U),A,A),A,A,A,A,A,A,C(U),C(U),A,A,A,A,A,A,A,A,A,A,A,A,A,A)><S,U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor21 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFloatingTensor_$ctanh ::
     GHC.Float.Floating a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -748,7 +748,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <L,U(1*U(A,C(U),A,A),A,A,A,A,A,A,A,A,A,A,A,A,C(U),C(U),A,A,A,A,A,A,A,A)><S,U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor14 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFractionalTensor ::
     GHC.Real.Fractional a =>
     GHC.Real.Fractional (Multilinear.ListTensor.Tensor a)
@@ -763,7 +763,7 @@ a33652ecc1956c362f29330e05eaaef9
                      @ a
                      $dFractional)
                   (Multilinear.ListTensor.$fFractionalTensor1 @ a $dFractional) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFractionalTensor1 ::
     GHC.Real.Fractional a =>
     GHC.Real.Rational -> Multilinear.ListTensor.Tensor a
@@ -776,7 +776,7 @@ a33652ecc1956c362f29330e05eaaef9
                  case x1 of x2 { GHC.Real.:% ipv ipv1 ->
                  case GHC.Real.fromRational @ a $dFractional x2 of dt1 { DEFAULT ->
                  Multilinear.ListTensor.Scalar @ a dt1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFractionalTensor2 ::
     GHC.Real.Fractional a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -794,7 +794,7 @@ a33652ecc1956c362f29330e05eaaef9
                    $dFractional
                    (Multilinear.ListTensor.Scalar @ a dt1)
                    eta }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFractionalTensor3 ::
     GHC.Real.Fractional a =>
     GHC.Num.Num (Multilinear.ListTensor.Tensor a)
@@ -805,7 +805,7 @@ a33652ecc1956c362f29330e05eaaef9
                  Multilinear.ListTensor.$fNumTensor
                    @ a
                    (GHC.Real.$p1Fractional @ a $dFractional)) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFractionalTensor_$c/ ::
     GHC.Real.Fractional a =>
     Multilinear.ListTensor.Tensor a
@@ -814,7 +814,7 @@ a33652ecc1956c362f29330e05eaaef9
   {- Arity: 3, Strictness: <L,U(A,C(U),A,A)><S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor17 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFractionalTensor_$crecip ::
     GHC.Real.Fractional a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -822,7 +822,7 @@ a33652ecc1956c362f29330e05eaaef9
      Strictness: <S(S(LLLLLLC(S))LLL),U(1*U(A,A,A,A,A,A,1*C1(U)),C(U),A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFractionalTensor2 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFunctorTensor :: GHC.Base.Functor Multilinear.ListTensor.Tensor
   DFunId
   {- HasNoCafRefs, Strictness: m,
@@ -830,7 +830,7 @@ a33652ecc1956c362f29330e05eaaef9
                   @ Multilinear.ListTensor.Tensor
                   Multilinear.ListTensor.$fFloatingTensor27
                   Multilinear.ListTensor.$fFunctorTensor1 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fFunctorTensor1 ::
     a
     -> Multilinear.ListTensor.Tensor b
@@ -843,9 +843,9 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (\ (ds2 :: b) -> eta)
                    eta1) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor ::
-    Multilinear.Multilinear Multilinear.ListTensor.Tensor
+    Multilinear.Operations.Multilinear Multilinear.ListTensor.Tensor
   DFunId
   {- Unfolding: DFun:.
                   @ Multilinear.ListTensor.Tensor
@@ -865,7 +865,7 @@ a33652ecc1956c362f29330e05eaaef9
                   Multilinear.ListTensor.$fMultilinearTensor_$cconcat
                   Multilinear.ListTensor.$fMultilinearTensor2
                   Multilinear.ListTensor.$fMultilinearTensor1 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor1 ::
     Multilinear.ListTensor.Tensor a -> GHC.Types.Int
   {- Arity: 1, Strictness: <S,1*U>m, Inline: INLINE[0],
@@ -873,7 +873,7 @@ a33652ecc1956c362f29330e05eaaef9
                 (\ @ a (w :: Multilinear.ListTensor.Tensor a) ->
                  case Multilinear.ListTensor.$wds @ a w of ww { DEFAULT ->
                  GHC.Types.I# ww }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor2 ::
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a -> GHC.Types.Bool
@@ -887,18 +887,18 @@ a33652ecc1956c362f29330e05eaaef9
                     (Multilinear.ListTensor.$fFloatingTensor28 @ a t4))
                    `cast`
                  (Data.Monoid.N:All[0]) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor3 ::
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor4 ::
     Multilinear.ListTensor.Tensor a
     -> GHC.Base.String
     -> GHC.Base.String
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 3, HasNoCafRefs, Strictness: <S,1*U><S,1*U><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor5 ::
     Multilinear.ListTensor.Tensor a -> (GHC.Types.Int, GHC.Types.Int)
   {- Arity: 1, Strictness: <S,1*U>m, Inline: INLINE[0],
@@ -906,7 +906,7 @@ a33652ecc1956c362f29330e05eaaef9
                 (\ @ a (w :: Multilinear.ListTensor.Tensor a) ->
                  case Multilinear.ListTensor.$wds1 @ a w of ww { (#,#) ww1 ww2 ->
                  (ww1, ww2) }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c*. ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -925,7 +925,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (\ (ds2 :: a) -> GHC.Num.* @ a $dNum ds2 x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c+. ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -944,7 +944,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (\ (ds2 :: a) -> GHC.Num.+ @ a $dNum ds2 x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c-. ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -962,7 +962,7 @@ a33652ecc1956c362f29330e05eaaef9
                    (\ (p :: a) ->
                     case p of p1 { DEFAULT -> GHC.Num.- @ a $dNum p1 x2 })
                    t }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c.* ::
     GHC.Num.Num a =>
     a
@@ -982,7 +982,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (GHC.Num.* @ a $dNum x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c.+ ::
     GHC.Num.Num a =>
     a
@@ -1002,7 +1002,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (GHC.Num.+ @ a $dNum x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c.- ::
     GHC.Num.Num a =>
     a
@@ -1022,7 +1022,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (GHC.Num.- @ a $dNum x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c./ ::
     GHC.Real.Fractional a =>
     a
@@ -1042,7 +1042,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (GHC.Real./ @ a $dFractional x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$c/. ::
     GHC.Real.Fractional a =>
     Multilinear.ListTensor.Tensor a
@@ -1061,7 +1061,7 @@ a33652ecc1956c362f29330e05eaaef9
                    @ a
                    (\ (ds2 :: a) -> GHC.Real./ @ a $dFractional ds2 x2)
                    t1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$cconcat ::
     GHC.Types.Char
     -> Multilinear.ListTensor.Tensor a
@@ -1075,7 +1075,7 @@ a33652ecc1956c362f29330e05eaaef9
                    (t :: Multilinear.ListTensor.Tensor a) ->
                  case ds2 of ds4 { GHC.Types.C# ipv ->
                  case ds3 of ds5 { DEFAULT -> t } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fMultilinearTensor_$cinverse ::
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U>,
@@ -1086,7 +1086,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
     [Multilinear.Index.TIndex]
     -> [Multilinear.Index.TIndex] -> Data.Monoid.All
   {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><L,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor ::
     GHC.Num.Num a => GHC.Num.Num (Multilinear.ListTensor.Tensor a)
   DFunId
@@ -1101,7 +1101,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
                   (Multilinear.ListTensor.$fNumTensor_$cabs @ a $dNum)
                   (Multilinear.ListTensor.$fNumTensor_$csignum @ a $dNum)
                   (Multilinear.ListTensor.$fNumTensor1 @ a $dNum) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor1 ::
     GHC.Num.Num a =>
     GHC.Integer.Type.Integer -> Multilinear.ListTensor.Tensor a
@@ -1112,19 +1112,19 @@ d92d98e1ac0f38ea9795f466aa8c2253
                  case x1 of x2 { DEFAULT ->
                  case GHC.Num.fromInteger @ a $dNum x2 of dt1 { DEFAULT ->
                  Multilinear.ListTensor.Scalar @ a dt1 } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor2 ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,A,C(U),A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor3 ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, HasNoCafRefs,
      Strictness: <L,U(A,A,A,A,C(U),A,A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor4 ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -1142,7 +1142,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
                    $dNum
                    (Multilinear.ListTensor.Scalar @ a dt1)
                    eta }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor_$c+ ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -1151,7 +1151,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
   {- Arity: 3, Strictness: <L,U(C(U),A,A,A,A,A,A)><S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor5 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor_$c- ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -1160,7 +1160,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
   {- Arity: 3, Strictness: <L,U(A,C(C1(U)),A,A,A,A,A)><S,1*U><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fFloatingTensor3 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor_$cabs ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -1168,7 +1168,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
      Strictness: <L,U(A,A,A,A,C(U),A,A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fNumTensor3 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor_$cnegate ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -1176,7 +1176,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
      Strictness: <S(LLLLLLC(S)),U(A,C(C1(U)),A,A,A,A,1*C1(U))><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fNumTensor4 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fNumTensor_$csignum ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a -> Multilinear.ListTensor.Tensor a
@@ -1184,7 +1184,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
      Strictness: <L,U(A,A,A,A,A,C(U),A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fNumTensor2 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor ::
     GHC.Show.Show a => GHC.Show.Show (Multilinear.ListTensor.Tensor a)
   DFunId
@@ -1194,7 +1194,7 @@ d92d98e1ac0f38ea9795f466aa8c2253
                   (Multilinear.ListTensor.$fShowTensor_$cshowsPrec @ a $dShow)
                   (Multilinear.ListTensor.$fShowTensor_$cshow @ a $dShow)
                   (Multilinear.ListTensor.$fShowTensor_$cshowList @ a $dShow) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor1 ::
     GHC.Show.Show a =>
     [Multilinear.ListTensor.Tensor a] -> GHC.Show.ShowS
@@ -1213,12 +1213,12 @@ d92d98e1ac0f38ea9795f466aa8c2253
                       s1)
                    ls
                    s) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor2 ::
     GHC.Show.Show a =>
     Multilinear.ListTensor.Tensor a -> GHC.Base.String
   {- Arity: 2, Strictness: <L,U(A,C(U),A)><S,1*U> -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor3 ::
     GHC.Show.Show a =>
     GHC.Types.Int -> Multilinear.ListTensor.Tensor a -> GHC.Show.ShowS
@@ -1241,21 +1241,21 @@ d92d98e1ac0f38ea9795f466aa8c2253
                       n
                       (Multilinear.ListTensor.$fShowTensor2 @ a $dShow x1))
                    s) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor_$cshow ::
     GHC.Show.Show a =>
     Multilinear.ListTensor.Tensor a -> GHC.Base.String
   {- Arity: 2, Strictness: <L,U(A,C(U),A)><S,1*U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fShowTensor2 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor_$cshowList ::
     GHC.Show.Show a =>
     [Multilinear.ListTensor.Tensor a] -> GHC.Show.ShowS
   {- Arity: 3, Strictness: <L,U(A,C(U),A)><S,1*U><L,U>,
      Unfolding: InlineRule (0, True, True)
                 Multilinear.ListTensor.$fShowTensor1 -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $fShowTensor_$cshowsPrec ::
     GHC.Show.Show a =>
     GHC.Types.Int -> Multilinear.ListTensor.Tensor a -> GHC.Show.ShowS
@@ -1325,14 +1325,14 @@ c4b840e014d89554f640fdd528fc605a
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $w$cput ::
     Data.Binary.Class.Binary a =>
     Multilinear.ListTensor.Tensor a
     -> (# (), Data.ByteString.Builder.Internal.Builder #)
   {- Arity: 2, Strictness: <L,U(C(U(U,U)),U,A)><S,1*U>,
      Inline: [0] -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $wcommonIndex ::
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
@@ -1393,40 +1393,40 @@ c4b840e014d89554f640fdd528fc605a
                                       GHC.Base.Nothing -> go1 ys GHC.Base.Just ipv -> wild3 } } }
                            } in
                            go1 indicesNames1 } } } }) -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $wds :: Multilinear.ListTensor.Tensor a -> GHC.Prim.Int#
   {- Arity: 1, Strictness: <S,1*U>, Inline: [0] -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $wds1 ::
     Multilinear.ListTensor.Tensor a
     -> (# GHC.Types.Int, GHC.Types.Int #)
   {- Arity: 1, Strictness: <S,1*U>, Inline: [0] -}
-6902556bf1281772c8b64cf43755d794
+48ae9d6d1662cef914fc7ece014ba31a
   $wswitchInd ::
     Multilinear.ListTensor.Tensor a
     -> GHC.Base.Maybe GHC.Base.String
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, Strictness: <S,1*U><S,1*U>, Inline: [0] -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   $wswitchInd' ::
     Multilinear.ListTensor.Tensor a
     -> GHC.Base.Maybe GHC.Base.String
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 2, Strictness: <S,1*U><S,1*U>, Inline: [0] -}
-308e239bd673f098b9054c39581f1f8e
+1a86e5834f76ffec13dcab17d51e7246
   data Tensor a
     = Scalar {scalarVal :: !a}
     | Tensor {tensorIndex :: !Multilinear.Index.TIndex,
               tensorData :: ![Multilinear.ListTensor.Tensor a]}
     | Err {errMessage :: !GHC.Base.String}
-39e936be8fdf3c9a224db81880bf3640
+3a4d16dd0931ec5368dad1dcde000e14
   _dot ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
     -> Multilinear.ListTensor.Tensor a
   {- Arity: 1, Strictness: <L,U(C(U),A,C(U),A,A,A,C(U))> -}
-361c714217496a110e253c8c8332a01f
+88cf63cec6ffb2e781d579b8bcc9f833
   commonIndex ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -1439,7 +1439,7 @@ c4b840e014d89554f640fdd528fc605a
                    (w1 :: Multilinear.ListTensor.Tensor a)
                    (w2 :: Multilinear.ListTensor.Tensor a) ->
                  Multilinear.ListTensor.$wcommonIndex @ a w1 w2) -}
-f9df4181c3a6f07f87e85fbba49d28b5
+8becbc659bc0f58717324e0eccdc8ef8
   errMessage :: Multilinear.ListTensor.Tensor a -> GHC.Base.String
   RecSel Left Multilinear.ListTensor.Tensor
   {- Arity: 1, Strictness: <S,1*U>,
@@ -1451,7 +1451,7 @@ f9df4181c3a6f07f87e85fbba49d28b5
 507396842c85978733d9e21c74e90a1a
   errMessage1 :: GHC.Base.String
   {- Strictness: x -}
-7fb6e440ef411c69b19901d52d41bbc8
+cde78b1f2377bfebb6c33de8feac3038
   scalarVal :: Multilinear.ListTensor.Tensor a -> a
   RecSel Left Multilinear.ListTensor.Tensor
   {- Arity: 1, Strictness: <S,1*U>,
@@ -1463,7 +1463,7 @@ f9df4181c3a6f07f87e85fbba49d28b5
 a95f75eb03277d505564aca92eca58fe
   scalarVal1 :: a
   {- Strictness: x -}
-a15041cb8853d193f9ae0b21dc49d7e9
+a73cc680d5bd08e3b46d0e3110e53e2d
   switchInd ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -1476,7 +1476,7 @@ a15041cb8853d193f9ae0b21dc49d7e9
                    (w1 :: Multilinear.ListTensor.Tensor a)
                    (w2 :: GHC.Base.Maybe GHC.Base.String) ->
                  Multilinear.ListTensor.$wswitchInd @ a w1 w2) -}
-b5aa158183f62b08a80a70c08192e736
+f6059c99aefa464e333b444b420f16e4
   switchInd' ::
     GHC.Num.Num a =>
     Multilinear.ListTensor.Tensor a
@@ -1489,7 +1489,7 @@ b5aa158183f62b08a80a70c08192e736
                    (w1 :: Multilinear.ListTensor.Tensor a)
                    (w2 :: GHC.Base.Maybe GHC.Base.String) ->
                  Multilinear.ListTensor.$wswitchInd' @ a w1 w2) -}
-0b5b82a5a26f48830558ab952ad1667a
+d1dc843d4b9583578795b1d279154276
   tensorData ::
     Multilinear.ListTensor.Tensor a
     -> [Multilinear.ListTensor.Tensor a]
@@ -1500,10 +1500,10 @@ b5aa158183f62b08a80a70c08192e736
                  case ds2 of wild {
                    DEFAULT -> Multilinear.ListTensor.tensorData1 @ a
                    Multilinear.ListTensor.Tensor ds3 ds4 -> ds4 }) -}
-eed09eec590cff3c0ae082932d7c4ea5
+16b531148353ba8f961cdaec32df6c8a
   tensorData1 :: [Multilinear.ListTensor.Tensor a]
   {- Strictness: x -}
-62c2a6c1679d29632638aa94ba73ef8d
+653da9f501c2322aba62895861e2c937
   tensorIndex ::
     Multilinear.ListTensor.Tensor a -> Multilinear.Index.TIndex
   RecSel Left Multilinear.ListTensor.Tensor
@@ -1526,7 +1526,7 @@ instance [safe] GHC.Real.Fractional [Multilinear.ListTensor.Tensor]
   = Multilinear.ListTensor.$fFractionalTensor
 instance [safe] GHC.Base.Functor [Multilinear.ListTensor.Tensor]
   = Multilinear.ListTensor.$fFunctorTensor
-instance [safe] Multilinear.Multilinear [Multilinear.ListTensor.Tensor]
+instance [safe] Multilinear.Operations.Multilinear [Multilinear.ListTensor.Tensor]
   = Multilinear.ListTensor.$fMultilinearTensor
 instance [safe] GHC.Num.Num [Multilinear.ListTensor.Tensor]
   = Multilinear.ListTensor.$fNumTensor

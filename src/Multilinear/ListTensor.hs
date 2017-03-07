@@ -9,19 +9,22 @@ Portability : Windows/POSIX
 
 -}
 
-{-# LANGUAGE Strict, GADTs #-}
+{-# LANGUAGE GADTs  #-}
+{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
 module Multilinear.ListTensor (
     Tensor(..),
-    switchInd, switchInd', commonIndex, _dot
+    switchInd, switchInd', commonIndex, _dot,
+    module Ind
 ) where
 
-import           Multilinear
 import           Control.Monad
+import           Data.Binary
 import           Data.List
 import           Data.Maybe
-import           Data.Binary
+import           Multilinear.Index      as Ind
+import           Multilinear.Operations
 
 {- ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -30,23 +33,23 @@ deserializationErr :: String
 deserializationErr = "Tensor deserialization error!"
 
 {- Tensor defined recursively as scalar or list of other tensors -}
-data Tensor a =
+data Tensor i a =
     {-| Tensor may be a scalar -}
-    Scalar { 
-        scalarVal :: a 
+    Scalar {
+        scalarVal :: a
     } |
     {-| Or a list of other tensors -}
-    Tensor { 
-        tensorIndex :: TIndex, 
-        tensorData :: [Tensor a] 
+    Tensor {
+        tensorIndex :: TIndex i,
+        tensorData  :: [Tensor i a]
     } |
     {-| Operations on tensors may throw an error -}
-    Err { 
-        errMessage :: String 
+    Err {
+        errMessage :: String
     } deriving Eq
 
 {-| Tensor serialization and deserialization -}
-instance Binary a => Binary (Tensor a) where
+instance (Binary i, Binary a) => Binary (Tensor i a) where
     put (Scalar x) = do
         put (0 :: Word8)
         put x
@@ -83,22 +86,22 @@ _showVertical v =
         where vShowed = (\x -> "| " ++ show x ++ "\n  ") <$> v :: [String]
 
 -- return True if tensor is an error
-_isErrTensor :: Tensor a -> Bool
+_isErrTensor :: Tensor i a -> Bool
 _isErrTensor (Err _) = True
 _isErrTensor _       = False
 
 -- collapse many errors in tensor to the first one
-_collapseErr :: Tensor a -> Tensor a
+_collapseErr :: Tensor i a -> Tensor i a
 _collapseErr t1@(Tensor _ ts) =
     -- find first error if present
-    let err = Data.List.find _isErrTensor (_collapseErr <$> ts) 
+    let err = Data.List.find _isErrTensor (_collapseErr <$> ts)
     -- and return this error if found, whole tensor otherwise
-    in fromMaybe t1 err 
+    in fromMaybe t1 err
 -- in scalars cannot be any error
 _collapseErr t = t
 
 -- Show tensor without collapsing
-show' :: Show a => Tensor a -> String
+show' :: (Show i, Show a) => Tensor i a -> String
 -- Scalar is showed simply as its value
 show' (Scalar x) = show x
 -- Covariant components are shown horizontally
@@ -114,12 +117,12 @@ show' (Tensor index@(Indifferent _ _) ts) =
 show' (Err msg) = show msg
 
 -- Print tensor
-instance Show a => Show (Tensor a) where
+instance (Show i, Show a) => Show (Tensor i a) where
     -- collapse errors first and then print tensor
     show t = show' $ _collapseErr t
 
 -- Tensor is a Functor
-instance Functor Tensor where
+instance Functor (Tensor i) where
     -- Mapping scalars simply maps its value
     fmap f (Scalar v_) = Scalar (f v_)
     -- Mapping tensors does mapping element by element
@@ -129,7 +132,7 @@ instance Functor Tensor where
     fmap _ (Err msg) = Err msg
 
 -- Tensor can be added, subtracted and multiplicated
-instance Num a => Num (Tensor a) where
+instance (Eq i, Show i, Integral i, Num a) => Num (Tensor i a) where
     -- Adding - element by element
     Scalar x1 + Scalar x2 = Scalar $ x1 + x2
     Scalar x + t = (x+) <$> t
@@ -178,7 +181,7 @@ instance Num a => Num (Tensor a) where
     fromInteger x = Scalar $ fromInteger x
 
 -- Tensors can be divided by each other
-instance Fractional a => Fractional (Tensor a) where
+instance (Eq i, Show i, Integral i, Fractional a) => Fractional (Tensor i a) where
     -- Scalar division return result of division of its values
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
     -- Tensor and scalar are divided value by value
@@ -201,7 +204,7 @@ instance Fractional a => Fractional (Tensor a) where
 -- Real-number functions on tensors.
 -- Function of tensor is a tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance Floating a => Floating (Tensor a) where
+instance (Eq i, Show i, Integral i, Floating a) => Floating (Tensor i a) where
     pi = Scalar pi
 
     exp (Scalar x)        = Scalar $ exp x
@@ -318,11 +321,11 @@ instance Multilinear Tensor where
     -- Transpose a tensor (switch all indices types)
     transpose (Scalar x) = Scalar x
     transpose (Tensor (Covariant count name) ts) =
-        Tensor (Contravariant count name) (Multilinear.transpose <$> ts)
+        Tensor (Contravariant count name) (Multilinear.Operations.transpose <$> ts)
     transpose (Tensor (Contravariant count name) ts) =
-        Tensor (Covariant count name) (Multilinear.transpose <$> ts)
+        Tensor (Covariant count name) (Multilinear.Operations.transpose <$> ts)
     transpose (Tensor (Indifferent count name) ts) =
-        Tensor (Indifferent count name) (Multilinear.transpose <$> ts)
+        Tensor (Indifferent count name) (Multilinear.Operations.transpose <$> ts)
     transpose (Err msg) = Err msg
 
     -- Inverse a tensor as a multilinear map
@@ -335,20 +338,20 @@ instance Multilinear Tensor where
 
 -- Push index given as Maybe String one step deeper in recursion
 -- Important for performance - tensor product is most efficient if summed indices are on the deepest level of recursion
-switchInd :: Num a => Tensor a -> Maybe String -> Tensor a
+switchInd :: (Integral i, Num a) => Tensor i a -> Maybe String -> Tensor i a
 switchInd (Scalar x) _ = Scalar x
 switchInd t1 Nothing = t1
 switchInd t1@(Tensor index1 ts1) (Just ind)
     | length (indices t1) > 1 && indexName index1 == ind =
         let index2 = tensorIndex (head ts1)
-        in Tensor index2 [Tensor index1 [tensorData (ts1 !! j) !! i
+        in Tensor index2 [Tensor index1 [tensorData (ts1 !! fromIntegral j) !! fromIntegral i
             | j <- [0 .. indexCount index1 - 1]]
             | i <- [0 .. indexCount index2 - 1]]
     | otherwise = t1
 switchInd (Err msg) _ = Err msg
 
 -- Push index given as Maybe String into the deepest level of recursion
-switchInd' :: Num a => Tensor a -> Maybe String -> Tensor a
+switchInd' :: (Integral i, Num a) => Tensor i a -> Maybe String -> Tensor i a
 switchInd' (Scalar x) _ = Scalar x
 switchInd' t1 Nothing = t1
 switchInd' t1@(Tensor _ _) i@(Just _)
@@ -360,7 +363,7 @@ switchInd' (Err msg) _ = Err msg
 
 -- Dot product of covector and vector (specifically in this order)
 -- Number of elements in two tensors must be the same
-_dot :: Num a => Tensor a -> Tensor a -> Tensor a
+_dot :: (Eq i, Show i, Integral i, Num a) => Tensor i a -> Tensor i a -> Tensor i a
 Scalar x1 `_dot` Scalar x2 =  Scalar $ x1 * x2
 Tensor i1@(Covariant count1 _) ts1 `_dot` Tensor i2@(Contravariant count2 _) ts2
     | count1 == count2 = sum $ zipWith (*) ts1 ts2
@@ -375,21 +378,21 @@ t1 `_dot` t2 = Err $
 
 -- Tensor product with Einstein summation convention
 -- Does not optimize tensor structure (summed indices on deepest level of recursion)
-(!*!) :: Num a => Tensor a -> Tensor a -> Tensor a
+(!*!) :: (Integral i, Show i, Num a) => Tensor i a -> Tensor i a -> Tensor i a
 (Scalar x1) !*! (Scalar x2) = Scalar $ x1 * x2
 (Scalar x) !*! t2 = (x *) <$> t2
 t1 !*! (Scalar x) = (* x) <$> t1
 t1@(Tensor index1 ts1) !*! t2@(Tensor index2 ts2)
     | indexName index1 == indexName index2 = t1 `_dot` t2
     | indexName index1 `elem` (indexName <$> indices t2) =
-        Tensor index2 [t1 !*! (ts2 !! i) | i <- [1 .. indexCount index2] ]
-    | otherwise = Tensor index1 [(ts1 !! i) !*! t2 | i <- [1 .. indexCount index1] ]
+        Tensor index2 [t1 !*! (ts2 !! fromIntegral i) | i <- [0 .. indexCount index2 - 1] ]
+    | otherwise = Tensor index1 [(ts1 !! fromIntegral i) !*! t2 | i <- [0 .. indexCount index1 - 1] ]
 Err msg !*! _ = Err msg
 _ !*! Err msg = Err msg
 
 -- Tensor product with Einstein summation convention
 -- Optimizes tensor structure for efficiency - pushes summed indices at the deepest level of recursion
-(!*) :: Num a => Tensor a -> Tensor a -> Tensor a
+(!*) :: (Integral i, Show i, Num a) => Tensor i a -> Tensor i a -> Tensor i a
 (Scalar x1) !* (Scalar x2) = Scalar $ x1 * x2
 (Scalar x) !* t2 = (x *) <$> t2
 t1 !* (Scalar x) = (* x) <$> t1
@@ -400,7 +403,7 @@ Err msg !* _ = Err msg
 _ !* Err msg = Err msg
 
 -- Find common index in two tensors, if any
-commonIndex :: Num a => Tensor a -> Tensor a -> Maybe String
+commonIndex :: Num a => Tensor i a -> Tensor i a -> Maybe String
 commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
     let indicesNames1 = indexName <$> indices t1
         indicesNames2 = indexName <$> indices t2

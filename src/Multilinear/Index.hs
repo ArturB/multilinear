@@ -12,30 +12,30 @@ Portability : Windows/POSIX
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Index (
-    TIndex(..), 
-    equivI, (!=!), 
+    TIndex(..),
+    equivI, (!=!),
 ) where
 
-import Data.Binary
+import           Data.Binary
 
 {-| TENSOR INDEX -}
-data TIndex =
+data TIndex i =
     Covariant {
-        indexCount :: Int,
-        indexName :: String
+        indexCount :: i,
+        indexName  :: String
     } |
     Contravariant {
-        indexCount :: Int,
-        indexName :: String
+        indexCount :: i,
+        indexName  :: String
     } |
     Indifferent {
-        indexCount :: Int,
-        indexName :: String
+        indexCount :: i,
+        indexName  :: String
     }
     deriving Eq
 
 {-| Serialization -}
-instance Binary TIndex where
+instance Binary i => Binary (TIndex i) where
     put (Covariant c n) = do
         put (0 :: Word8)
         put c
@@ -61,13 +61,13 @@ instance Binary TIndex where
             return $ Contravariant c n
 
 {-| Show instance of TIndex -}
-instance Show TIndex where
-    show (Covariant c n) = "[" ++ n ++ ":" ++ show c ++ "]"
+instance Show i => Show (TIndex i) where
+    show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
-    show (Indifferent c n) = "(" ++ n ++ ":" ++ show c ++ ")"
+    show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
 
 {-| Returns true if two indices are quivalent, i.e. differs only by name -}
-equivI :: TIndex -> TIndex -> Bool
+equivI :: Eq i => TIndex i -> TIndex i -> Bool
 equivI (Covariant count1 _) (Covariant count2 _)
     | count1 == count2 = True
     | otherwise = False
@@ -81,7 +81,7 @@ equivI _ _ = False
 
 {-| Infix operator equivalent of equiv -}
 infixl 6 !=!
-(!=!) :: TIndex -> TIndex -> Bool
+(!=!) :: Eq i => TIndex i -> TIndex i -> Bool
 (!=!) = equivI
 
 
