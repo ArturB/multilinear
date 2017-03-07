@@ -30,6 +30,7 @@ library
                     ,  Multilinear.NVector
                     ,  Multilinear.NVector.Seq
                     ,  Multilinear.NVector.Field
+                    ,  Multilinear.Operations
                     ,  Multilinear.Tensor
                     ,  Multilinear.Tensor.Seq
                     ,  Multilinear.Tensor.Field

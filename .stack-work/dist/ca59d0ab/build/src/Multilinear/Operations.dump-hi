@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-07 10:02:15.6647369 UTC
+2017-03-07 11:57:17.0285704 UTC
 
 interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Operations 8002
-  interface hash: 8fe3f0123a063e87edb5c1d59dbf0a36
-  ABI hash: f1bdfd2c1843b4c367b9ecb4e819d086
+  interface hash: 40b79fc11aae48bdf6db093d87faf33d
+  ABI hash: 5f452ebcd5ea401c9b6224bb7dea7be6
   export-list hash: 0256d389d11297b144ccf71dffaa2450
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 0a867a4eb71687b8f77180a0cef6e55a
@@ -36,13 +36,14 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear.Index 6b74f99d0b1eae81d6b9713aea48329e
+import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
   exports: 480060e0b08455ffef717b127d57d7f9
-  TIndex c25d5a990f007668cc984a5c013dda4a
+  TIndex 48f8ee88f7f9a97b4b06621968312cde
 import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
 import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
 import  -/  base-4.9.1.0:GHC.Real b88ae4a48c079652623073a5bbf5c9b0
 import  -/  base-4.9.1.0:Prelude 74b3e204395920329f6de9d97206abe9
+import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
 fixities infixl 8 *., infixl 7 +., infixl 7 -., infixl 8 .*,
          infixl 7 .+, infixl 7 .-
 7bc8fe0b433c80bdc801b99cc17e95fa
@@ -84,24 +85,24 @@ fb49925a88cfaeffb9c86a2b691b9117
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-5bb6d239f939d025b80dd0486dc1b2f2
-  class Multilinear (t :: * -> *) where
-    (.+) :: GHC.Num.Num a => a -> t a -> t a
-    (.-) :: GHC.Num.Num a => a -> t a -> t a
-    (.*) :: GHC.Num.Num a => a -> t a -> t a
-    (./) :: GHC.Real.Fractional a => a -> t a -> t a
-    (+.) :: GHC.Num.Num a => t a -> a -> t a
-    (-.) :: GHC.Num.Num a => t a -> a -> t a
-    (*.) :: GHC.Num.Num a => t a -> a -> t a
-    (/.) :: GHC.Real.Fractional a => t a -> a -> t a
-    order :: t a -> (GHC.Types.Int, GHC.Types.Int)
-    indices :: t a -> [Multilinear.Index.TIndex]
-    rename :: t a -> GHC.Base.String -> GHC.Base.String -> t a
-    transpose :: t a -> t a
-    inverse :: t a -> t a
-    concat :: GHC.Types.Char -> t a -> t a -> t a
-    equiv :: t a -> t a -> GHC.Types.Bool
-    elems :: t a -> GHC.Types.Int
+db59ac4e784384516d08ab9b5fda7108
+  class Multilinear (t :: * -> * -> *) where
+    (.+) :: GHC.Num.Num a => a -> t i a -> t i a
+    (.-) :: GHC.Num.Num a => a -> t i a -> t i a
+    (.*) :: GHC.Num.Num a => a -> t i a -> t i a
+    (./) :: GHC.Real.Fractional a => a -> t i a -> t i a
+    (+.) :: GHC.Num.Num a => t i a -> a -> t i a
+    (-.) :: GHC.Num.Num a => t i a -> a -> t i a
+    (*.) :: GHC.Num.Num a => t i a -> a -> t i a
+    (/.) :: GHC.Real.Fractional a => t i a -> a -> t i a
+    order :: t i a -> (GHC.Types.Int, GHC.Types.Int)
+    indices :: t i a -> [Multilinear.Index.TIndex i]
+    rename :: t i a -> GHC.Base.String -> GHC.Base.String -> t i a
+    transpose :: t i a -> t i a
+    inverse :: t i a -> t i a
+    concat :: GHC.Types.Char -> t i a -> t i a -> t i a
+    equiv :: GHC.Classes.Eq i => t i a -> t i a -> GHC.Types.Bool
+    elems :: GHC.Num.Num i => t i a -> i
     {-# MINIMAL (.+), (.-), (.*), (./), (+.), (-.), (*.), (/.), order,
                 indices, rename, transpose, inverse, concat, equiv, elems #-}
 vectorised variables:
