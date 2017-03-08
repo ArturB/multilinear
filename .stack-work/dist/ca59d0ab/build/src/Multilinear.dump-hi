@@ -1,11 +1,11 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-07 11:57:18.6292197 UTC
+2017-03-07 12:41:27.2796633 UTC
 
 interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear 8002
-  interface hash: 231d702188bc1bb64f9676d54b2e3706
-  ABI hash: 7d8685fd911be535b87328a611af2430
-  export-list hash: 5e796bc07f99b8e66d2fa8a0fcb2c2ea
+  interface hash: 0fd4bb1ec19fc728c5e1cb56ec2a857b
+  ABI hash: 6feea61a9bce4887202f99e5c67e433c
+  export-list hash: b08f82d15478281177fc05abeb1a4d24
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 5e8d2fee958d78fc7128f272f0da37fb
   sig of: Nothing
@@ -14,9 +14,14 @@ interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear 8002
 exports:
   Multilinear.Index.!=!
   Multilinear.Index.equivI
+  Multilinear.ListTensor._dot
+  Multilinear.ListTensor.commonIndex
+  Multilinear.ListTensor.switchInd
+  Multilinear.ListTensor.switchInd'
   Multilinear.Tensor.tensor
   Multilinear.Covector.T_{Multilinear.Covector.T_}
   Multilinear.Index.TIndex{Multilinear.Index.Contravariant Multilinear.Index.Covariant Multilinear.Index.Indifferent indexCount indexName}
+  Multilinear.ListTensor.Tensor{Multilinear.ListTensor.Err Multilinear.ListTensor.Scalar Multilinear.ListTensor.Tensor errMessage scalarVal tensorData tensorIndex}
   Multilinear.Vector.V{Multilinear.Vector.V}
 module dependencies: Multilinear.Covector
                      Multilinear.Covector.Field Multilinear.Covector.Seq
@@ -67,8 +72,20 @@ import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
   equivI 7e19baab020695e36b536396a839a761
   indexCount 49c023e428a00d7dca1693a4affbb696
   indexName 13bb28b4dd79fe499c2d343e0b2cd53b
-import  -/  Multilinear.ListTensor d74f29bf3fe3059b01a63980a6236a0a
+import  -/  Multilinear.ListTensor 79ba5a8eeff160a1aa1d9fea82ad766a
   exports: ddd81772a3c709b060fefc4962663eb7
+  Err 0d666cefc46932ce1fd764cfcab8a254
+  Scalar 865a2a1fa4d3629a193dcdf565c295ae
+  Tensor 6e0cfafc1d98df153956a082511db3f7
+  Tensor b1bce1931c788ab8b744f827a7a88135
+  _dot 6377018e1d181f3d6adc9ae646f4a6a8
+  commonIndex ae5b6e12fb1bb65be90e639478680ce4
+  errMessage eda57f1289f373231c51cdf842739461
+  scalarVal e1cba0c5d92178f79fe6c365f4724c56
+  switchInd 7fb2b761324cfa4ed57ffbfccb8784ea
+  switchInd' d144b20554263bbae9970cfe1a350575
+  tensorData 08aa0ea68012efd81f9bf8ffb8e78054
+  tensorIndex e0172391584818b6bde2af3d1908461f
 import  -/  Multilinear.Matrix 6051cb95cb561d181ea979c81205e0ff
   exports: 1e51e1ca10f94a1b3ad5308e659c77d6
 import  -/  Multilinear.Matrix.Field 47c69d57861a35050931acc745553777
@@ -87,9 +104,9 @@ import  -/  Multilinear.NVector.Field 448a068b106e64dfa3a2b7ecff978cf9
   exports: 1e51e1ca10f94a1b3ad5308e659c77d6
 import  -/  Multilinear.NVector.Seq bfc72a839d69f706d407c544c7cf8c17
   exports: 1e51e1ca10f94a1b3ad5308e659c77d6
-import  -/  Multilinear.Tensor e54ff908dce4a4f29dd95a94ab514521
+import  -/  Multilinear.Tensor 7d38fa934da41aeb31ca6ba6db4a931e
   exports: 7d8965f0dc48bc9b4b86f324155138f9
-  tensor 41df6db2631d0e4eb0916b83152e0007
+  tensor 5378053ca81c6480c460fa2cda9f9606
 import  -/  Multilinear.Tensor.Field c313c5811f504b96bbc21671cbd2eb23
   exports: 1e51e1ca10f94a1b3ad5308e659c77d6
 import  -/  Multilinear.Tensor.Seq 39a678db8653dd514bca4c949021f95d

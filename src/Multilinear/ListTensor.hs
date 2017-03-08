@@ -11,7 +11,7 @@ Portability : Windows/POSIX
 
 {-# LANGUAGE GADTs  #-}
 {-# LANGUAGE Strict #-}
-{-# OPTIONS_GHC #-}
+{-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.ListTensor (
     Tensor(..),

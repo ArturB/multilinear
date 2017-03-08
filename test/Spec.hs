@@ -13,29 +13,21 @@ module Main (
     main
 ) where
 
-import           Prelude            as P
---import Multilinear
-{-
-m1 :: Tensor Int
-m1 = T.generate (Contravariant 500 "i")
-        (\i -> T.generate (Covariant 500 "j") (\j -> Scalar $ i + j `mod` 10))
+import           Multilinear
+import           Prelude     as P
 
-m2 :: Tensor Int
-m2 = T.generate (Contravariant 500 "j")
-        (\i -> T.generate (Covariant 500 "k") (\j -> Scalar $ i + j `mod` 10))
+m1 :: Tensor Int Int
+m1 = tensor ("i",[1000]) ("j",[1000]) $ \[i] [j] -> i+j
 
-m3 :: Tensor Int
-m3 = m1 !* m2
+m2 :: Tensor Int Int
+m2 = tensor ("j",[1000]) ("k",[1000]) $ \[i] [j] -> i+j
 
-v :: Tensor Int
-v = T.generate (Contravariant 500 "k") (\i -> Scalar $ i `mod` 10)
+v :: Tensor Int Int
+v = tensor ("k",[1000]) ([],[]) $ \[k] _ -> k
 
-v2 :: Tensor Int
-v2 = m3 !* v
--}
-{-| Entry point of all library tests -}
 main :: IO ()
 main = do
-        putStrLn "Starting..."
-        putStrLn "End."
+    putStrLn "Start..."
+    print $ m1 * m2 * v
+    putStrLn "End."
 

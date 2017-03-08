@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-07 11:57:18.4021559 UTC
+2017-03-07 12:41:27.1583297 UTC
 
 interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Tensor 8002
-  interface hash: a31931199ea33eb6dbe20bb4a9044680
-  ABI hash: e54ff908dce4a4f29dd95a94ab514521
+  interface hash: 05adf6808962040fde462796d4f1f15f
+  ABI hash: 7d38fa934da41aeb31ca6ba6db4a931e
   export-list hash: 7d8965f0dc48bc9b4b86f324155138f9
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: d421a442bac5348a67fd3f91398c6034
@@ -40,11 +40,11 @@ family instance modules: base-4.9.1.0:Control.Applicative
 import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
   Contravariant 2680d4713bab913b467ff0d038d4a33d
   Covariant 16da5fe1147889248667555c02800759
-import  -/  Multilinear.ListTensor d74f29bf3fe3059b01a63980a6236a0a
+import  -/  Multilinear.ListTensor 79ba5a8eeff160a1aa1d9fea82ad766a
   exports: ddd81772a3c709b060fefc4962663eb7
-  Scalar a644e6f975a4347d76644f34cc6f7f41
-  Tensor 0661fe5cc7b9eed57e2861e8d1c37f46
-  Tensor 1d7419959ad8fbac5761a3dc7b046420
+  Scalar 865a2a1fa4d3629a193dcdf565c295ae
+  Tensor 6e0cfafc1d98df153956a082511db3f7
+  Tensor b1bce1931c788ab8b744f827a7a88135
 import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
 import  -/  base-4.9.1.0:GHC.Err 20faef8829fd13c027d0ee2213637534
 import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
@@ -66,7 +66,7 @@ c02d74ece54831f0c019ca8f0edf7987
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-41df6db2631d0e4eb0916b83152e0007
+5378053ca81c6480c460fa2cda9f9606
   tensor ::
     (GHC.Show.Show i, GHC.Real.Integral i) =>
     (GHC.Base.String, [i])

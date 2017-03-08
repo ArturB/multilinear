@@ -16,7 +16,7 @@ Defines main tyclasses to deal with multilinear algebra and re-exports content o
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear (
-    --module X
+    module X
 ) where
 
 -- Re-export other library modules
@@ -24,7 +24,7 @@ import           Multilinear.Covector       as X
 import           Multilinear.Covector.Field as X
 import           Multilinear.Covector.Seq   as X
 import           Multilinear.Index          as X
-import           Multilinear.ListTensor
+import           Multilinear.ListTensor     as X
 import           Multilinear.Matrix         as X
 import           Multilinear.Matrix.Field   as X
 import           Multilinear.Matrix.Seq     as X
