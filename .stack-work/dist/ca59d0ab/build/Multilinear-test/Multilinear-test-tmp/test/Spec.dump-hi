@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-07 12:41:28.3409208 UTC
+2017-03-08 08:36:09.4493892 UTC
 
 interface main@main:Main 8002
-  interface hash: e87a12eccb6fb0f464e6ef296f2d3336
-  ABI hash: d5038453d4ea58770207de2c1e8c5e58
+  interface hash: 6e9dd03b7400ca0c228fe26c59e23165
+  ABI hash: 81c51d83b34b84915206e4c07cd1bac6
   export-list hash: 2d6bf477379ef42ffde40e0e9560c0f8
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: 44807d58ed47a0482913eefa2ba073a9
@@ -56,12 +56,12 @@ d6831ef04cb9301b090dfae6f7bb7ec7
   $trModule2 :: GHC.Types.TrName
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS "main"#) -}
-525728e1d6a92aa097be9a510c7e6d9b
+834a705b06eab46d276b4d07e135a247
   main :: GHC.Types.IO ()
   {- Arity: 1, Strictness: <S,U>,
      Unfolding: InlineRule (0, True, True)
                 Main.main1 `cast` (Sym (GHC.Types.N:IO[0] <()>_R)) -}
-47ab51dca6b1908b85a47723e4689371
+29598565e437895dadf69b52f1a07096
   main1 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
@@ -82,16 +82,16 @@ d6831ef04cb9301b090dfae6f7bb7ec7
                    Main.main2
                    GHC.Types.True
                    ipv2 } }) -}
-a74ff954deac91c5f0be98bb913d2768
+8215ac63d9131df053ce8192ba9565dc
   main10 :: [GHC.Types.Int]
   {- HasNoCafRefs,
      Unfolding: (GHC.Types.:
                    @ GHC.Types.Int
                    Main.main11
                    (GHC.Types.[] @ GHC.Types.Int)) -}
-97227dd05770c31ad761e76318c6d537
+058ddd275ccefba952161f1aea83bea8
   main11 :: GHC.Types.Int
-  {- HasNoCafRefs, Unfolding: (GHC.Types.I# 1000#) -}
+  {- HasNoCafRefs, Unfolding: (GHC.Types.I# 500#) -}
 461ad6bfd1542320f28371b7a5f25bcc
   main12 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "k"#) -}
@@ -106,7 +106,7 @@ a74ff954deac91c5f0be98bb913d2768
                    @ GHC.Types.Int
                    GHC.Show.$fShowInt
                    GHC.Real.$fIntegralInt) -}
-8ca2433c69fad93ab6d58ab2ee9fe0fb
+2cfaae054b529292e43a4ba6c0780feb
   main14 :: Multilinear.ListTensor.Tensor GHC.Types.Int GHC.Types.Int
   {- Unfolding: (Multilinear.ListTensor.$wds22
                    @ GHC.Types.Int
@@ -116,7 +116,7 @@ a74ff954deac91c5f0be98bb913d2768
                    GHC.Num.$fNumInt
                    Main.main20
                    Main.main15) -}
-1cd15a5b50a10d44098316ba0f441682
+56dff03af3e5b23fd366eed2ceae2226
   main15 :: Multilinear.ListTensor.Tensor GHC.Types.Int GHC.Types.Int
   {- Unfolding: (Main.main13 Main.main18 Main.main9 Main.main16) -}
 bf75d8b7d94d3895528f78176f52387c
@@ -137,7 +137,7 @@ bf75d8b7d94d3895528f78176f52387c
 d7b406242e92767195e0391584a1a25d
   main17 :: GHC.Types.Int
   {- Strictness: x -}
-c3efe8c03f55472012162b7294bf2a28
+680019f5cf4966eb5ba39b103401d535
   main18 :: ([GHC.Types.Char], [GHC.Types.Int])
   {- Unfolding: ((Main.main19, Main.main10)) -}
 33ff29bc3e38ede0ea66d7afadfceec2
@@ -146,7 +146,7 @@ c3efe8c03f55472012162b7294bf2a28
 0b2d7c6de626649ae9b52f6ba0ab79e2
   main2 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "End."#) -}
-89a2a68506e2803e22492a18ae9171e7
+8cb967fdab846b56b4485b6f9f4d6311
   main20 :: Multilinear.ListTensor.Tensor GHC.Types.Int GHC.Types.Int
   {- Unfolding: (Main.main13 Main.main23 Main.main18 Main.main21) -}
 e0af0fca78b0acdfc3be7e50dfa69d68
@@ -167,7 +167,7 @@ e0af0fca78b0acdfc3be7e50dfa69d68
 5c486bb7d66fd19d7826b347198eaf65
   main22 :: GHC.Types.Int
   {- Strictness: x -}
-034d25c0dea94efd60588ea9cef84757
+75e41a47106c0581197b3159a03414fe
   main23 :: ([GHC.Types.Char], [GHC.Types.Int])
   {- Unfolding: ((Main.main24, Main.main10)) -}
 1e8e8ea0ab4c14039cb1ec804c80f87b
@@ -176,7 +176,7 @@ e0af0fca78b0acdfc3be7e50dfa69d68
 ceadc3439962eab8ad80d4e7bbb2242c
   main25 :: [GHC.Types.Char]
   {- Unfolding: (GHC.CString.unpackCString# "Start..."#) -}
-843aba811c5d7bd1cd4db63d1bc9e70b
+fc5924e4fe57830879f7abf2e15a9c57
   main26 ::
     GHC.Prim.State# GHC.Prim.RealWorld
     -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
@@ -184,7 +184,7 @@ ceadc3439962eab8ad80d4e7bbb2242c
      Unfolding: (GHC.TopHandler.runMainIO1
                    @ ()
                    Main.main1 `cast` (Sym (GHC.Types.N:IO[0] <()>_R))) -}
-089c2f87c97a8c777bbe86c408874d56
+01162cf1a52bdec464663fd37a25bdfe
   main3 :: GHC.Base.String
   {- Unfolding: (Multilinear.ListTensor.$fShowTensor2
                    @ GHC.Types.Int
@@ -192,7 +192,7 @@ ceadc3439962eab8ad80d4e7bbb2242c
                    GHC.Show.$fShowInt
                    GHC.Show.$fShowInt
                    Main.main4) -}
-6b8303f0007f88f90697d5112997dae6
+efbc8e5bf10b0f153c8173f21c30263b
   main4 :: Multilinear.ListTensor.Tensor GHC.Types.Int GHC.Types.Int
   {- Unfolding: (Multilinear.ListTensor.$wds22
                    @ GHC.Types.Int
@@ -202,7 +202,7 @@ ceadc3439962eab8ad80d4e7bbb2242c
                    GHC.Num.$fNumInt
                    Main.main14
                    Main.main5) -}
-4eb30f2a783e566bb868979f2281a64a
+2143e64dde1979a1793732ced8c2dac2
   main5 :: Multilinear.ListTensor.Tensor GHC.Types.Int GHC.Types.Int
   {- Unfolding: (Main.main13 Main.main9 Main.main8 Main.main6) -}
 92144ab31eb928a9d7661b039575a002
@@ -221,7 +221,7 @@ f4769928fb896e0793dede73a4658451
   {- HasNoCafRefs,
      Unfolding: ((GHC.Types.[] @ GHC.Types.Char,
                   GHC.Types.[] @ GHC.Types.Int)) -}
-392df9fd4934d7c0be94028dc37c8869
+b8aa7869acbc93e80f076e569ba69419
   main9 :: ([GHC.Types.Char], [GHC.Types.Int])
   {- Unfolding: ((Main.main12, Main.main10)) -}
 vectorised variables:

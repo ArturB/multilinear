@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-06 22:11:47.5097269 UTC
+2017-03-08 11:51:11.2434078 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.NForm.Field 8002
-  interface hash: 4963ef23adc399c9fff0de4516f46cef
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.NForm.Field [hpc] 8002
+  interface hash: a32befce65849e16a03fcdba4f94b90d
   ABI hash: 12c399fa787f3be3f3d23bbad2388131
   export-list hash: 1e51e1ca10f94a1b3ad5308e659c77d6
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: 749aac39fc5f6ba1fd67f54ca2008f59
+  flag hash: a5298a39106d5bd67d49fe90fb78516e
   sig of: Nothing
   used TH splices: False
   where

@@ -12,9 +12,19 @@ Portability : Windows/POSIX
 {-# LANGUAGE Strict, GADTs #-}
 
 module Multilinear.Vector (
-  V(..)
+  vector, elv
 ) where
 
-{-| Vector datatype -}
-data V a where
-    V :: String -> ([Int] -> a) -> V a
+import           Multilinear.ListTensor
+
+{-| Concise constructor for a vector -}
+vector :: (Show i, Integral i) => String -> i -> (i -> a) -> Tensor i a
+vector [u] s f =
+    Tensor (Contravariant s [u]) [Scalar $ f x | x <- [0 .. s - 1] ]
+vector _ _ _ = error "Indices and its sizes not compatible with structure of vector!"
+
+{-| Concise getter for a vector -}
+elv :: Integral i => Tensor i a -> i -> a
+elv (Err msg) _  = error msg
+elv t@(Tensor (Contravariant _ _) _) u = scalarVal $ t ! u
+elv _ _ = error "Given indices are not compatible with vector structure!"

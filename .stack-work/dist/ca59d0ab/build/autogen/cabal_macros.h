@@ -21,6 +21,13 @@
   (major1) == 0 && (major2) <  8 || \
   (major1) == 0 && (major2) == 8 && (minor) <= 3)
 
+/* package criterion-1.1.4.0 */
+#define VERSION_criterion "1.1.4.0"
+#define MIN_VERSION_criterion(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  1 || \
+  (major1) == 1 && (major2) == 1 && (minor) <= 4)
+
 /* tool alex-3.2.1 */
 #define TOOL_VERSION_alex "3.2.1"
 #define MIN_TOOL_VERSION_alex(major1,major2,minor) (\

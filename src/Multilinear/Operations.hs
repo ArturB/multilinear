@@ -17,6 +17,10 @@ import           Multilinear.Index
 
 {-| Multidimensional arrays are trated as tensors - multilinear maps. -}
 class Multilinear t where
+    {-| Recursive indexing -}
+    infixl 9 !
+    (!) :: Integral i => t i a -> i -> t i a
+
     {-| Add scalar left -}
     infixl 7 .+
     (.+) :: Num a => a -> t i a -> t i a

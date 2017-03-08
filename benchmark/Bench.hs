@@ -1,6 +1,6 @@
 {-|
 Module      : Spec/Main
-Description : Tests specification of Multilinear library
+Description : Benchmark of Multilinear library
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : 3-clause BSD
 Maintainer  : artur.brodzki@gmail.com
@@ -14,7 +14,9 @@ module Main (
 ) where
 
 import           Multilinear
-import           Prelude     as P
+import           Criterion.Main
+import           Criterion.Measurement as Meas
+import           Criterion.Types
 
 m1 :: Tensor Int Int
 m1 = tensor ("i",[500]) ("j",[500]) $ \[i] [j] -> i+j
@@ -23,11 +25,14 @@ m2 :: Tensor Int Int
 m2 = tensor ("j",[500]) ("k",[500]) $ \[i] [j] -> i+j
 
 v :: Tensor Int Int
-v = tensor ("k",[500]) ([],[]) $ \[k] _ -> k
+v = vector "k" 500 id
+
+v2 :: Tensor Int Int
+v2 = form "i" 500 id
 
 main :: IO ()
 main = do
-    putStrLn "Start..."
-    print $ m1 * m2 * v
-    putStrLn "End."
+    result <- Meas.measure ( nfIO $ print (v2 * (m1 * m2 * v)) ) 1
+    putStrLn $ "\nTime: " ++ show (measCpuTime $ fst result) ++ "s\n"
+    return ()
 

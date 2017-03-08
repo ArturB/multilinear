@@ -12,6 +12,6 @@ Portability : Windows/POSIX
 {-# LANGUAGE Strict, GADTs #-}
 {-# OPTIONS_GHC #-}
 
-module Multilinear.Covector.Field (
+module Multilinear.Form.Field (
   
 ) where

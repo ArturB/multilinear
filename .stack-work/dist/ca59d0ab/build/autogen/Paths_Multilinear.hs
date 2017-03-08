@@ -29,12 +29,12 @@ version :: Version
 version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
-bindir     = "C:\\Users\\Artur\\Downloads\\Multilinear\\.stack-work\\install\\401d7a24\\bin"
-libdir     = "C:\\Users\\Artur\\Downloads\\Multilinear\\.stack-work\\install\\401d7a24\\lib\\x86_64-windows-ghc-8.0.2\\Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"
-dynlibdir  = "C:\\Users\\Artur\\Downloads\\Multilinear\\.stack-work\\install\\401d7a24\\lib\\x86_64-windows-ghc-8.0.2"
-datadir    = "C:\\Users\\Artur\\Downloads\\Multilinear\\.stack-work\\install\\401d7a24\\share\\x86_64-windows-ghc-8.0.2\\Multilinear-0.1.0.0"
-libexecdir = "C:\\Users\\Artur\\Downloads\\Multilinear\\.stack-work\\install\\401d7a24\\libexec"
-sysconfdir = "C:\\Users\\Artur\\Downloads\\Multilinear\\.stack-work\\install\\401d7a24\\etc"
+bindir     = "C:\\Users\\Artur\\Downloads\\multilinear-0.1.0.0\\.stack-work\\install\\401d7a24\\bin"
+libdir     = "C:\\Users\\Artur\\Downloads\\multilinear-0.1.0.0\\.stack-work\\install\\401d7a24\\lib\\x86_64-windows-ghc-8.0.2\\Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"
+dynlibdir  = "C:\\Users\\Artur\\Downloads\\multilinear-0.1.0.0\\.stack-work\\install\\401d7a24\\lib\\x86_64-windows-ghc-8.0.2"
+datadir    = "C:\\Users\\Artur\\Downloads\\multilinear-0.1.0.0\\.stack-work\\install\\401d7a24\\share\\x86_64-windows-ghc-8.0.2\\Multilinear-0.1.0.0"
+libexecdir = "C:\\Users\\Artur\\Downloads\\multilinear-0.1.0.0\\.stack-work\\install\\401d7a24\\libexec"
+sysconfdir = "C:\\Users\\Artur\\Downloads\\multilinear-0.1.0.0\\.stack-work\\install\\401d7a24\\etc"
 
 getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: IO FilePath
 getBinDir = catchIO (getEnv "Multilinear_bindir") (\_ -> return bindir)

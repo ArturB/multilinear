@@ -10,13 +10,13 @@ Portability : Windows/POSIX
 -}
 
 {-# LANGUAGE GADTs  #-}
-{-# LANGUAGE Strict #-}
+{-# LANGUAGE Strict  #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.ListTensor (
     Tensor(..),
     switchInd, switchInd', commonIndex, _dot,
-    module Ind
+    module Ind, module Ops
 ) where
 
 import           Control.Monad
@@ -24,7 +24,7 @@ import           Data.Binary
 import           Data.List
 import           Data.Maybe
 import           Multilinear.Index      as Ind
-import           Multilinear.Operations
+import           Multilinear.Operations as Ops
 
 {- ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -258,6 +258,11 @@ instance (Eq i, Show i, Integral i, Floating a) => Floating (Tensor i a) where
 
 -- Multilinear operations
 instance Multilinear Tensor where
+    -- Recursive indexing
+    (!) (Scalar _) _ = Err "Scalar has no indices!"
+    (!) (Err msg) _ = Err msg
+    (!) (Tensor _ ts) i = ts !! fromIntegral i
+
     -- Add scalar left
     x .+ t = (x+) <$> t
 
@@ -321,11 +326,11 @@ instance Multilinear Tensor where
     -- Transpose a tensor (switch all indices types)
     transpose (Scalar x) = Scalar x
     transpose (Tensor (Covariant count name) ts) =
-        Tensor (Contravariant count name) (Multilinear.Operations.transpose <$> ts)
+        Tensor (Contravariant count name) (Ops.transpose <$> ts)
     transpose (Tensor (Contravariant count name) ts) =
-        Tensor (Covariant count name) (Multilinear.Operations.transpose <$> ts)
+        Tensor (Covariant count name) (Ops.transpose <$> ts)
     transpose (Tensor (Indifferent count name) ts) =
-        Tensor (Indifferent count name) (Multilinear.Operations.transpose <$> ts)
+        Tensor (Indifferent count name) (Ops.transpose <$> ts)
     transpose (Err msg) = Err msg
 
     -- Inverse a tensor as a multilinear map

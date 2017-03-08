@@ -1,18 +1,18 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-07 11:57:17.0285704 UTC
+2017-03-08 11:51:13.6788774 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Operations 8002
-  interface hash: 40b79fc11aae48bdf6db093d87faf33d
-  ABI hash: 5f452ebcd5ea401c9b6224bb7dea7be6
-  export-list hash: 0256d389d11297b144ccf71dffaa2450
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Operations [hpc] 8002
+  interface hash: dac137f794d2bf7763a11fce42dc0e26
+  ABI hash: 8ab6bc0011c3314e3da12bcb094dccf6
+  export-list hash: f19f996b8cedaeadb661e4f59750a6a6
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: 0a867a4eb71687b8f77180a0cef6e55a
+  flag hash: 48e575b13c1c7a3c302fc19bcf5abfef
   sig of: Nothing
   used TH splices: False
   where
 exports:
-  Multilinear.Operations.Multilinear{Multilinear.Operations.*. Multilinear.Operations.+. Multilinear.Operations.-. Multilinear.Operations..* Multilinear.Operations..+ Multilinear.Operations..- Multilinear.Operations../ Multilinear.Operations./. Multilinear.Operations.concat Multilinear.Operations.elems Multilinear.Operations.equiv Multilinear.Operations.indices Multilinear.Operations.inverse Multilinear.Operations.order Multilinear.Operations.rename Multilinear.Operations.transpose}
+  Multilinear.Operations.Multilinear{Multilinear.Operations.! Multilinear.Operations.*. Multilinear.Operations.+. Multilinear.Operations.-. Multilinear.Operations..* Multilinear.Operations..+ Multilinear.Operations..- Multilinear.Operations../ Multilinear.Operations./. Multilinear.Operations.concat Multilinear.Operations.elems Multilinear.Operations.equiv Multilinear.Operations.indices Multilinear.Operations.inverse Multilinear.Operations.order Multilinear.Operations.rename Multilinear.Operations.transpose}
 module dependencies: Multilinear.Index
 package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.1.0*
                       binary-0.8.3.0@binary-0.8.3.0
@@ -36,16 +36,16 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
+import  -/  Multilinear.Index 96f5eab2d014ca17efdb25c1b12aea1e
   exports: 480060e0b08455ffef717b127d57d7f9
-  TIndex 48f8ee88f7f9a97b4b06621968312cde
+  TIndex 10eb11f1d6ab4bdd9fedcea30e3dd762
 import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
 import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
 import  -/  base-4.9.1.0:GHC.Real b88ae4a48c079652623073a5bbf5c9b0
 import  -/  base-4.9.1.0:Prelude 74b3e204395920329f6de9d97206abe9
 import  -/  ghc-prim-0.5.0.0:GHC.Classes 16d48e012d23eaef9bca91ccdd572c02
-fixities infixl 8 *., infixl 7 +., infixl 7 -., infixl 8 .*,
-         infixl 7 .+, infixl 7 .-
+fixities infixl 9 !, infixl 8 *., infixl 7 +., infixl 7 -.,
+         infixl 8 .*, infixl 7 .+, infixl 7 .-
 7bc8fe0b433c80bdc801b99cc17e95fa
   $tc'C:Multilinear :: GHC.Types.TyCon
   {- HasNoCafRefs, Strictness: m,
@@ -85,8 +85,9 @@ fb49925a88cfaeffb9c86a2b691b9117
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-db59ac4e784384516d08ab9b5fda7108
+0c319c1286c1638903abf2ed55a6a178
   class Multilinear (t :: * -> * -> *) where
+    (!) :: GHC.Real.Integral i => t i a -> i -> t i a
     (.+) :: GHC.Num.Num a => a -> t i a -> t i a
     (.-) :: GHC.Num.Num a => a -> t i a -> t i a
     (.*) :: GHC.Num.Num a => a -> t i a -> t i a
@@ -103,8 +104,9 @@ db59ac4e784384516d08ab9b5fda7108
     concat :: GHC.Types.Char -> t i a -> t i a -> t i a
     equiv :: GHC.Classes.Eq i => t i a -> t i a -> GHC.Types.Bool
     elems :: GHC.Num.Num i => t i a -> i
-    {-# MINIMAL (.+), (.-), (.*), (./), (+.), (-.), (*.), (/.), order,
-                indices, rename, transpose, inverse, concat, equiv, elems #-}
+    {-# MINIMAL (!), (.+), (.-), (.*), (./), (+.), (-.), (*.), (/.),
+                order, indices, rename, transpose, inverse, concat, equiv,
+                elems #-}
 vectorised variables:
 vectorised tycons:
 vectorised reused tycons:
