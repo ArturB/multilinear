@@ -1,0 +1,7 @@
+ghc: 8.0.2
+
+install:
+ - cabal install stack
+
+script:
+ - stack test
