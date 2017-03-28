@@ -9,4 +9,4 @@ script:
  - stack test
 
 notifications:
- - email: false
+ email: false
