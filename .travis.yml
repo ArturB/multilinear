@@ -1,6 +1,6 @@
 language: haskell
 
-ghc: 8.0.2
+ghc: 8.0
 
 install:
  - cabal install stack
