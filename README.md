@@ -18,9 +18,9 @@ Multi-dimensional algebra is especially useful to quickly write machine learning
 
 Installation using Stack. Invoke this command in library folder:
 
-...
+``'
 stack build
-...
+`''
 
 ### Contribution guidelines ###
 
