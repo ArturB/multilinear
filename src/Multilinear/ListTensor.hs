@@ -11,6 +11,7 @@ Portability : Windows/POSIX
 
 {-# LANGUAGE GADTs  #-}
 {-# LANGUAGE Strict  #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.ListTensor (
@@ -47,9 +48,28 @@ data Tensor i a =
     Err {
         errMessage :: String
     } deriving Eq
+{-
+data Tensor i a where
+    Scalar :: (Integral i, Floating a) => a -> Tensor i a
+    Tensor :: (Integral i, Floating a) => TIndex i -> [Tensor i a] -> Tensor i a
+    Err    :: String -> Tensor i a
+
+scalarVal :: Tensor i a -> a
+scalarVal (Scalar x) = x
+
+tensorIndex :: Tensor i a -> TIndex i
+tensorIndex (Tensor i _) = i
+
+tensorData :: Tensor i a -> [Tensor i a]
+tensorData (Tensor _ ts) = ts
+
+errMessage :: Tensor i a -> String
+errMessage (Err msg) = msg
+
+-}
 
 {-| Tensor serialization and deserialization -}
-instance (Binary i, Binary a) => Binary (Tensor i a) where
+instance (Integral i, Binary i, Floating a, Binary a) => Binary (Tensor i a) where
     put (Scalar x) = do
         put (0 :: Word8)
         put x
@@ -79,7 +99,7 @@ instance (Binary i, Binary a) => Binary (Tensor i a) where
             _ -> return $ Err deserializationErr
 
 -- print list elements vertically
--- used to show contravariant components of tensor, which by convention are printed vertically
+-- used to show contravariant components of tensor, which by convention are written vertically
 _showVertical :: Show a => [a] -> String
 _showVertical v =
     "\n  " ++ ((++) `foldl1` vShowed)
@@ -90,17 +110,17 @@ _isErrTensor :: Tensor i a -> Bool
 _isErrTensor (Err _) = True
 _isErrTensor _       = False
 
--- collapse many errors in tensor to the first one
-_collapseErr :: Tensor i a -> Tensor i a
-_collapseErr t1@(Tensor _ ts) =
+-- merge many errors in tensor to the first one
+_mergeErr :: Tensor i a -> Tensor i a
+_mergeErr t1@(Tensor _ ts) =
     -- find first error if present
-    let err = Data.List.find _isErrTensor (_collapseErr <$> ts)
+    let err = Data.List.find _isErrTensor (_mergeErr <$> ts)
     -- and return this error if found, whole tensor otherwise
     in fromMaybe t1 err
 -- in scalars cannot be any error
-_collapseErr t = t
+_mergeErr t = t
 
--- Show tensor without collapsing
+-- Show tensor (but without merging errors first)
 show' :: (Show i, Show a) => Tensor i a -> String
 -- Scalar is showed simply as its value
 show' (Scalar x) = show x
@@ -118,8 +138,8 @@ show' (Err msg) = show msg
 
 -- Print tensor
 instance (Show i, Show a) => Show (Tensor i a) where
-    -- collapse errors first and then print tensor
-    show t = show' $ _collapseErr t
+    -- merge errors first and then print tensor
+    show t = show' $ _mergeErr t
 
 -- Tensor is a Functor
 instance Functor (Tensor i) where
@@ -132,7 +152,7 @@ instance Functor (Tensor i) where
     fmap _ (Err msg) = Err msg
 
 -- Tensor can be added, subtracted and multiplicated
-instance (Eq i, Show i, Integral i, Num a) => Num (Tensor i a) where
+instance (Eq i, Show i, Integral i, Eq a, Show a, Floating a) => Num (Tensor i a) where
     -- Adding - element by element
     Scalar x1 + Scalar x2 = Scalar $ x1 + x2
     Scalar x + t = (x+) <$> t
@@ -181,7 +201,7 @@ instance (Eq i, Show i, Integral i, Num a) => Num (Tensor i a) where
     fromInteger x = Scalar $ fromInteger x
 
 -- Tensors can be divided by each other
-instance (Eq i, Show i, Integral i, Fractional a) => Fractional (Tensor i a) where
+instance (Show i, Integral i, Eq a, Show a, Floating a) => Fractional (Tensor i a) where
     -- Scalar division return result of division of its values
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
     -- Tensor and scalar are divided value by value
@@ -204,7 +224,7 @@ instance (Eq i, Show i, Integral i, Fractional a) => Fractional (Tensor i a) whe
 -- Real-number functions on tensors.
 -- Function of tensor is a tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (Eq i, Show i, Integral i, Floating a) => Floating (Tensor i a) where
+instance (Eq i, Show i, Integral i, Eq a, Show a, Floating a) => Floating (Tensor i a) where
     pi = Scalar pi
 
     exp (Scalar x)        = Scalar $ exp x
@@ -255,9 +275,8 @@ instance (Eq i, Show i, Integral i, Floating a) => Floating (Tensor i a) where
     atanh (Tensor index ts) = Tensor index (atanh <$> ts)
     atanh (Err msg)         = Err msg
 
-
 -- Multilinear operations
-instance Multilinear Tensor where
+instance (Eq i, Show i, Integral i, Eq a, Show a, Floating a) => Multilinear Tensor i a where
     -- Recursive indexing
     (!) (Scalar _) _ = Err "Scalar has no indices!"
     (!) (Err msg) _ = Err msg
@@ -343,7 +362,7 @@ instance Multilinear Tensor where
 
 -- Push index given as Maybe String one step deeper in recursion
 -- Important for performance - tensor product is most efficient if summed indices are on the deepest level of recursion
-switchInd :: (Integral i, Num a) => Tensor i a -> Maybe String -> Tensor i a
+switchInd :: (Show i, Integral i, Eq a, Show a, Floating a) => Tensor i a -> Maybe String -> Tensor i a
 switchInd (Scalar x) _ = Scalar x
 switchInd t1 Nothing = t1
 switchInd t1@(Tensor index1 ts1) (Just ind)
@@ -356,7 +375,7 @@ switchInd t1@(Tensor index1 ts1) (Just ind)
 switchInd (Err msg) _ = Err msg
 
 -- Push index given as Maybe String into the deepest level of recursion
-switchInd' :: (Integral i, Num a) => Tensor i a -> Maybe String -> Tensor i a
+switchInd' :: (Show i, Integral i,Eq a, Show a, Floating a) => Tensor i a -> Maybe String -> Tensor i a
 switchInd' (Scalar x) _ = Scalar x
 switchInd' t1 Nothing = t1
 switchInd' t1@(Tensor _ _) i@(Just _)
@@ -368,7 +387,7 @@ switchInd' (Err msg) _ = Err msg
 
 -- Dot product of covector and vector (specifically in this order)
 -- Number of elements in two tensors must be the same
-_dot :: (Eq i, Show i, Integral i, Num a) => Tensor i a -> Tensor i a -> Tensor i a
+_dot :: (Eq i, Show i, Integral i, Eq a, Show a, Floating a) => Tensor i a -> Tensor i a -> Tensor i a
 Scalar x1 `_dot` Scalar x2 =  Scalar $ x1 * x2
 Tensor i1@(Covariant count1 _) ts1 `_dot` Tensor i2@(Contravariant count2 _) ts2
     | count1 == count2 = sum $ zipWith (*) ts1 ts2
@@ -383,7 +402,7 @@ t1 `_dot` t2 = Err $
 
 -- Tensor product with Einstein summation convention
 -- Does not optimize tensor structure (summed indices on deepest level of recursion)
-(!*!) :: (Integral i, Show i, Num a) => Tensor i a -> Tensor i a -> Tensor i a
+(!*!) :: (Show i, Integral i, Eq a, Show a, Floating a) => Tensor i a -> Tensor i a -> Tensor i a
 (Scalar x1) !*! (Scalar x2) = Scalar $ x1 * x2
 (Scalar x) !*! t2 = (x *) <$> t2
 t1 !*! (Scalar x) = (* x) <$> t1
@@ -397,7 +416,7 @@ _ !*! Err msg = Err msg
 
 -- Tensor product with Einstein summation convention
 -- Optimizes tensor structure for efficiency - pushes summed indices at the deepest level of recursion
-(!*) :: (Integral i, Show i, Num a) => Tensor i a -> Tensor i a -> Tensor i a
+(!*) :: (Show i, Integral i, Eq a, Show a, Floating a) => Tensor i a -> Tensor i a -> Tensor i a
 (Scalar x1) !* (Scalar x2) = Scalar $ x1 * x2
 (Scalar x) !* t2 = (x *) <$> t2
 t1 !* (Scalar x) = (* x) <$> t1
@@ -408,7 +427,7 @@ Err msg !* _ = Err msg
 _ !* Err msg = Err msg
 
 -- Find common index in two tensors, if any
-commonIndex :: Num a => Tensor i a -> Tensor i a -> Maybe String
+commonIndex :: (Show i, Integral i, Eq a, Show a, Floating a) => Tensor i a -> Tensor i a -> Maybe String
 commonIndex t1@(Tensor _ _) t2@(Tensor _ _) =
     let indicesNames1 = indexName <$> indices t1
         indicesNames2 = indexName <$> indices t2

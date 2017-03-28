@@ -16,40 +16,49 @@ module Multilinear.Operations (
 import           Multilinear.Index
 
 {-| Multidimensional arrays are trated as tensors - multilinear maps. -}
-class Multilinear t where
+class (
+  Eq (t i a),         -- Eq and Show are superclasses of Num
+  Show (t i a),       -- Eq and Show are superclasses of Num 
+  Num (t i a),        -- Tensors may be added, subtracted and multiplicated
+  Fractional (t i a), -- Multiplicating has its inverse
+  Floating (t i a),   -- Tensors may be de-liearinzed by common non-linear functions
+  Integral i,         -- Indices of tensors must be of integral type to sum them up in finite manner
+  Functor (t i)       -- Tensors are multi-dimensional arrays and must be functors
+  ) => Multilinear t i a where
+
     {-| Recursive indexing -}
     infixl 9 !
-    (!) :: Integral i => t i a -> i -> t i a
+    (!) :: t i a -> i -> t i a
 
     {-| Add scalar left -}
     infixl 7 .+
-    (.+) :: Num a => a -> t i a -> t i a
+    (.+) :: a -> t i a -> t i a
 
     {-| Subtract scalar left -}
     infixl 7 .-
-    (.-) :: Num a => a -> t i a -> t i a
+    (.-) :: a -> t i a -> t i a
 
     {-| Multiply by scalar left-}
     infixl 8 .*
-    (.*) :: Num a => a -> t i a -> t i a
+    (.*) :: a -> t i a -> t i a
 
     {-| Divide by scalar left -}
-    (./) :: Fractional a => a -> t i a -> t i a
+    (./) :: a -> t i a -> t i a
 
     {-| Add scalar right -}
     infixl 7 +.
-    (+.) :: Num a => t i a -> a -> t i a
+    (+.) :: t i a -> a -> t i a
 
     {-| Subtract scalar right -}
     infixl 7 -.
-    (-.) :: Num a => t i a -> a -> t i a
+    (-.) :: t i a -> a -> t i a
 
     {-| Multiply by scalar right-}
     infixl 8 *.
-    (*.) :: Num a => t i a -> a -> t i a
+    (*.) :: t i a -> a -> t i a
 
     {-| Divide by scalar right -}
-    (/.) :: Fractional a => t i a -> a -> t i a
+    (/.) :: t i a -> a -> t i a
 
     {-| Tensor order (contravariant, covariant) -}
     order :: t i a -> (Int,Int)
@@ -70,9 +79,9 @@ class Multilinear t where
     concat ::  Char -> t i a -> t i a -> t i a
 
     {-| Check if tensors are equivalent (are of the same type and size) -}
-    equiv :: Eq i => t i a -> t i a -> Bool
+    equiv :: t i a -> t i a -> Bool
 
     {-| Number of tensor elements -}
-    elems :: Num i => t i a -> i
+    elems :: t i a -> i
 
 
