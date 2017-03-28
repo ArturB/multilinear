@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-08 11:51:21.4059255 UTC
+2017-03-28 15:15:07.8746694 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear [hpc] 8002
-  interface hash: 360f1821ee01de2e24fef7d6e44fb083
-  ABI hash: 232feb1271c41836662ac397076c6fd6
-  export-list hash: 766b1eb910e2ead1ba13eb2610fee639
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear 8002
+  interface hash: 6f746dc3be68818a44bb9a381868172f
+  ABI hash: ec62048d290d84b98cf250c811fd0eee
+  export-list hash: 26117422d5509b4ce591ca2a78241faa
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: 1d715f630b0d3ea9b22bd2fed5502d0e
+  flag hash: 5e8d2fee958d78fc7128f272f0da37fb
   sig of: Nothing
   used TH splices: False
   where
@@ -28,19 +28,15 @@ exports:
   Multilinear.NVector.nvector
   Multilinear.Tensor.el
   Multilinear.Tensor.tensor
-  Multilinear.Tensor.Seq.elseq
-  Multilinear.Tensor.Seq.tensorseq
   Multilinear.Vector.elv
   Multilinear.Vector.vector
   Multilinear.Index.TIndex{Multilinear.Index.Contravariant Multilinear.Index.Covariant Multilinear.Index.Indifferent indexCount indexName}
   Multilinear.ListTensor.Tensor{Multilinear.ListTensor.Err Multilinear.ListTensor.Scalar Multilinear.ListTensor.Tensor errMessage scalarVal tensorData tensorIndex}
   Multilinear.Operations.Multilinear{Multilinear.Operations.! Multilinear.Operations.*. Multilinear.Operations.+. Multilinear.Operations.-. Multilinear.Operations..* Multilinear.Operations..+ Multilinear.Operations..- Multilinear.Operations../ Multilinear.Operations./. Multilinear.Operations.concat Multilinear.Operations.elems Multilinear.Operations.equiv Multilinear.Operations.indices Multilinear.Operations.inverse Multilinear.Operations.order Multilinear.Operations.rename Multilinear.Operations.transpose}
-module dependencies: Multilinear.Form Multilinear.Form.Seq
-                     Multilinear.Index Multilinear.ListTensor Multilinear.Matrix
-                     Multilinear.Matrix.Seq Multilinear.NForm Multilinear.NForm.Seq
-                     Multilinear.NVector Multilinear.NVector.Seq Multilinear.Operations
-                     Multilinear.Tensor Multilinear.Tensor.Seq Multilinear.Vector
-                     Multilinear.Vector.Seq
+module dependencies: Multilinear.Form Multilinear.Index
+                     Multilinear.ListTensor Multilinear.Matrix Multilinear.NForm
+                     Multilinear.NVector Multilinear.Operations Multilinear.Tensor
+                     Multilinear.Vector
 package dependencies: array-0.5.1.1@array-0.5.1.1 base-4.9.1.0*
                       binary-0.8.3.0@binary-0.8.3.0
                       bytestring-0.10.8.1@bytestring-0.10.8.1
@@ -63,87 +59,73 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear.Form cf5fb7e136a0600978cd803964d83059
+import  -/  Multilinear.Form f321cd0b647dc706278bc6074c2be8be
   exports: 43fa4a0109c133a1b1172427d5dafff5
-  elf 4e02832eb2ab0ff5574c0b7e6117af7e
-  form 0543fa79b6e3f8561025c9c28670ac67
-import  -/  Multilinear.Form.Seq 8ed52bde1c9a4bac29696fd792310abb
-  exports: 1e51e1ca10f94a1b3ad5308e659c77d6
-import  -/  Multilinear.Index 96f5eab2d014ca17efdb25c1b12aea1e
+  elf 3dcb5eb5f97a2ba9968714b470da4a3c
+  form 1ab24961f27fee33424c00b3d41c90c3
+import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
   exports: 480060e0b08455ffef717b127d57d7f9
-  !=! 960830ca27f3e8be496dfcab090468f7
-  Contravariant f35df31575f7fffe0ff0a88179e1b103
-  Covariant c34f217e53acac5f1d202abf0ffbb9f5
-  Indifferent 54fae6659f7d7fe49bc90b0f18ce80a5
-  TIndex 10eb11f1d6ab4bdd9fedcea30e3dd762
-  equivI e512db28c9c07eb6716d661de08a3083
-  indexCount 60f809096bec974d4e6eb335aa265884
-  indexName 9a7f0f785eba6dd99af730eea511f699
-import  -/  Multilinear.ListTensor 1aa12da4311c717d52523d414dc255b7
+  !=! 79ed98e0d5f11e1d4e005cb01471ead9
+  Contravariant 2680d4713bab913b467ff0d038d4a33d
+  Covariant 16da5fe1147889248667555c02800759
+  Indifferent 7f94d9b535305244b12b6e615aa26100
+  TIndex 48f8ee88f7f9a97b4b06621968312cde
+  equivI 7e19baab020695e36b536396a839a761
+  indexCount 49c023e428a00d7dca1693a4affbb696
+  indexName 13bb28b4dd79fe499c2d343e0b2cd53b
+import  -/  Multilinear.ListTensor ce7dceec1f296136e193ca4eec1092fc
   exports: 21ba8672b49c8e662b8221a66ae7512b
-  Err c266c846c01b058e815218236ad66c22
-  Scalar 330e8ae5b25ead09b72c2a1705110684
-  Tensor cb3f0a9dd6551b554c4574073259d366
-  Tensor 2865e39650f0269bce86f81a7bc8be88
-  _dot b3a0e41c5426a7d52932228a4aa4ecb8
-  commonIndex 03f50dccd1617504be47aff3976d65e6
-  errMessage d36dfe3023bb98cf5712c72dddbb26ce
-  scalarVal 2ba1d1e3c5c7cfc4b3bfda10cce3d19e
-  switchInd 9d1cf0a852ec986cc4c42a493c8253b1
-  switchInd' 466ffb18954fcf05deb2653965a62ac0
-  tensorData b077f63a02658a74359bbc756a57e66d
-  tensorIndex cb52e3b0aa46be85695eea1e4304aac9
-import  -/  Multilinear.Matrix beb235e10dd309a59698bb4f30a63383
+  Err 36db548ded0473322b6bc9841e081fbf
+  Scalar 424db0c2d2ac3d55deaf0fbb824b807f
+  Tensor 7327cf8b84d3375b94c5c32a9e110ecd
+  Tensor db682abd7ee3719e4ed0464e1e8be9a5
+  _dot 5323bac8c8b13f654caeb38757fdab15
+  commonIndex 06451ca6e1fb84d78265212c02db6d31
+  errMessage 2576a0fdbc46aac2995f0aa9fce80af7
+  scalarVal 03cbfbdf6e3361f57391edf149fa379e
+  switchInd 8e3633ecdeda977d34d0e2d1caac292d
+  switchInd' 09fed680c5091d929a57bfa21e0f774c
+  tensorData 6239e84fa06bb1ef0ec350098f5539af
+  tensorIndex 0c6fce8adbb44fe7666fa7260450e788
+import  -/  Multilinear.Matrix a8cf8118b8a0a37114b18d3e0ad6fb92
   exports: cd679beb18bc1209b0ba841c17d694e9
-  elm bffbfff29254d738d99c650ee625db09
-  matrix 334d7228a33773daa372a2c8a824cce3
-import  -/  Multilinear.Matrix.Seq 6665401606178a829e9729801dbf2110
-  exports: 1e51e1ca10f94a1b3ad5308e659c77d6
-import  -/  Multilinear.NForm aaf86aeda22d5e4e5291cfda0c6dec9d
+  elm d03998f83898faa7f17f08076036dcaf
+  matrix b650db6231b4322f01f03639d1b27d8b
+import  -/  Multilinear.NForm 95dfaece093e0a608385c3cc2eefb09a
   exports: a875be13f7483869f49beec3e4632628
-  elnf 12c0616b556140a27ca276582f720fa2
-  nform 554f8f3d636d83b8ae69d43ed249e3be
-import  -/  Multilinear.NForm.Seq 23fbbe125a360a441521ccb2ac3c2ac3
-  exports: 1e51e1ca10f94a1b3ad5308e659c77d6
-import  -/  Multilinear.NVector c68c13d35cb695082b9c5eb9747071f5
+  elnf f5b2cbfcb146aeb10c18ede52e11def3
+  nform beb874bfb3d853ee3be552d54fd6d98e
+import  -/  Multilinear.NVector 0748332cc27cbb0f840a59f688f67729
   exports: 040a9c37c1c01d53fd7b355e6d3457ce
-  elnv e27d181a617d9edf0f7bbbdb9116fb5b
-  nvector 55d666394d6066fa953ecb768324bdbf
-import  -/  Multilinear.NVector.Seq bfc72a839d69f706d407c544c7cf8c17
-  exports: 1e51e1ca10f94a1b3ad5308e659c77d6
-import  -/  Multilinear.Operations 8ab6bc0011c3314e3da12bcb094dccf6
-  ! fbc3c2792ed61413eb86c828f23edd52
-  *. b7d9f2789a0550cf140a39a4f64e192c
-  +. bbffc736be5211d21c21e7014bced54c
-  -. 9f50be5a744e7a7f84f5d219cc089c33
-  .* 0791a2834e542d55614f5d69669f0b16
-  .+ 8751693a00dc35a7d0f1019f68e9d7d2
-  .- 9f847e9d6b21fe56816b809d5241262c
-  ./ 298d020d96e15c57de3371e6ffa842bb
-  /. e26ed541ae918281011a07420668c7c3
-  Multilinear 0c319c1286c1638903abf2ed55a6a178
-  concat 92afae8b263c6ce67cab2f59eab6bc42
-  elems bb38cee891a568342d038a82c740359c
-  equiv a8ef19888eaf0467d5c4f8588a434357
-  indices f1a7038a7253ef6cf89e207278105505
-  inverse bf02a982fb8e1ca893e3008e7fa5a8bd
-  order 5841309ab596da02c27e09b1032c30a8
-  rename 7ebedc1ee1b1e92251cc841734468219
-  transpose 4d8cd59141c90d8b321006e7843bdd75
-import  -/  Multilinear.Tensor 3ecc93c617d435d321bc88700927449e
+  elnv aa1783db39acb33bb622e6fbda865647
+  nvector dd18a9b5a8d1f1d72ae5bc7db81e266d
+import  -/  Multilinear.Operations 070c8dcc0456fd44e8ed76de7042572b
+  ! d892338a84c0ded6ef3a69ec0f1d1307
+  *. f0a1856e2fec81f62f852091a2c8247b
+  +. 282cccc072dea9d500ab414748674017
+  -. 2295c6c7e02901db005ceef9833756ae
+  .* 9cd993716a1e84a32e0f15f3aee45819
+  .+ 6ab70aace107fe342b7f1332453f8677
+  .- 2c96fa0386fbe335eaa9c5d94c86da1b
+  ./ 7ac28b4e2427c5b3a25b532cc4c5bd01
+  /. 37e4fb617cda605b4a6f62cb4c036245
+  Multilinear c6ab5ea33c8a0ff599a9ed7899910339
+  concat 0a146be60cd420f603b535f3dc2e8ec0
+  elems 83acb2dd4f53d2c990656b899a49a991
+  equiv 90471ac34b445a0df1a3b6171984af11
+  indices 524066d384e98ff8d684be486281a592
+  inverse fadf18dc82e845d4841fd4100ed4d064
+  order 96ae9886d36c4a0e7d4d3f5ed68f3a42
+  rename cf08bcc8dc6bd76ead0461a99d2f7e34
+  transpose 2626291772e88f5f1ac49f766546d35f
+import  -/  Multilinear.Tensor f4161351c71b272f52f69326f53df13a
   exports: 3e35e64a67b095156d839715064abe48
-  el 115f60932a614f195bfcc25daba824a8
-  tensor 2418c2cb1578354e110c38a722849214
-import  -/  Multilinear.Tensor.Seq ac3843736ec0bc1cb41c5b01f5eeb34e
-  exports: 40d321447f76a68729b1458741d268fb
-  elseq 77dd40d5d0d2f717127772ad135280e9
-  tensorseq 5500804592324e326f9a19ec38af42ca
-import  -/  Multilinear.Vector 1778ece02e4ddf11700dda3115aac3fd
+  el 48071e4844d9d35ed2f50174d12f7d53
+  tensor f1bff2c55655e5b489859efa058a02e7
+import  -/  Multilinear.Vector 6ae414d7319711414ee1c09aa19741a5
   exports: 871e642d8875edc63688be124a4bc6d6
-  elv 303ebb4a6727d78485ee85c34d1fc356
-  vector b1e8e9e0176b3448c2e31dc3ec25fae4
-import  -/  Multilinear.Vector.Seq e90fbfd8d1bdaeb033b9eb7d73931abb
-  exports: 1e51e1ca10f94a1b3ad5308e659c77d6
+  elv a094d15cf96fc5f6d931d4ebf02c2151
+  vector 5931f5739ca4cbae514d7083c3311316
 import  -/  base-4.9.1.0:Prelude 74b3e204395920329f6de9d97206abe9
 92b1be387178a08ece12bd53f2d9bce2
   $trModule :: GHC.Types.Module

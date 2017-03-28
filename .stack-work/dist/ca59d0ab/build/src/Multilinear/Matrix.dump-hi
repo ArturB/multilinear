@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-08 11:51:16.2302132 UTC
+2017-03-08 13:10:32.5974315 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Matrix [hpc] 8002
-  interface hash: d761ea832fa05631bec1f2a2dace26df
-  ABI hash: beb235e10dd309a59698bb4f30a63383
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Matrix 8002
+  interface hash: 485ec3427a80b5ed649d527d46123e27
+  ABI hash: a8cf8118b8a0a37114b18d3e0ad6fb92
   export-list hash: cd679beb18bc1209b0ba841c17d694e9
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: cdec9b8537761099e1856f370e63f4f5
+  flag hash: d421a442bac5348a67fd3f91398c6034
   sig of: Nothing
   used TH splices: False
   where
@@ -38,17 +38,17 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear.Index 96f5eab2d014ca17efdb25c1b12aea1e
-  Contravariant f35df31575f7fffe0ff0a88179e1b103
-  Covariant c34f217e53acac5f1d202abf0ffbb9f5
-import  -/  Multilinear.ListTensor 1aa12da4311c717d52523d414dc255b7
+import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
+  Contravariant 2680d4713bab913b467ff0d038d4a33d
+  Covariant 16da5fe1147889248667555c02800759
+import  -/  Multilinear.ListTensor ce7dceec1f296136e193ca4eec1092fc
   exports: 21ba8672b49c8e662b8221a66ae7512b
-  Scalar 330e8ae5b25ead09b72c2a1705110684
-  Tensor cb3f0a9dd6551b554c4574073259d366
-  Tensor 2865e39650f0269bce86f81a7bc8be88
-  scalarVal 2ba1d1e3c5c7cfc4b3bfda10cce3d19e
-import  -/  Multilinear.Operations 8ab6bc0011c3314e3da12bcb094dccf6
-  ! fbc3c2792ed61413eb86c828f23edd52
+  Scalar 424db0c2d2ac3d55deaf0fbb824b807f
+  Tensor 7327cf8b84d3375b94c5c32a9e110ecd
+  Tensor db682abd7ee3719e4ed0464e1e8be9a5
+  scalarVal 03cbfbdf6e3361f57391edf149fa379e
+import  -/  Multilinear.Operations 070c8dcc0456fd44e8ed76de7042572b
+  ! d892338a84c0ded6ef3a69ec0f1d1307
 import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
 import  -/  base-4.9.1.0:GHC.Err 20faef8829fd13c027d0ee2213637534
 import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
@@ -70,82 +70,47 @@ a4a96a643a3437fed9ff21237a3bbae6
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-b10dd19f9a4a859cb30ebddbbe751c1a
+189f49ebb72a1e05bc3d6541939ba288
   $wmatrix ::
     GHC.Real.Integral i =>
     [GHC.Types.Char]
     -> i -> i -> (i -> i -> a) -> Multilinear.ListTensor.Tensor i a
   {- Arity: 1, Strictness: <L,U(1*U,1*U,A,A,A,A,A,A,A)>,
      Inline: [0] -}
-bffbfff29254d738d99c650ee625db09
+d03998f83898faa7f17f08076036dcaf
   elm ::
     GHC.Real.Integral i =>
     Multilinear.ListTensor.Tensor i a -> i -> i -> a
   {- Arity: 4,
-     Strictness: <L,U(A,A,A,A,A,A,A,A,C(U))><S,1*U><S,1*U><S,1*U>,
+     Strictness: <S(LLLLLLLLC(S)),U(A,A,A,A,A,A,A,A,C(U))><S,1*U><S,1*U><S,1*U>,
      Unfolding: (\ @ i
                    @ a
                    ($dIntegral :: GHC.Real.Integral i)
                    (m :: Multilinear.ListTensor.Tensor i a)
                    (i1 :: i)
                    (i2 :: i) ->
-                 {__scc {Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Matrix.elm} True True} case i1 of i4 { DEFAULT ->
-                                                                                                       case i2 of i5 { DEFAULT ->
-                                                                                                       let {
-                                                                                                         ds3 :: Multilinear.ListTensor.Tensor
-                                                                                                                  i
-                                                                                                                  a
-                                                                                                         = {__scc {Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.ListTensor.!} True True} case m of wild {
-                                                                                                                                                                                                     Multilinear.ListTensor.Scalar ds5
-                                                                                                                                                                                                     -> Multilinear.ListTensor.$fMultilinearTensor7
-                                                                                                                                                                                                          @ a
-                                                                                                                                                                                                          @ i
-                                                                                                                                                                                                     Multilinear.ListTensor.Tensor ds5 ts
-                                                                                                                                                                                                     -> case GHC.Integer.Type.integerToInt
-                                                                                                                                                                                                               (GHC.Real.toInteger
-                                                                                                                                                                                                                  @ i
-                                                                                                                                                                                                                  $dIntegral
-                                                                                                                                                                                                                  i4) of wild1 { DEFAULT ->
-                                                                                                                                                                                                        GHC.List.$w!!
-                                                                                                                                                                                                          @ (Multilinear.ListTensor.Tensor
-                                                                                                                                                                                                               i
-                                                                                                                                                                                                               a)
-                                                                                                                                                                                                          ts
-                                                                                                                                                                                                          wild1 }
-                                                                                                                                                                                                     Multilinear.ListTensor.Err msg
-                                                                                                                                                                                                     -> wild }
-                                                                                                       } in
-                                                                                                       let {
-                                                                                                         ds1 :: Multilinear.ListTensor.Tensor
-                                                                                                                  i
-                                                                                                                  a
-                                                                                                         = {__scc {Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.ListTensor.!} True True} case ds3 of wild {
-                                                                                                                                                                                                     Multilinear.ListTensor.Scalar ds5
-                                                                                                                                                                                                     -> Multilinear.ListTensor.$fMultilinearTensor7
-                                                                                                                                                                                                          @ a
-                                                                                                                                                                                                          @ i
-                                                                                                                                                                                                     Multilinear.ListTensor.Tensor ds5 ts
-                                                                                                                                                                                                     -> case GHC.Integer.Type.integerToInt
-                                                                                                                                                                                                               (GHC.Real.toInteger
-                                                                                                                                                                                                                  @ i
-                                                                                                                                                                                                                  $dIntegral
-                                                                                                                                                                                                                  i5) of wild1 { DEFAULT ->
-                                                                                                                                                                                                        GHC.List.$w!!
-                                                                                                                                                                                                          @ (Multilinear.ListTensor.Tensor
-                                                                                                                                                                                                               i
-                                                                                                                                                                                                               a)
-                                                                                                                                                                                                          ts
-                                                                                                                                                                                                          wild1 }
-                                                                                                                                                                                                     Multilinear.ListTensor.Err msg
-                                                                                                                                                                                                     -> wild }
-                                                                                                       } in
-                                                                                                       {__scc {Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.ListTensor.scalarVal} True True} case ds1 of wild {
-                                                                                                                                                                                                         DEFAULT
-                                                                                                                                                                                                         -> Multilinear.ListTensor.scalarVal1
-                                                                                                                                                                                                              @ a
-                                                                                                                                                                                                         Multilinear.ListTensor.Scalar ds4
-                                                                                                                                                                                                         -> ds4 } } }) -}
-334d7228a33773daa372a2c8a824cce3
+                 case i1 of i4 { DEFAULT ->
+                 case i2 of i5 { DEFAULT ->
+                 case m of wild {
+                   DEFAULT -> Multilinear.ListTensor.scalarVal1 @ a
+                   Multilinear.ListTensor.Tensor ds4 ts
+                   -> case GHC.Integer.Type.integerToInt
+                             (GHC.Real.toInteger @ i $dIntegral i4) of wild1 { DEFAULT ->
+                      case GHC.List.$w!!
+                             @ (Multilinear.ListTensor.Tensor i a)
+                             ts
+                             wild1 of wild2 {
+                        DEFAULT -> Multilinear.ListTensor.scalarVal1 @ a
+                        Multilinear.ListTensor.Tensor ds1 ts1
+                        -> case GHC.Integer.Type.integerToInt
+                                  (GHC.Real.toInteger @ i $dIntegral i5) of wild3 { DEFAULT ->
+                           case GHC.List.$w!!
+                                  @ (Multilinear.ListTensor.Tensor i a)
+                                  ts1
+                                  wild3 of wild4 {
+                             DEFAULT -> Multilinear.ListTensor.scalarVal1 @ a
+                             Multilinear.ListTensor.Scalar ds3 -> ds3 } } } } } } }) -}
+b650db6231b4322f01f03639d1b27d8b
   matrix ::
     (GHC.Show.Show i, GHC.Real.Integral i) =>
     GHC.Base.String

@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-08 11:51:16.8157298 UTC
+2017-03-08 13:10:32.7440295 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.NForm [hpc] 8002
-  interface hash: f36a79ebdd939625b7cc59dc8acc61f8
-  ABI hash: aaf86aeda22d5e4e5291cfda0c6dec9d
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.NForm 8002
+  interface hash: 050c23f8aa6efec0bcbd85a31baacdad
+  ABI hash: 95dfaece093e0a608385c3cc2eefb09a
   export-list hash: a875be13f7483869f49beec3e4632628
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: cdec9b8537761099e1856f370e63f4f5
+  flag hash: d421a442bac5348a67fd3f91398c6034
   sig of: Nothing
   used TH splices: False
   where
@@ -38,16 +38,16 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear.Index 96f5eab2d014ca17efdb25c1b12aea1e
-  Covariant c34f217e53acac5f1d202abf0ffbb9f5
-import  -/  Multilinear.ListTensor 1aa12da4311c717d52523d414dc255b7
+import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
+  Covariant 16da5fe1147889248667555c02800759
+import  -/  Multilinear.ListTensor ce7dceec1f296136e193ca4eec1092fc
   exports: 21ba8672b49c8e662b8221a66ae7512b
-  Err c266c846c01b058e815218236ad66c22
-  Scalar 330e8ae5b25ead09b72c2a1705110684
-  Tensor cb3f0a9dd6551b554c4574073259d366
-  Tensor 2865e39650f0269bce86f81a7bc8be88
-import  -/  Multilinear.Operations 8ab6bc0011c3314e3da12bcb094dccf6
-  ! fbc3c2792ed61413eb86c828f23edd52
+  Err 36db548ded0473322b6bc9841e081fbf
+  Scalar 424db0c2d2ac3d55deaf0fbb824b807f
+  Tensor 7327cf8b84d3375b94c5c32a9e110ecd
+  Tensor db682abd7ee3719e4ed0464e1e8be9a5
+import  -/  Multilinear.Operations 070c8dcc0456fd44e8ed76de7042572b
+  ! d892338a84c0ded6ef3a69ec0f1d1307
 import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
 import  -/  base-4.9.1.0:GHC.Err 20faef8829fd13c027d0ee2213637534
 import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
@@ -69,19 +69,19 @@ e863d85320e2cdb9723f42e225d54e3b
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-3a7a149e900b9432832d3c8e022af986
+b8dfa9c3aec3fc400799ceeccc5c77ea
   $wnform ::
     GHC.Real.Integral i =>
     [GHC.Types.Char]
     -> [i] -> ([i] -> a) -> Multilinear.ListTensor.Tensor i a
   {- Arity: 1, Strictness: <L,U(U,U,A,A,A,A,A,A,A)>, Inline: [0] -}
-12c0616b556140a27ca276582f720fa2
+f5b2cbfcb146aeb10c18ede52e11def3
   elnf ::
     GHC.Real.Integral i =>
     Multilinear.ListTensor.Tensor i a -> [i] -> a
   {- Arity: 3,
      Strictness: <L,U(A,A,A,A,A,A,A,A,C(U))><S,1*U><S,1*U> -}
-554f8f3d636d83b8ae69d43ed249e3be
+beb874bfb3d853ee3be552d54fd6d98e
   nform ::
     (GHC.Show.Show i, GHC.Real.Integral i) =>
     GHC.Base.String

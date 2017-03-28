@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-08 11:51:18.0041031 UTC
+2017-03-08 13:10:33.0542367 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Tensor [hpc] 8002
-  interface hash: e294f1b7da35da38a8b1d45e0630c455
-  ABI hash: 3ecc93c617d435d321bc88700927449e
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Tensor 8002
+  interface hash: 00eac263b6d6752b826d180cb4b9ac17
+  ABI hash: f4161351c71b272f52f69326f53df13a
   export-list hash: 3e35e64a67b095156d839715064abe48
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: cdec9b8537761099e1856f370e63f4f5
+  flag hash: d421a442bac5348a67fd3f91398c6034
   sig of: Nothing
   used TH splices: False
   where
@@ -38,17 +38,17 @@ family instance modules: base-4.9.1.0:Control.Applicative
                          containers-0.5.7.1@containers-0.5.7.1:Data.Map.Base
                          containers-0.5.7.1@containers-0.5.7.1:Data.Sequence
                          containers-0.5.7.1@containers-0.5.7.1:Data.Set.Base
-import  -/  Multilinear.Index 96f5eab2d014ca17efdb25c1b12aea1e
-  Contravariant f35df31575f7fffe0ff0a88179e1b103
-  Covariant c34f217e53acac5f1d202abf0ffbb9f5
-import  -/  Multilinear.ListTensor 1aa12da4311c717d52523d414dc255b7
+import  -/  Multilinear.Index ff73d2761af0be0de22b54b7d68b02b1
+  Contravariant 2680d4713bab913b467ff0d038d4a33d
+  Covariant 16da5fe1147889248667555c02800759
+import  -/  Multilinear.ListTensor ce7dceec1f296136e193ca4eec1092fc
   exports: 21ba8672b49c8e662b8221a66ae7512b
-  Err c266c846c01b058e815218236ad66c22
-  Scalar 330e8ae5b25ead09b72c2a1705110684
-  Tensor cb3f0a9dd6551b554c4574073259d366
-  Tensor 2865e39650f0269bce86f81a7bc8be88
-import  -/  Multilinear.Operations 8ab6bc0011c3314e3da12bcb094dccf6
-  ! fbc3c2792ed61413eb86c828f23edd52
+  Err 36db548ded0473322b6bc9841e081fbf
+  Scalar 424db0c2d2ac3d55deaf0fbb824b807f
+  Tensor 7327cf8b84d3375b94c5c32a9e110ecd
+  Tensor db682abd7ee3719e4ed0464e1e8be9a5
+import  -/  Multilinear.Operations 070c8dcc0456fd44e8ed76de7042572b
+  ! d892338a84c0ded6ef3a69ec0f1d1307
 import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
 import  -/  base-4.9.1.0:GHC.Err 20faef8829fd13c027d0ee2213637534
 import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
@@ -70,13 +70,13 @@ c02d74ece54831f0c019ca8f0edf7987
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU"#) -}
-115f60932a614f195bfcc25daba824a8
+48071e4844d9d35ed2f50174d12f7d53
   el ::
     GHC.Real.Integral i =>
     Multilinear.ListTensor.Tensor i a -> [i] -> [i] -> a
   {- Arity: 4,
      Strictness: <L,U(A,A,A,A,A,A,A,A,C(U))><S,1*U><S,1*U><S,1*U> -}
-2418c2cb1578354e110c38a722849214
+f1bff2c55655e5b489859efa058a02e7
   tensor ::
     (GHC.Show.Show i, GHC.Real.Integral i) =>
     (GHC.Base.String, [i])

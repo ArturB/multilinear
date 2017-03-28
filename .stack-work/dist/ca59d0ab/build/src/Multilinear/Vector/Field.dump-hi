@@ -1,13 +1,13 @@
 
 ==================== FINAL INTERFACE ====================
-2017-03-08 11:51:08.6681427 UTC
+2017-03-08 13:10:29.935156 UTC
 
-interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Vector.Field [hpc] 8002
-  interface hash: a8d09cd0d527f53b9c2ccfdc49663899
+interface Multilinear-0.1.0.0-E9ARM2QGVFX7aqrS3x5JFU:Multilinear.Vector.Field 8002
+  interface hash: 8628be14d6a0199118c9a2101b19009b
   ABI hash: 70e56309fc588bd6f61a0c67ac7b0930
   export-list hash: 1e51e1ca10f94a1b3ad5308e659c77d6
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
-  flag hash: b7b5778c3c00d50bf66d1a3fce67d443
+  flag hash: 9e00fbdcad369925056ef067da1f1607
   sig of: Nothing
   used TH splices: False
   where

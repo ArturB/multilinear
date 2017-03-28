@@ -22,21 +22,21 @@ module Multilinear (
 -- Re-export other library modules
 import           Multilinear.Form           as X
 --import           Multilinear.Form.Field     as X
-import           Multilinear.Form.Seq       as X
+--import           Multilinear.Form.Seq       as X
 import           Multilinear.Index          as X
 import           Multilinear.ListTensor     as X
 import           Multilinear.Matrix         as X
 --import           Multilinear.Matrix.Field   as X
-import           Multilinear.Matrix.Seq     as X
+--import           Multilinear.Matrix.Seq     as X
 import           Multilinear.NForm          as X
 --import           Multilinear.NForm.Field    as X
-import           Multilinear.NForm.Seq      as X
+--import           Multilinear.NForm.Seq      as X
 import           Multilinear.NVector        as X
 --import           Multilinear.NVector.Field  as X
-import           Multilinear.NVector.Seq    as X
+--import           Multilinear.NVector.Seq    as X
 import           Multilinear.Tensor         as X
 --import           Multilinear.Tensor.Field   as X
-import           Multilinear.Tensor.Seq     as X
+--import           Multilinear.Tensor.Seq     as X
 import           Multilinear.Vector         as X
 --import           Multilinear.Vector.Field   as X
-import           Multilinear.Vector.Seq     as X
+--import           Multilinear.Vector.Seq     as X
