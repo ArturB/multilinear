@@ -1,3 +1,5 @@
+language: haskell
+
 ghc: 8.0.2
 
 install:
@@ -5,3 +7,6 @@ install:
 
 script:
  - stack test
+
+notifications:
+ - email: false
