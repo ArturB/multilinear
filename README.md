@@ -1,6 +1,6 @@
 # README #
 
-https://travis-ci.org/ArturB/Multilinear.svg?branch=master
+[![Build Status](https://travis-ci.org/ArturB/Multilinear.svg?branch=master)](https://travis-ci.org/ArturB/Multilinear)
 
 ## Quick summary ##
 
