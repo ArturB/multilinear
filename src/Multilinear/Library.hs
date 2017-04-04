@@ -26,11 +26,11 @@ module Multilinear.Library (
 ) where
 
 -- Re-export other library modules
---import qualified Multilinear                as X
---import qualified Multilinear.Form           as Form
---import qualified Multilinear.Index          as X
---import qualified Multilinear.Matrix         as Matrix
---import qualified Multilinear.NForm          as NForm
---import qualified Multilinear.NVector        as NVector
---import qualified Multilinear.Tensor         as Tensor
---import qualified Multilinear.Vector         as Vector
+import qualified Multilinear
+import qualified Multilinear.Form           as Form
+import qualified Multilinear.Index          as Index
+import qualified Multilinear.Matrix         as Matrix
+import qualified Multilinear.NForm          as NForm
+import qualified Multilinear.NVector        as NVector
+import qualified Multilinear.Tensor         as Tensor
+import qualified Multilinear.Vector         as Vector
