@@ -16,11 +16,12 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Multilinear
+                    ,  Multilinear.Generic.AsList
+                    ,  Multilinear.Generic.AsArray
                     ,  Multilinear.Form
                     ,  Multilinear.Form.Seq
                     ,  Multilinear.Form.Field
                     ,  Multilinear.Index
-                    ,  Multilinear.ListTensor
                     ,  Multilinear.Matrix
                     ,  Multilinear.Matrix.Seq
                     ,  Multilinear.Matrix.Field
@@ -30,7 +31,6 @@ library
                     ,  Multilinear.NVector
                     ,  Multilinear.NVector.Seq
                     ,  Multilinear.NVector.Field
-                    ,  Multilinear.Operations
                     ,  Multilinear.Tensor
                     ,  Multilinear.Tensor.Seq
                     ,  Multilinear.Tensor.Field
@@ -38,8 +38,13 @@ library
                     ,  Multilinear.Vector.Seq
                     ,  Multilinear.Vector.Field
   build-depends:
-                       base >= 4.7 && < 5,
-                       binary
+                       base >= 4.7 && < 5
+                    ,  binary
+                    ,  containers
+                    ,  hashable
+                    ,  aeson
+                    ,  bytestring
+                    ,  zlib
   default-language:    Haskell2010
   ghc-options:         -Wall -O2
   default-extensions:  FlexibleInstances

@@ -10,61 +10,73 @@ Portability : Windows/POSIX
 -}
 
 {-# LANGUAGE Strict #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Multilinear.Index (
-    TIndex(..),
+    TIndex(..), 
+    isContravariant, 
+    isCovariant, 
+    isIndifferent,
     equivI, (!=!),
 ) where
 
+import           GHC.Generics
 import           Data.Binary
+import           Data.Hashable
+import           Data.Aeson
 
 {-| TENSOR INDEX -}
 data TIndex i =
     Covariant {
-        indexCount :: i,
+        indexSize :: i,
         indexName  :: String
     } |
     Contravariant {
-        indexCount :: i,
+        indexSize :: i,
         indexName  :: String
     } |
     Indifferent {
-        indexCount :: i,
+        indexSize :: i,
         indexName  :: String
     }
-    deriving Eq
+    deriving (Eq, Generic)
 
-{-| Serialization -}
-instance Binary i => Binary (TIndex i) where
-    put (Covariant c n) = do
-        put (0 :: Word8)
-        put c
-        put n
+{-| Return true if index is covariant |-}
+isCovariant :: TIndex i -> Bool
+isCovariant (Covariant _ _) = True
+isCovariant _ = False
 
-    put (Contravariant c n) = do
-        put (1 :: Word8)
-        put c
-        put n
-    put (Indifferent c n) = do
-        put (2 :: Word8)
-        put c
-        put n
+{-| Return true if index is contravariant |-}
+isContravariant :: TIndex i -> Bool
+isContravariant (Contravariant _ _) = True
+isContravariant _ = False
 
-    get = do
-        f <- get :: Get Word8
-        c <- get
-        n <- get
-        if f == 0
-        then
-            return $ Covariant c n
-        else
-            return $ Contravariant c n
+{-| Return true if index is indifferent |-}
+isIndifferent :: TIndex i -> Bool
+isIndifferent (Indifferent _ _) = True
+isIndifferent _ = False
+
+{-| Binary serialization and deserialization |-}
+instance Binary i => Binary (TIndex i)
+
+{-| Serialization to and from JSON |-}
+instance FromJSON i => FromJSON (TIndex i)
+instance   ToJSON i =>   ToJSON (TIndex i)
 
 {-| Show instance of TIndex -}
 instance Show i => Show (TIndex i) where
     show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
     show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
+
+{-| Indices can be compared by its size |-}
+{-| Used to allow to put tensors to typical ordered containers |-}
+instance Ord i => Ord (TIndex i) where
+    ind1 <= ind2 = indexSize ind1 <= indexSize ind2
+
+{-| Indices can be hashes by hash functions |-}
+{-| Used to allow to put tensors to typical unordered containers |-}
+instance Hashable i => Hashable (TIndex i)
 
 {-| Returns true if two indices are quivalent, i.e. differs only by name -}
 equivI :: Eq i => TIndex i -> TIndex i -> Bool
