@@ -13,10 +13,10 @@ Portability : Windows/POSIX
 {-# OPTIONS_GHC #-}
 
 module Multilinear.Tensor.Seq (
-  tensorseq, elseq
+  
 ) where
 
-import           Multilinear.ListTensor
+{-import           Multilinear.ListTensor
 
 {-| Concise constructor for a tensor memoized sequence -}
 tensorseq :: (Show i, Integral i) => (String,[i]) -> (String,[i]) -> (String,i) -> ([i] -> [i] -> i -> a) -> Tensor i a
@@ -36,3 +36,4 @@ elseq t@(Tensor (Contravariant _ _) _) (u:us) ds is = elseq (t ! u) us ds is
 elseq t@(Tensor (Covariant _ _) _) us (d:ds) is = elseq (t ! d) us ds is
 elseq t@(Tensor (Indifferent _ _) _) us ds is = elseq (t ! is) us ds is
 elseq _ _ _ _ = error "Given indices are not compatible with tensor type!"
+-}

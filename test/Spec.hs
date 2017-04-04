@@ -13,17 +13,18 @@ module Main (
     main
 ) where
 
-import           Multilinear
-import           Prelude     as P
+import qualified Multilinear.Tensor         as Tensor
+import qualified Multilinear.Generic.AsList as List
+import           Prelude                    as P
 
-m1 :: Tensor Int Int
-m1 = tensor ("i",[100]) ("j",[100]) $ \[i] [j] -> i+j
+m1 :: List.Tensor Int Int
+m1 = Tensor.fromIndices ("i",[100]) ("j",[100]) $ \[i] [j] -> i+j
 
-m2 :: Tensor Int Int
-m2 = tensor ("j",[100]) ("k",[100]) $ \[i] [j] -> i+j
+m2 :: List.Tensor Int Int
+m2 = Tensor.fromIndices ("j",[100]) ("k",[100]) $ \[i] [j] -> i+j
 
-v :: Tensor Int Int
-v = tensor ("k",[100]) ([],[]) $ \[k] _ -> k
+v :: List.Tensor Int Int
+v = Tensor.fromIndices ("k",[100]) ([],[]) $ \[k] _ -> k
 
 main :: IO ()
 main = do

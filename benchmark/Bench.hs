@@ -13,22 +13,24 @@ module Main (
     main
 ) where
 
-import           Multilinear
+import qualified Multilinear.Tensor         as Tensor
+import qualified Multilinear.Vector         as Vector
+import qualified Multilinear.Generic.AsList as List
+import           Criterion.Measurement      as Meas
 import           Criterion.Main
-import           Criterion.Measurement as Meas
 import           Criterion.Types
 
-m1 :: Tensor Int Int
-m1 = tensor ("i",[500]) ("j",[500]) $ \[i] [j] -> i+j
+m1 :: List.Tensor Int Int
+m1 = Tensor.fromIndices ("i",[500]) ("j",[500]) $ \[i] [j] -> i+j
 
-m2 :: Tensor Int Int
-m2 = tensor ("j",[500]) ("k",[500]) $ \[i] [j] -> i+j
+m2 :: List.Tensor Int Int
+m2 = Tensor.fromIndices ("j",[500]) ("k",[500]) $ \[i] [j] -> i+j
 
-v :: Tensor Int Int
-v = vector "k" 500 id
+v :: List.Tensor Int Int
+v = Vector.fromIndices "k" 500 id
 
-v2 :: Tensor Int Int
-v2 = form "i" 500 id
+v2 :: List.Tensor Int Int
+v2 = Vector.fromIndices "i" 500 id
 
 main :: IO ()
 main = do

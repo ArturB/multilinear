@@ -1,6 +1,6 @@
 {-|
-Module      : Covector
-Description : Implements a Covector datatype - a tensor with only covariant indices, especially 1-covector: linear functional.
+Module      : Form
+Description : Implements a Form datatype - a tensor with only covariant indices, especially 1-covector: linear functional.
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : 3-clause BSD
 Maintainer  : artur.brodzki@gmail.com
@@ -13,19 +13,40 @@ Portability : Windows/POSIX
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Form (
-  form, elf
+  fromIndices, 
+  Multilinear.Form.const 
+  --elf
 ) where
 
-import           Multilinear.ListTensor
+import           Multilinear.Generic.AsList
+import           Multilinear.Index
+import           Data.Hashable
+import           Data.Bits
 
-{-| Concise constructor for a linear form -}
-form :: (Show i, Integral i) => String -> i -> (i -> a) -> Tensor i a
-form [d] s f =
+{-| Generate form as function of indices |-}
+fromIndices :: (
+    Eq i, Show i, Integral i, Ord i, Hashable i,
+    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+  ) => String -> i -> (i -> a) -> Tensor i a
+
+fromIndices [d] s f =
     Tensor (Covariant s [d]) [Scalar $ f x | x <- [0 .. s - 1] ]
-form _ _ _ = error "Indices and its sizes not compatible with structure of 1-form!"
+fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of 1-form!"
+
+const :: (
+    Eq i, Show i, Integral i, Ord i, Hashable i,
+    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+  ) => String -> i -> a -> Tensor i a
+
+{-| Generate form with all s components equal to v |-}
+const [d] s v = 
+    Tensor (Covariant s [d]) $ replicate (fromIntegral s) (Scalar v)
+const _ _ _ = Err "Indices and its sizes not compatible with structure of 1-form!"
 
 {-| Concise getter for a linear form -}
+{-
 elf :: Integral i => Tensor i a -> i -> a
 elf (Err msg) _  = error msg
 elf t@(Tensor (Covariant _ _) _) u = scalarVal $ t ! u
 elf _ _ = error "Given indices are not compatible with 1-form structure!"
+-}
