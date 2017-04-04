@@ -47,9 +47,7 @@ library
                     ,  zlib
   default-language:    Haskell2010
   ghc-options:         -Wall -O2
-  default-extensions:  FlexibleInstances
-                     , MultiParamTypeClasses
-                     , GADTs
+  default-extensions:
 
 test-suite Multilinear-test
   type:                exitcode-stdio-1.0

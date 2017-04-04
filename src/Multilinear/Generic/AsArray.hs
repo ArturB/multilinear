@@ -13,6 +13,8 @@ Portability : Windows/POSIX
 {-# LANGUAGE Strict  #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.Generic.AsArray (

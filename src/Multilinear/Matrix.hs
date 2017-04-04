@@ -27,7 +27,7 @@ import           Data.Bits
 {-| Generate matrix as function of its indices -}
 fromIndices :: (
     Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq a, Show a, Integral a, Num a, Ord a, Hashable a, Bits a
   ) => String -> i -> i -> (i -> i -> a) -> Tensor i a
 
 fromIndices [u,d] su sd f =
@@ -45,10 +45,11 @@ const :: (
   ) => String -> i -> i -> a -> Tensor i a
 
 const [u,d] su sd v =
-    Tensor (Contravariant su [u]) 
-      [Tensor (Covariant sd [d]) $ 
-        replicate (fromIntegral sd) $ Scalar v
-      ]
+    Tensor (Contravariant su [u]) $
+      replicate (fromIntegral su) $
+        Tensor (Covariant sd [d]) $ 
+          replicate (fromIntegral sd) $ Scalar v
+      
 const _ _ _ _ = error "Indices and its sizes incompatible with matrix structure!"
 
 {-| Concise getter for a matrix -}

@@ -12,6 +12,7 @@ Defines Multilinear typeclass repsents a tensor-like datatypes
 -}
 
 {-# LANGUAGE GADTs  #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC -O2 #-}
 
