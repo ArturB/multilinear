@@ -20,13 +20,12 @@ module Multilinear.Tensor (
 
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Data.Hashable
 import           Data.Bits
 
 {-| Generate tensor as functions of its indices -}
 fromIndices :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => (String,[i]) -> (String,[i]) -> ([i] -> [i] -> a) -> Tensor i a
 
 fromIndices ([],[]) ([],[]) f = Scalar $ f [] []
@@ -38,8 +37,8 @@ fromIndices us ds _ = error $ "Indices and its sizes incompatible, upper indices
 
 {-| Generate tensor with all components equal to v -}
 const :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => (String,[i]) -> (String,[i]) -> a -> Tensor i a
 
 const ([],[]) ([],[]) v = Scalar v

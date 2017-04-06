@@ -2,12 +2,22 @@
 Module      : Multilinear
 Description : Provides efficient and generic implementation of linear algebra operation using Ricci - Einstein tensor formalism
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-Defines Multilinear typeclass repsents a tensor-like datatypes
+
+
+Examples:
+
+@
+Prelude>Matrix.fromIndices "ij" 10 10 $ \i j -> i + j
+line 2 
+line 3
+@
+
+prop> a .+ t = t +. a
 
 -}
 
@@ -17,35 +27,35 @@ Defines Multilinear typeclass repsents a tensor-like datatypes
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear (
-    Multilinear(..), module Multilinear.Index
+    Multilinear(..), 
+    module Multilinear.Index
 ) where
 
-import Data.Hashable
 import Data.Maybe
 import Data.Set
 import Multilinear.Index
 import Data.Bits
 
-{-| Multidimensional arrays are trated as tensors - multilinear maps. -}
+{-| Multidimensional array treated as multilinear map - tensor -}
 class (
-  Eq (t i a),         -- Eq and Show are superclasses of Num
-  Show (t i a),       -- Eq and Show are superclasses of Num 
   Num (t i a),        -- Tensors may be added, subtracted and multiplicated
-  Bits a,             -- Bit operations can be performed on tensor elements
-  Bits (t i a),       -- Also bit operations can be performed
-  Ord (t i a),        -- Tensors may be compared lexicographically. Used in general to allow to put them to typical ordered containers.
-  Hashable (t i a),   -- You may compute a hash value of tensor. Used in general to allow to put them to typical unordered containers. 
-  Integral i,         -- Indices of tensors must be of integral type to sum them up in finite manner
-  Functor (t i)       -- Tensors are multi-dimensional arrays and must be functors
+  Integral i,         -- Indices of tensors must be of integral type that allow to sum them finitely
+  Bits (t i a),       -- Also bit operations can be performed on tensors
+  Functor (t i)       -- Tensor is a multidimensional array and should be a Functor for convenience
   ) => Multilinear t i a where
 
-    {-| Add scalar left -}
+    {-| Add scalar @a@ left to tensor @t@ producing tensor @a + t@ -}
+    -- prop> a .+ t = t +. a
     infixl 7 .+
-    (.+) :: a -> t i a -> t i a
+    (.+) :: a     -- ^ Scalar a
+         -> t i a -- ^ Tensor t
+         -> t i a -- ^ Tensor a + t
 
     {-| Subtract scalar left -}
     infixl 7 .-
-    (.-) :: a -> t i a -> t i a
+    (.-) :: a       
+         -> t i a 
+         -> t i a
 
     {-| Multiply by scalar left-}
     infixl 8 .*
@@ -63,8 +73,10 @@ class (
     infixl 8 *.
     (*.) :: t i a -> a -> t i a
 
-    {-| List of tensor indices -}
-    indices :: t i a -> [TIndex i]
+    -- | List of tensor indices \n
+    -- @indices t@ return list of all indices of tensor @t@. 
+    indices :: t i a       -- ^ tensor @t@
+            -> [TIndex i]  -- ^ list of indices of tensor @t@
         
     {-| Number of tensor elements -}
     elements :: t i a -> i
@@ -78,11 +90,11 @@ class (
     order :: t i a -> (Int,Int)
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
-    equiv :: t i a -> t i a -> Bool
+    equiv :: Ord a => t i a -> t i a -> Bool
     equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
 
-    {-| Infix equivalent of equiv |-}
-    (|==|) :: t i a -> t i a -> Bool
+    {-| Infix equivalent of 'equiv' |-}
+    (|==|) :: Ord a => t i a -> t i a -> Bool
     t1 |==| t2 = equiv t1 t2
 
     {-| Rename tensor index -}

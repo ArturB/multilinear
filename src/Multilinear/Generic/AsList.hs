@@ -2,10 +2,16 @@
 Module      : Multilinear
 Description : Provides efficient and generic implementation of linear algebra operation using Ricci - Einstein tensor formalism
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
+
+- This module contains implementation of tensor defined as nested list of its components.
+- The other implementation "Multilinear.Generic.AsArray" uses an array insted of list.
+- Array implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
+- List implementation is slower but lazy and when tensor is generated from indices or randomly, it does not generate all elements at once if not necessary, 
+so it may operate in smaller memory (e.g. linear instead of quadratic when multiplying matrix by vector or form). 
 
 -}
 
@@ -25,6 +31,7 @@ module Multilinear.Generic.AsList (
     Multilinear.Generic.AsList.fromJSON, fromJSONFile
 ) where
 
+import           Multilinear
 import           GHC.Generics
 import           Data.Binary
 import           Data.List
@@ -34,30 +41,40 @@ import           Data.Bits
 import           Data.Aeson
 import           Codec.Compression.GZip
 import qualified Data.ByteString.Lazy as ByteString
-import           Multilinear
 
-{- ERROR MESSAGES -}
+{-| ERROR MESSAGES -}
 incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
 
-{- Tensor defined recursively as scalar or list of other tensors -}
+{-| Tensor defined recursively as scalar or list of other tensors -}
 data Tensor i a =
-    {-| Tensor may be a scalar -}
+    {-| Scalar -}
     Scalar {
+        {-| value of scalar -}
         scalarVal :: a
     } |
-    {-| Or a list of other tensors -}
+    {-| List of other tensors -}
     Tensor {
+        {-| Index "Mutltilinear.Index" of tensor -}
         tensorIndex :: TIndex i,
+        {-| List of tensors on deeper recursion level -}
         tensorData  :: [Tensor i a]
     } |
     {-| Operations on tensors may throw an error -}
     Err {
+        {-| Error message -}
         errMessage :: String
     } deriving (Eq, Generic)
 
--- Recursive indexing
-(!) :: (Eq i, Show i, Integral i, Eq a, Show a, Num a) => Tensor i a -> i -> Tensor i a
+{-| 
+    Recursive indexing. 
+    @t ! i = t[i]@ 
+-}
+(!) :: Integral i => 
+       Tensor i a -- ^ tensor @t@
+    -> i          -- ^ index @i@
+    -> Tensor i a -- ^ tensor @t[i]@
+
 (!) (Scalar _) _ = Err "Scalar has no indices!"
 (!) (Err msg) _ = Err msg
 (!) (Tensor _ ts) i = ts !! fromIntegral i
@@ -65,41 +82,41 @@ data Tensor i a =
 {-| Binary serialization and deserialization -}
 instance (Binary i, Binary a) => Binary (Tensor i a)
 
-{-| Serialize to binary string |-}
+{-| Serialize to binary string -}
 toBinary :: (Binary i, Binary a) => Tensor i a -> ByteString.ByteString
 toBinary = Data.Binary.encode
 
-{-| Write to binary file. Uses compression with gzip |-}
+{-| Write to binary file. Uses compression with gzip -}
 toBinaryFile :: (Binary i, Binary a) => String -> Tensor i a -> IO ()
 toBinaryFile name = ByteString.writeFile name . compress . toBinary
 
-{-| Deserialize from binary string |-}
+{-| Deserialize from binary string -}
 fromBinary :: (Binary i, Binary a) => ByteString.ByteString -> Tensor i a
 fromBinary = Data.Binary.decode
 
-{-| Read from binary file |-}
+{-| Read from binary file -}
 fromBinaryFile :: (Binary i, Binary a) => String -> IO (Tensor i a)
 fromBinaryFile name = do
     contents <- ByteString.readFile name
     return $ fromBinary $ decompress contents
 
-{-| Serialization to and from JSON |-}
+{-| Serialization to and from JSON -}
 instance (FromJSON i, FromJSON a) => FromJSON (Tensor i a)
 instance (  ToJSON i,   ToJSON a) =>   ToJSON (Tensor i a)
 
-{-| Serialize to JSON string |-}
+{-| Serialize to JSON string -}
 toJSON :: (ToJSON i, ToJSON a) => Tensor i a -> ByteString.ByteString
 toJSON = Data.Aeson.encode
 
-{-| Write to JSON file |-}
+{-| Write to JSON file -}
 toJSONFile :: (ToJSON i, ToJSON a) => String -> Tensor i a -> IO ()
 toJSONFile name = ByteString.writeFile name . Multilinear.Generic.AsList.toJSON
 
-{-| Deserialize from JSON string |-}
+{-| Deserialize from JSON string -}
 fromJSON :: (FromJSON i, FromJSON a) => ByteString.ByteString -> Maybe (Tensor i a)
 fromJSON = Data.Aeson.decode
 
-{-| Read from JSON file |-}
+{-| Read from JSON file -}
 fromJSONFile :: (FromJSON i, FromJSON a) => String -> IO (Maybe (Tensor i a))
 fromJSONFile name = do
     contents <- ByteString.readFile name
@@ -182,8 +199,8 @@ instance (Hashable i, Hashable a) => Hashable (Tensor i a)
 
 -- Tensors can be added, subtracted and multiplicated
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => Num (Tensor i a) where
 
     -- Adding - element by element
@@ -262,8 +279,8 @@ instance (
 
 -- Bit operations on tensors
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i, 
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => Bits (Tensor i a) where
 
     -- Bit sum
@@ -367,8 +384,8 @@ instance (
 
 -- Tensors can be divided by each other
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i, 
-    Eq a, Show a, Fractional a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Fractional a, Bits a
     ) => Fractional (Tensor i a) where
 
     -- Scalar division return result of division of its values
@@ -391,8 +408,8 @@ instance (
 -- Function of tensor is a tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i, 
-    Eq a, Show a, Floating a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Floating a, Bits a
     ) => Floating (Tensor i a) where
 
     pi = Scalar pi
@@ -447,8 +464,8 @@ instance (
 
 -- Multilinear operations
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => Multilinear Tensor i a where
 
     -- Add scalar left
@@ -515,7 +532,7 @@ instance (
             Tensor index [t /\ n | t <- ts]
     Err msg \/ _ = Err msg
 
-    {-| Transpose a tensor (switch all indices types) |-}
+    {-| Transpose a tensor (switch all indices types) -}
     transpose (Scalar x) = Scalar x
     transpose (Tensor (Covariant count name) ts) =
         Tensor (Contravariant count name) (Multilinear.transpose <$> ts)
@@ -525,7 +542,7 @@ instance (
         Tensor (Indifferent count name) (Multilinear.transpose <$> ts)
     transpose (Err msg) = Err msg
 
-    {-| Accessing tensor elements |-}
+    {-| Accessing tensor elements -}
     el [] t _                      = t
     el _ (Scalar x) _              = Scalar x
     el inds (Tensor index ts) vals = 
@@ -536,16 +553,14 @@ instance (
             else Tensor index [el inds t vals | t <- ts]
     el _ (Err msg) _               = Err msg
 
-    {-| Mapping with indices. |-}
+    {-| Mapping with indices. -}
     iMap f t = iMap' t zeroList
         where 
         zeroList = 0:zeroList
 
         iMap' (Scalar x) inds        = Scalar $ f inds x
         iMap' (Tensor index ts) inds = Tensor index [iMap' (fst tind) $ inds ++ [snd tind] | tind <- zip ts [0..] ]
-        iMap' (Err msg) _            = Err msg
-        
-    
+        iMap' (Err msg) _            = Err msg    
 
     {-| Concatenation of two tensor with given index or by creating a new one -}
     augment t1@(Tensor _ _) t2@(Tensor _ _) ind = 
@@ -560,8 +575,8 @@ instance (
     augment (Scalar _) _ _ = Err "Scalars cannot be augmented!"
     augment _ (Scalar _) _ = Err "Cannot augment by scalar!"
 
-    {-| Shift tensor index right |-}
-    {-| Moves given index one level deeper in recursion |-}
+    {-| Shift tensor index right -}
+    {-| Moves given index one level deeper in recursion -}
     Err msg |>> _  = Err msg
     Scalar x |>> _ = Scalar x
     t1@(Tensor index1 ts1) |>> ind

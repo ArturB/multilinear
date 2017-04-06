@@ -1,9 +1,9 @@
 name:                Multilinear
-version:             0.1.0.0
-synopsis:            Calculations of tensors
+version:             0.8.0.0
+synopsis:            Efficient implementation of (multi)linear algebra with Einstein summation convention
 description:         Please see README.md
-homepage:            https://bitbucket.org/ArturBrodzki/tensor/
-license:             BSD3
+homepage:            https://github.com/ArturB/Multilinear
+license:             GPL-3
 license-file:        LICENSE
 author:              Artur M. Brodzki
 maintainer:          artur.brodzki@gmail.com
@@ -19,8 +19,8 @@ library
                     ,  Multilinear.Generic.AsList
                     ,  Multilinear.Generic.AsArray
                     ,  Multilinear.Form
-                    ,  Multilinear.Form.Seq
-                    ,  Multilinear.Form.Field
+                    --,  Multilinear.Form.Seq
+                    --,  Multilinear.Form.Field
                     ,  Multilinear.Index
                     ,  Multilinear.Matrix
                     ,  Multilinear.Matrix.Seq
@@ -37,14 +37,18 @@ library
                     ,  Multilinear.Vector
                     ,  Multilinear.Vector.Seq
                     ,  Multilinear.Vector.Field
-  build-depends:
-                       base >= 4.7 && < 5
+  build-depends:       base >= 4.7 && < 5
                     ,  binary
                     ,  containers
                     ,  hashable
                     ,  aeson
                     ,  bytestring
                     ,  zlib
+                    ,  mwc-random
+                    ,  primitive
+                    ,  statistics
+                    ,  vector
+                    ,  csv-enumerator
   default-language:    Haskell2010
   ghc-options:         -Wall -O2
   default-extensions:
@@ -76,4 +80,4 @@ benchmark Multilinear-bench
 
 source-repository head
   type:     git
-  location: https://bitbucket.org/ArturBrodzki/tensor/
+  location: https://github.com/ArturB/Multilinear

@@ -20,14 +20,13 @@ module Multilinear.Matrix (
 
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Data.Hashable
 import           Data.Bits
 
 
 {-| Generate matrix as function of its indices -}
 fromIndices :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Integral a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Integral a, Num a, Bits a
   ) => String -> i -> i -> (i -> i -> a) -> Tensor i a
 
 fromIndices [u,d] su sd f =
@@ -40,8 +39,8 @@ fromIndices _ _ _ _ = error "Indices and its sizes incompatible with matrix stru
 
 {-| Generate matrix with all components equal to v |-}
 const :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
   ) => String -> i -> i -> a -> Tensor i a
 
 const [u,d] su sd v =

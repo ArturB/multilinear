@@ -21,13 +21,12 @@ module Multilinear.NVector (
 
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Data.Hashable
 import           Data.Bits
 
 {-| Generate n-vector as function of its indices -}
 fromIndices :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
   ) => String -> [i] -> ([i] -> a) -> Tensor i a
 
 fromIndices [] [] f = Scalar $ f []
@@ -37,8 +36,8 @@ fromIndices _ _ _ = error "Indices and its sizes incompatible with n-vector stru
 
 {-| Generate n-vector with all components equal to v -}
 const :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
   ) => String -> [i] -> a -> Tensor i a
 
 const [] [] v = Scalar v
