@@ -1,7 +1,7 @@
 name:                Multilinear
 version:             0.8.0.0
-synopsis:            Efficient implementation of (multi)linear algebra with Einstein summation convention
-description:         Please see README.md
+synopsis:            Efficient (multi)linear algebra
+description:         Library implements (multi)linear algebra based on multidimensional indexed arrays - tensors. Quick tutorial is available here: "Multilinear"
 homepage:            https://github.com/ArturB/Multilinear
 license:             GPL-3
 license-file:        LICENSE
