@@ -1,11 +1,13 @@
 {-|
 Module      : Vector
-Description : Vector is a tensor with only contravariant indices. It refleclts a common understanding of vector as some point in space. 
+Description : Vector
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
+
+
 
 -}
 

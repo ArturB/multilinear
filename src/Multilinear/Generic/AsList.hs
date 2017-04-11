@@ -33,12 +33,14 @@ module Multilinear.Generic.AsList (
 
 import           Multilinear
 import           GHC.Generics
-import           Data.Binary
+import           Data.Serialize
 import           Data.List
 import           Data.Hashable
 import           Data.Maybe
 import           Data.Bits
 import           Data.Aeson
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Either
 import           Codec.Compression.GZip
 import qualified Data.ByteString.Lazy as ByteString
 
@@ -80,25 +82,25 @@ data Tensor i a =
 (!) (Tensor _ ts) i = ts !! fromIntegral i
 
 {-| Binary serialization and deserialization -}
-instance (Binary i, Binary a) => Binary (Tensor i a)
+instance (Serialize i, Serialize a) => Serialize (Tensor i a)
 
 {-| Serialize to binary string -}
-toBinary :: (Binary i, Binary a) => Tensor i a -> ByteString.ByteString
-toBinary = Data.Binary.encode
+toBinary :: (Serialize i, Serialize a) => Tensor i a -> ByteString.ByteString
+toBinary = Data.Serialize.encodeLazy
 
 {-| Write to binary file. Uses compression with gzip -}
-toBinaryFile :: (Binary i, Binary a) => String -> Tensor i a -> IO ()
+toBinaryFile :: (Serialize i, Serialize a) => String -> Tensor i a -> IO ()
 toBinaryFile name = ByteString.writeFile name . compress . toBinary
 
 {-| Deserialize from binary string -}
-fromBinary :: (Binary i, Binary a) => ByteString.ByteString -> Tensor i a
-fromBinary = Data.Binary.decode
+fromBinary :: (Serialize i, Serialize a) => ByteString.ByteString -> Either String (Tensor i a)
+fromBinary = Data.Serialize.decodeLazy
 
 {-| Read from binary file -}
-fromBinaryFile :: (Binary i, Binary a) => String -> IO (Tensor i a)
+fromBinaryFile :: (Serialize i, Serialize a) => String -> EitherT String IO (Tensor i a)
 fromBinaryFile name = do
-    contents <- ByteString.readFile name
-    return $ fromBinary $ decompress contents
+    contents <- lift $ ByteString.readFile name
+    EitherT $ return $ fromBinary $ decompress contents
 
 {-| Serialization to and from JSON -}
 instance (FromJSON i, FromJSON a) => FromJSON (Tensor i a)

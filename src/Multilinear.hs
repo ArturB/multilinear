@@ -163,7 +163,7 @@ class (
   Functor (t i)       -- Tensor should be a Functor for convenience
   ) => Multilinear t i a where
 
-    {-| Add scalar @a@ left to each element of tensor @t@ -}
+    {-| Add scalar @a@ to each element of tensor @t@ -}
     infixl 7 .+
     (.+) :: a -> t i a -> t i a
 
@@ -171,36 +171,38 @@ class (
     infixl 7 .-
     (.-) :: a -> t i a -> t i a
 
-    {-| Multiply by scalar left-}
+    {-| Multiply scalar @a@ by each element of tensor @t@ -}
     infixl 8 .*
     (.*) :: a -> t i a -> t i a
 
-    {-| Add scalar right -}
+    {-| Add each element of tensor @t@ to scalar @a@ -}
     infixl 7 +.
     (+.) :: t i a -> a -> t i a
 
-    {-| Subtract scalar right -}
+    {-| Subtract scalar @a@ to each element of tensor @t@ -}
     infixl 7 -.
     (-.) :: t i a -> a -> t i a
 
-    {-| Multiply by scalar right-}
+    {-| Multiply each element of tensor @t@ by scalar @a@ -}
     infixl 8 *.
     (*.) :: t i a -> a -> t i a
 
-    -- | List of tensor indices \n
     -- @indices t@ return list of all indices of tensor @t@. 
     indices :: t i a       -- ^ tensor @t@
             -> [TIndex i]  -- ^ list of indices of tensor @t@
         
     {-| Number of tensor elements -}
+    {-| E.g. matrix 5x5 has 25 elements -}
     elements :: t i a -> i
     elements t = Prelude.foldl (*) 0 (Prelude.map indexSize $ indices t)
 
-    {-| List of tensor indices names |-}
+    {-| List of tensor indices names -}
+    {-| Equivalent to @map indexName . indices@ -}
     indicesNames :: t i a -> [String]
     indicesNames = Prelude.map indexName . indices
     
-    {-| Tensor order (contravariant, covariant) -}
+    {-| Tensor order - number of covariant and contravariant indices -}
+    {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
     order :: t i a -> (Int,Int)
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
@@ -211,56 +213,60 @@ class (
     (|==|) :: Ord a => t i a -> t i a -> Bool
     t1 |==| t2 = equiv t1 t2
 
-    {-| Rename tensor index -}
+    {-| @rename t "i" "j"@ renames index @i@ of tensor @t@ to @j@ -}
     rename :: t i a -> String -> String -> t i a
 
-    {-| Raise an index |-}
+    {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
     raise :: t i a -> String -> t i a
     raise t i = t /\ i
 
-    {-| Infix equivalent of raising index |-}
+    {-| Infix equivalent of 'raise' -}
     (/\) :: t i a -> String -> t i a
     t /\ i = raise t i
 
-    {-| Lower and index |-}
+    {-| @lower t "i"@ lowers an index @i@ of tensor @t@ -}
     lower :: t i a -> String -> t i a
     lower t i = t \/ i
 
-    {-| Infix equivalent of lowering index |-}
+    {-| Infix equivalent of 'lower' -}
     (\/) :: t i a -> String -> t i a
     t \/ i = lower t i
 
-    {-| Switch all indices type -}
+    {-| Switch all indices of tensor @t@ - upper indices becomes lower and vice versa -}
     transpose :: t i a -> t i a
 
-    {-| Shift tensor index right |-}
-    {-| Moves given index one level depeer in recursion |-}
+    {-| Shift tensor index right -}
+    {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion. Elements of tensor as indexed with indices names becomes unchanged. -}
     shiftRight :: t i a -> String -> t i a
-    -- Left shift of an index is equivalent to right shift of its successor, if only it exists
+    -- ^ Right shift of an index is equivalent to left shift of its successor in recursion @s@, if only @s@ exists, so:
+    -- Given a tensor @t[i1,i2,i3,...]@: @shiftRight t "i2" == t[i1,i3,i2,...] == shiftLeft t "i3"@
     shiftRight t n
-        | isJust $ successor n (indicesNames t) = shiftRight t (fromJust $ successor n (indicesNames t))
+        | isJust $ successor n (indicesNames t) = shiftLeft t (fromJust $ successor n (indicesNames t))
         | otherwise = t
         where
         successor x (a1:a2:as) = if x == a1 then Just a2 else successor x (a2:as)
         successor _ _ = Nothing
 
-    {-| Infix equivalent to right shift |-}
+    {-| Infix equivalent of 'shiftRight' -}
+    {-| @t |>> "i"@ moves index @i@ of tensor @t@ one level depeer in recursion -}
     (|>>) :: t i a -> String -> t i a
     t |>> n = shiftRight t n
 
-    {-| Shift tensor index rightmost |-}
-    {-| Moves given index to the deepest level in recursion |-}
+    {-| Shift tensor index rightmost -}
+    {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion. Elements of tensor as indexed with indices names becomes unchanged.  -}
     shiftRightmost :: t i a -> String -> t i a
     shiftRightmost t n = until (\x -> n == last (indicesNames x)) (|>> n) t
 
-    {-| Infix equivalent of shiftRightmost |-}
+    {-| Infix equivalent of 'shiftRightmost' -}
+    {-| @t |>>> "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion -}
     (|>>>) :: t i a -> String -> t i a
     t |>>> n = shiftRightmost t n
 
-    {-| Shift tensor index left |-}
-    {-| Moves given index one level up in recursion |-}
+    {-| Shift tensor index left. Elements of tensor as indexed with indices names becomes unchanged. -}
+    {-| @shiftLeft t "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
     shiftLeft :: t i a -> String -> t i a
-    -- Right shift of an index is equivalent to left shift of its predecessor, if only it exists
+    -- ^ Left shift of an index is equivalent to right shift of its predecessor in recursion @p@, if only @p@ exists, so:
+    -- Given a tensor t[i1,i2,i3,...]: @shiftLeft t "i3" == t[i1,i3,i2,...] == shiftRight t "i2"@
     shiftLeft t n
         | isJust $ predecessor n (indicesNames t) = shiftRight t (fromJust $ predecessor n (indicesNames t))
         | otherwise = t
@@ -268,32 +274,35 @@ class (
         predecessor x (a1:a2:as) = if x == a2 then Just a1 else predecessor x (a2:as)
         predecessor _ _ = Nothing
 
-    {-| Infix equivalent to left shift |-}
+    {-| Infix equivalent to 'shiftLeft' -}
+    {-| @t <<| "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
     (<<|) :: t i a -> String -> t i a
     t <<| n = shiftRight t n
 
-    {-| Shift tensor index leftmost |-}
-    {-| Moves given index to the first level in recursion |-}
+    {-| Shift tensor index leftmost. Elements of tensor as indexed with indices names becomes unchanged. -}
+    {-| @shiftLeftmost t "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
     shiftLeftmost :: t i a -> String -> t i a
     shiftLeftmost t n = until (\x -> n == last (indicesNames x)) (<<| n) t
 
-    {-| Infix equivalent of shiftLeftmost |-}
+    {-| Infix equivalent of 'shiftLeftmost' -}
+    {-| @t <<<| "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
     (<<<|) :: t i a -> String -> t i a
     t <<<| n = shiftLeftmost t n
 
-    {-| Concatenation of two tensor by common index  -}
+    {-| Concatenation of two tensors by common index -}
+    {-| Tensors must be equivalent: 'equiv' t1 t2 == True -}
     augment ::  t i a -> t i a -> String -> t i a
 
-    {-| Accessing tensor elements |-}
+    {-| Accessing tensor elements -}
+    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5. Values of other indices are insignificant -}
+    {-| If given index value is out of range, then modulo operation is performed: el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
     el :: [String] -> t i a -> [i] -> t i a
 
-    {-| Simple mapping |-}
+    {-| Simple mapping -}
+    {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
     map :: (a -> b) -> t i a -> t i b
     map = fmap
 
-    {-| Mapping with indices |-}
+    {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
+    {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
     iMap :: ([i] -> a -> b) -> t i a -> t i b
-
-
-{-| If tensor elements are fractional, then tensors may be fractional too |-}
---instance (Fractional a, Multilinear t i a) => Fractional (t i a) where

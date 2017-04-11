@@ -21,7 +21,7 @@ module Multilinear.Index (
 ) where
 
 import           GHC.Generics
-import           Data.Binary
+import           Data.Serialize
 import           Data.Hashable
 import           Data.Aeson
 
@@ -57,7 +57,7 @@ isIndifferent (Indifferent _ _) = True
 isIndifferent _ = False
 
 {-| Binary serialization and deserialization |-}
-instance Binary i => Binary (TIndex i)
+instance Serialize i => Serialize (TIndex i)
 
 {-| Serialization to and from JSON |-}
 instance FromJSON i => FromJSON (TIndex i)

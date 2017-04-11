@@ -1,8 +1,8 @@
 {-|
 Module      : Tensor
-Description : Defines concise constructor and getter to operate on generic, arbitrary-dimensional tensor
+Description : Tensors
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
