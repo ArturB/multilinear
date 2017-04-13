@@ -23,12 +23,12 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -O2 #-}
 
-module Multilinear.Generic.AsList (
+module Multilinear.Generic.AsArray (
     Tensor(..), (!),
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
-    Multilinear.Generic.AsList.toJSON, toJSONFile,
-    Multilinear.Generic.AsList.fromJSON, fromJSONFile
+    Multilinear.Generic.AsArray.toJSON, toJSONFile,
+    Multilinear.Generic.AsArray.fromJSON, fromJSONFile
 ) where
 
 import           Multilinear
@@ -112,7 +112,7 @@ toJSON = Data.Aeson.encode
 
 {-| Write to JSON file -}
 toJSONFile :: (ToJSON i, ToJSON a) => String -> Tensor i a -> IO ()
-toJSONFile name = ByteString.writeFile name . Multilinear.Generic.AsList.toJSON
+toJSONFile name = ByteString.writeFile name . Multilinear.Generic.AsArray.toJSON
 
 {-| Deserialize from JSON string -}
 fromJSON :: (FromJSON i, FromJSON a) => ByteString.ByteString -> Maybe (Tensor i a)
@@ -122,7 +122,7 @@ fromJSON = Data.Aeson.decode
 fromJSONFile :: (FromJSON i, FromJSON a) => String -> IO (Maybe (Tensor i a))
 fromJSONFile name = do
     contents <- ByteString.readFile name
-    return $ Multilinear.Generic.AsList.fromJSON contents
+    return $ Multilinear.Generic.AsArray.fromJSON contents
 
 -- Print tensor
 instance (Show i, Show a) => Show (Tensor i a) where

@@ -14,15 +14,14 @@ This module provides convenient constructors that generates a linear functionals
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Form (
-  fromIndices, 
+  fromIndices, Multilinear.Form.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
-  fromCSV,
-  Multilinear.Form.const 
+  fromCSV, toCSV  
 ) where
 
 import           Multilinear.Generic.AsList
-import           Multilinear.Index
+import           Multilinear
 import           Data.Bits
 import           Data.Either
 import           Data.Serialize
@@ -40,7 +39,7 @@ fromIndices :: (
     Eq a, Show a, Num a, Bits a
   ) => String      -- ^ Index name (one character)
     -> i           -- ^ Number of elements
-    -> (i -> a)    -- ^ generator function - returns a linear functional component at index @i@
+    -> (i -> a)    -- ^ Generator function - returns a linear functional component at index @i@
     -> Tensor i a  -- ^ Generated linear functional
 
 fromIndices [d] s f =
@@ -74,7 +73,7 @@ randomDouble [i] s d = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate form with random integer components with given probability distribution. The form is wrapped in the IO monad. -}
+{-| Generate linear functional with random integer components with given probability distribution. The form is wrapped in the IO monad. -}
 randomInt :: (
     Eq i, Show i, Integral i,
     DiscreteGen d
@@ -88,7 +87,7 @@ randomInt [i] s d = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate form with random real components with given probability distribution and given seed. The form is wrapped in a monad. -}
+{-| Generate linear functional with random real components with given probability distribution and given seed. The form is wrapped in a monad. -}
 randomDoubleSeed :: (
     Eq i, Show i, Integral i,
     ContGen d, Integral i2, PrimMonad m
@@ -104,7 +103,7 @@ randomDoubleSeed [i] s d seed = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate form with random integer components with given probability distribution and given seed. The form is wrapped in a monad. -}
+{-| Generate linear functional with random integer components with given probability distribution and given seed. The form is wrapped in a monad. -}
 randomIntSeed :: (
     Eq i, Show i, Integral i,
     DiscreteGen d, Integral i2, PrimMonad m
@@ -120,7 +119,7 @@ randomIntSeed [i] s d seed = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Read form components from CSV file. Reads only the first row of the file. -}
+{-| Read linear functional components from CSV file. Reads only the first row of the file. -}
 fromCSV :: (
     Eq a, Show a, Num a, Bits a, Serialize a
   ) => String                                  -- ^ Index name (one character)
@@ -132,9 +131,25 @@ fromCSV [i] fileName separator = do
   csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
   let firstLine = head csv
   let components = decode <$> firstLine
-  let size = length components
+  let size = length $ rights components
   if size > 0
   then return $ Tensor (Covariant size [i]) (Scalar <$> rights components)
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
 fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
+{-| Write linear functional to CSV file. -}
+toCSV :: (
+    Eq i, Show i, Integral i, Serialize i, 
+    Eq a, Show a, Num a, Bits a, Serialize a
+  ) => Tensor i a  -- ^ Functional to serialize
+    -> String      -- ^ CSV file name
+    -> Char        -- ^ Separator expected to be used in this CSV file
+    -> IO Int      -- ^ Number of rows written
+
+toCSV t@(Tensor (Covariant _ _) elems) fileName separator = 
+  let encodedElems = [encode <$> elems]
+  in  
+    if length (indices t) == 1
+    then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
+    else return 0
+toCSV _ _ _ = return 0

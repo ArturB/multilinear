@@ -15,7 +15,6 @@ Portability : Windows/POSIX
 module Multilinear.Tensor (
     fromIndices,
     Multilinear.Tensor.const
-    --el
 ) where
 
 import           Multilinear.Generic.AsList
@@ -47,13 +46,3 @@ const (u:us,s:size) d v =
 const u (d:ds,s:size) v =
     Tensor (    Covariant s [d]) $ replicate (fromIntegral s) $ Multilinear.Tensor.const u (ds,size) v
 const us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
-
-
-
-{-| Concise getter for a tensor -}
-{-el :: Integral i => Tensor i a -> [i] -> [i] -> a
-el (Scalar x) [] [] = x
-el (Err msg) _ _  = error msg
-el t@(Tensor (Contravariant _ _) _) (u:us) ds = el (t ! u) us ds
-el t@(Tensor (Covariant _ _) _) us (d:ds) = el (t ! d) us ds
-el _ _ _ = error "Given indices are not compatible with tensor type!"-}

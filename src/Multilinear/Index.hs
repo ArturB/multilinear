@@ -2,7 +2,7 @@
 Module      : Index
 Description : Implements tensor index.
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
@@ -20,8 +20,8 @@ module Multilinear.Index (
     equivI, (!=!),
 ) where
 
-import           GHC.Generics
 import           Data.Serialize
+import           GHC.Generics
 import           Data.Hashable
 import           Data.Aeson
 

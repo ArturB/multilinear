@@ -15,7 +15,6 @@ Portability : Windows/POSIX
 module Multilinear.NVector (
   fromIndices, 
   Multilinear.NVector.const
-  --elnv
 ) where
 
 
@@ -45,9 +44,3 @@ const (d:ds) (s:size) v =
     Tensor (Contravariant s [d]) $ replicate (fromIntegral s) $ Multilinear.NVector.const ds size v
 const _ _ _ = error "Indices and its sizes incompatible with n-vector structure!"
 
-{-| Concise getter for a n-vector -}
-{-elnv :: Integral i => Tensor i a -> [i] -> a
-elnv (Scalar x) [] = x
-elnv (Err msg) _ = error msg
-elnv t@(Tensor (Contravariant _ _) _) (d:ds) = elnv (t ! d) ds
-elnv _ _ = error "Given indices incompatible with n-vector structure!"-}

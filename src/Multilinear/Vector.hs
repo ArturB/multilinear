@@ -7,45 +7,149 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-
+This module provides convenient constructors that generates a vector (tensor with one upper index). 
 
 -}
 
 {-# LANGUAGE Strict, GADTs #-}
 
 module Multilinear.Vector (
-  fromIndices, 
-  Multilinear.Vector.const
-  --elv
+  fromIndices, Multilinear.Vector.const,
+  randomDouble, randomDoubleSeed,
+  randomInt, randomIntSeed,
+  fromCSV, toCSV  
 ) where
 
 import           Multilinear.Generic.AsList
-import           Multilinear.Index
+import           Multilinear
 import           Data.Bits
+import           Data.Either
+import           Data.Serialize
+import           Data.CSV.Enumerator
+import           Control.Monad.Primitive
+import           Control.Monad.Trans.Either
+import           Control.Exception
+import           Statistics.Distribution
+import qualified System.Random.MWC         as MWC
+import qualified Data.Vector               as Vector
 
-{-| Generate vector as function of its indices -}
+{-| Generate vector as function of indices -}
 fromIndices :: (
     Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-  ) => String -> i -> (i -> a) -> Tensor i a
+  ) => String      -- ^ Index name (one character)
+    -> i           -- ^ Number of elements
+    -> (i -> a)    -- ^ Generator function - returns a vector component at index @i@
+    -> Tensor i a  -- ^ Generated vector
 
-fromIndices [u] s f =
-    Tensor (Contravariant s [u]) [Scalar $ f x | x <- [0 .. s - 1] ]
-fromIndices _ _ _ = error "Indices and its sizes not compatible with structure of vector!"
+fromIndices [d] s f =
+    Tensor (Contravariant s [d]) [Scalar $ f x | x <- [0 .. s - 1] ]
+fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
-{-| Generate vector with all components equal to v -}
+{-| Generate vector with all components equal to some @v@ -}
 const :: (
     Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-  ) => String -> i -> a -> Tensor i a
+  ) => String       -- ^ Index name (one character)
+    -> i            -- ^ Number of elements
+    -> a            -- ^ Value of each element
+    -> Tensor i a   -- ^ Generated vector
 
-const [u] s v =
-    Tensor (Contravariant s [u]) $ replicate (fromIntegral s) $ Scalar v
-const _ _ _ = error "Indices and its sizes not compatible with structure of vector!"
+const [d] s v = 
+    Tensor (Contravariant s [d]) $ replicate (fromIntegral s) (Scalar v)
+const _ _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
+{-| Generate vector with random real components with given probability distribution. The vector is wrapped in the IO monad. -}
+randomDouble :: (
+    Eq i, Show i, Integral i,
+    ContGen d
+  ) => String                -- ^ Index name (one character)
+    -> i                     -- ^ Number of elements
+    -> d                     -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> IO (Tensor i Double)  -- ^ Generated vector
 
-{-| Concise getter for a vector -}
-{-elv :: Integral i => Tensor i a -> i -> a
-elv (Err msg) _  = error msg
-elv t@(Tensor (Contravariant _ _) _) u = scalarVal $ t ! u
-elv _ _ = error "Given indices are not compatible with vector structure!"-}
+randomDouble [i] s d = do
+  components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..s] ]
+  return $ Tensor (Contravariant s [i]) $ Scalar <$> components
+randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
+
+{-| Generate vector with random integer components with given probability distribution. The vector is wrapped in the IO monad. -}
+randomInt :: (
+    Eq i, Show i, Integral i,
+    DiscreteGen d
+  ) => String             -- ^ Index name (one character)
+    -> i                  -- ^ Number of elements
+    -> d                  -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (Tensor i Int)  -- ^ Generated vector
+
+randomInt [i] s d = do
+  components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..s] ]
+  return $ Tensor (Contravariant s [i]) $ Scalar <$> components
+randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
+
+{-| Generate vector with random real components with given probability distribution and given seed. The vector is wrapped in a monad. -}
+randomDoubleSeed :: (
+    Eq i, Show i, Integral i,
+    ContGen d, Integral i2, PrimMonad m
+  ) => String              -- ^ Index name (one character)
+    -> i                   -- ^ Number of elements
+    -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> i2                  -- ^ Randomness seed
+    -> m (Tensor i Double) -- ^ Generated vector
+
+randomDoubleSeed [i] s d seed = do
+  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+  components <- sequence [ genContVar d gen | _ <- [1..s] ]
+  return $ Tensor (Contravariant s [i]) $ Scalar <$> components
+randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
+
+{-| Generate vector with random integer components with given probability distribution and given seed. The vector is wrapped in a monad. -}
+randomIntSeed :: (
+    Eq i, Show i, Integral i,
+    DiscreteGen d, Integral i2, PrimMonad m
+  ) => String             -- ^ Index name (one character)
+    -> i                  -- ^ Number of elements
+    -> d                  -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> i2                 -- ^ Randomness seed
+    -> m (Tensor i Int)   -- ^ Generated vector
+
+randomIntSeed [i] s d seed = do
+  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+  components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
+  return $ Tensor (Contravariant s [i]) $ Scalar <$> components
+randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
+
+{-| Read vector components from CSV file. Reads only the first row of the file. -}
+fromCSV :: (
+    Eq a, Show a, Num a, Bits a, Serialize a
+  ) => String                                  -- ^ Index name (one character)
+    -> String                                  -- ^ CSV file name
+    -> Char                                    -- ^ Separator expected to be used in this CSV file
+    -> EitherT SomeException IO (Tensor Int a) -- ^ Generated vector or error message
+
+fromCSV [i] fileName separator = do
+  csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
+  let firstLine = head csv
+  let components = decode <$> firstLine
+  let size = length components
+  if size > 0
+  then return $ Tensor (Contravariant size [i]) (Scalar <$> rights components)
+  else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
+fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
+
+{-| Write vector to CSV file. -}
+toCSV :: (
+    Eq i, Show i, Integral i, Serialize i, 
+    Eq a, Show a, Num a, Bits a, Serialize a
+  ) => Tensor i a  -- ^ Vector to serialize
+    -> String      -- ^ CSV file name
+    -> Char        -- ^ Separator expected to be used in this CSV file
+    -> IO Int      -- ^ Number of rows written
+
+toCSV t@(Tensor (Contravariant _ _) elems) fileName separator = 
+  let encodedElems = [encode <$> elems]
+  in  
+    if length (indices t) == 1
+    then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
+    else return 0
+toCSV _ _ _ = return 0
