@@ -154,5 +154,3 @@ toCSV t@(Tensor (Covariant _ _) elems) fileName separator =
     else return 0
 toCSV _ _ _ = return 0
 
-
-taka tam linia

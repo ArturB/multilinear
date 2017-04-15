@@ -16,6 +16,7 @@ module Main (
 import qualified Multilinear.Tensor         as Tensor
 import qualified Multilinear.Generic.AsList as List
 import           Prelude                    as P
+import           Multilinear.Library
 
 m1 :: List.Tensor Int Int
 m1 = Tensor.fromIndices ("i",[100]) ("j",[100]) $ \[i] [j] -> i+j
