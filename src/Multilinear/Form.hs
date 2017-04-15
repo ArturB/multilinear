@@ -7,7 +7,7 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-This module provides convenient constructors that generates a linear functionals (tensor with one lower index). 
+This module provides convenient constructors that generates a linear functionals (tensor with one lower index).
 
 -}
 
@@ -17,21 +17,21 @@ module Multilinear.Form (
   fromIndices, Multilinear.Form.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
-  fromCSV, toCSV  
+  fromCSV, toCSV
 ) where
 
-import           Multilinear.Generic.AsList
-import           Multilinear
-import           Data.Bits
-import           Data.Either
-import           Data.Serialize
-import           Data.CSV.Enumerator
+import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
-import           Control.Exception
+import           Data.Bits
+import           Data.CSV.Enumerator
+import           Data.Either
+import           Data.Serialize
+import qualified Data.Vector                as Vector
+import           Multilinear
+import           Multilinear.Generic.AsList
 import           Statistics.Distribution
-import qualified System.Random.MWC         as MWC
-import qualified Data.Vector               as Vector
+import qualified System.Random.MWC          as MWC
 
 {-| Generate linear functional as function of indices -}
 fromIndices :: (
@@ -55,7 +55,7 @@ const :: (
     -> a            -- ^ Value of each element
     -> Tensor i a   -- ^ Generated linear functional
 
-const [d] s v = 
+const [d] s v =
     Tensor (Covariant s [d]) $ replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -139,17 +139,20 @@ fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structur
 
 {-| Write linear functional to CSV file. -}
 toCSV :: (
-    Eq i, Show i, Integral i, Serialize i, 
+    Eq i, Show i, Integral i, Serialize i,
     Eq a, Show a, Num a, Bits a, Serialize a
   ) => Tensor i a  -- ^ Functional to serialize
     -> String      -- ^ CSV file name
     -> Char        -- ^ Separator expected to be used in this CSV file
     -> IO Int      -- ^ Number of rows written
 
-toCSV t@(Tensor (Covariant _ _) elems) fileName separator = 
+toCSV t@(Tensor (Covariant _ _) elems) fileName separator =
   let encodedElems = [encode <$> elems]
-  in  
+  in
     if length (indices t) == 1
     then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
     else return 0
 toCSV _ _ _ = return 0
+
+
+taka tam linia
