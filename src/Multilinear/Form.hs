@@ -59,7 +59,19 @@ const [d] s v =
     Tensor (Covariant s [d]) $ replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate linear functional with random real components with given probability distribution. The form is wrapped in the IO monad. -}
+{-| Generate linear functional with random real components with given probability distribution.
+The functional is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDouble :: (
     Eq i, Show i, Integral i,
     ContGen d
@@ -73,7 +85,13 @@ randomDouble [i] s d = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate linear functional with random integer components with given probability distribution. The form is wrapped in the IO monad. -}
+{-| Generate linear functional with random integer components with given probability distribution.
+The functional is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomInt :: (
     Eq i, Show i, Integral i,
     DiscreteGen d
@@ -87,7 +105,19 @@ randomInt [i] s d = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate linear functional with random real components with given probability distribution and given seed. The form is wrapped in a monad. -}
+{-| Generate linear functional with random real components with given probability distribution and given seed.
+The functional is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDoubleSeed :: (
     Eq i, Show i, Integral i,
     ContGen d, Integral i2, PrimMonad m
@@ -103,7 +133,13 @@ randomDoubleSeed [i] s d seed = do
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate linear functional with random integer components with given probability distribution and given seed. The form is wrapped in a monad. -}
+{-| Generate linear functional with random integer components with given probability distribution and given seed.
+The functional is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomIntSeed :: (
     Eq i, Show i, Integral i,
     DiscreteGen d, Integral i2, PrimMonad m

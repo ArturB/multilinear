@@ -17,9 +17,9 @@ module Multilinear.Tensor (
     Multilinear.Tensor.const
 ) where
 
+import           Data.Bits
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Data.Bits
 
 {-| Generate tensor as functions of its indices -}
 fromIndices :: (

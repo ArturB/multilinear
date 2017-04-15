@@ -9,52 +9,52 @@ Portability : Windows/POSIX
 
 -}
 
-{-# LANGUAGE Strict #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE Strict        #-}
 
 module Multilinear.Index (
-    TIndex(..), 
-    isContravariant, 
-    isCovariant, 
+    TIndex(..),
+    isContravariant,
+    isCovariant,
     isIndifferent,
     equivI, (!=!),
 ) where
 
+import           Data.Aeson
+import           Data.Hashable
 import           Data.Serialize
 import           GHC.Generics
-import           Data.Hashable
-import           Data.Aeson
 
 {-| TENSOR INDEX -}
 data TIndex i =
     Covariant {
         indexSize :: i,
-        indexName  :: String
+        indexName :: String
     } |
     Contravariant {
         indexSize :: i,
-        indexName  :: String
+        indexName :: String
     } |
     Indifferent {
         indexSize :: i,
-        indexName  :: String
+        indexName :: String
     }
     deriving (Eq, Generic)
 
 {-| Return true if index is covariant |-}
 isCovariant :: TIndex i -> Bool
 isCovariant (Covariant _ _) = True
-isCovariant _ = False
+isCovariant _               = False
 
 {-| Return true if index is contravariant |-}
 isContravariant :: TIndex i -> Bool
 isContravariant (Contravariant _ _) = True
-isContravariant _ = False
+isContravariant _                   = False
 
 {-| Return true if index is indifferent |-}
 isIndifferent :: TIndex i -> Bool
 isIndifferent (Indifferent _ _) = True
-isIndifferent _ = False
+isIndifferent _                 = False
 
 {-| Binary serialization and deserialization |-}
 instance Serialize i => Serialize (TIndex i)

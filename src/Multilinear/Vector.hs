@@ -7,31 +7,32 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-This module provides convenient constructors that generates a vector (tensor with one upper index). 
+This module provides convenient constructors that generates a vector (tensor with one upper index).
 
 -}
 
-{-# LANGUAGE Strict, GADTs #-}
+{-# LANGUAGE GADTs  #-}
+{-# LANGUAGE Strict #-}
 
 module Multilinear.Vector (
   fromIndices, Multilinear.Vector.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
-  fromCSV, toCSV  
+  fromCSV, toCSV
 ) where
 
-import           Multilinear.Generic.AsList
-import           Multilinear
-import           Data.Bits
-import           Data.Either
-import           Data.Serialize
-import           Data.CSV.Enumerator
+import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
-import           Control.Exception
+import           Data.Bits
+import           Data.CSV.Enumerator
+import           Data.Either
+import           Data.Serialize
+import qualified Data.Vector                as Vector
+import           Multilinear
+import           Multilinear.Generic.AsList
 import           Statistics.Distribution
-import qualified System.Random.MWC         as MWC
-import qualified Data.Vector               as Vector
+import qualified System.Random.MWC          as MWC
 
 {-| Generate vector as function of indices -}
 fromIndices :: (
@@ -55,11 +56,23 @@ const :: (
     -> a            -- ^ Value of each element
     -> Tensor i a   -- ^ Generated vector
 
-const [d] s v = 
+const [d] s v =
     Tensor (Contravariant s [d]) $ replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
-{-| Generate vector with random real components with given probability distribution. The vector is wrapped in the IO monad. -}
+{-| Generate vector with random real components with given probability distribution.
+The vector is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDouble :: (
     Eq i, Show i, Integral i,
     ContGen d
@@ -73,7 +86,13 @@ randomDouble [i] s d = do
   return $ Tensor (Contravariant s [i]) $ Scalar <$> components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
-{-| Generate vector with random integer components with given probability distribution. The vector is wrapped in the IO monad. -}
+{-| Generate vector with random integer components with given probability distribution.
+The vector is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomInt :: (
     Eq i, Show i, Integral i,
     DiscreteGen d
@@ -87,7 +106,19 @@ randomInt [i] s d = do
   return $ Tensor (Contravariant s [i]) $ Scalar <$> components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
-{-| Generate vector with random real components with given probability distribution and given seed. The vector is wrapped in a monad. -}
+{-| Generate vector with random real components with given probability distribution and given seed.
+The vector is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDoubleSeed :: (
     Eq i, Show i, Integral i,
     ContGen d, Integral i2, PrimMonad m
@@ -103,7 +134,13 @@ randomDoubleSeed [i] s d seed = do
   return $ Tensor (Contravariant s [i]) $ Scalar <$> components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
-{-| Generate vector with random integer components with given probability distribution and given seed. The vector is wrapped in a monad. -}
+{-| Generate vector with random integer components with given probability distribution and given seed.
+The vector is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomIntSeed :: (
     Eq i, Show i, Integral i,
     DiscreteGen d, Integral i2, PrimMonad m
@@ -139,16 +176,16 @@ fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structur
 
 {-| Write vector to CSV file. -}
 toCSV :: (
-    Eq i, Show i, Integral i, Serialize i, 
+    Eq i, Show i, Integral i, Serialize i,
     Eq a, Show a, Num a, Bits a, Serialize a
   ) => Tensor i a  -- ^ Vector to serialize
     -> String      -- ^ CSV file name
     -> Char        -- ^ Separator expected to be used in this CSV file
     -> IO Int      -- ^ Number of rows written
 
-toCSV t@(Tensor (Contravariant _ _) elems) fileName separator = 
+toCSV t@(Tensor (Contravariant _ _) elems) fileName separator =
   let encodedElems = [encode <$> elems]
-  in  
+  in
     if length (indices t) == 1
     then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
     else return 0

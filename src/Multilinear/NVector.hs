@@ -9,18 +9,19 @@ Portability : Windows/POSIX
 
 -}
 
-{-# LANGUAGE Strict, GADTs #-}
+{-# LANGUAGE GADTs  #-}
+{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
 module Multilinear.NVector (
-  fromIndices, 
+  fromIndices,
   Multilinear.NVector.const
 ) where
 
 
+import           Data.Bits
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Data.Bits
 
 {-| Generate n-vector as function of its indices -}
 fromIndices :: (

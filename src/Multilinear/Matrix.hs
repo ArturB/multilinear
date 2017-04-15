@@ -7,11 +7,13 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-
+This module provides convenient constructors that generates a matrix.
 
 -}
 
-{-# LANGUAGE Strict, GADTs, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs               #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE Strict              #-}
 {-# OPTIONS_GHC #-}
 
 module Multilinear.Matrix (
@@ -21,18 +23,18 @@ module Multilinear.Matrix (
   fromCSV, toCSV
 ) where
 
-import           Multilinear.Generic.AsList
-import           Multilinear
-import           Data.Bits
-import           Data.Either
-import           Data.Serialize
-import           Data.CSV.Enumerator
+import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
-import           Control.Exception
+import           Data.Bits
+import           Data.CSV.Enumerator
+import           Data.Either
+import           Data.Serialize
+import qualified Data.Vector                as Vector
+import           Multilinear
+import           Multilinear.Generic.AsList
 import           Statistics.Distribution
-import qualified System.Random.MWC         as MWC
-import qualified Data.Vector               as Vector
+import qualified System.Random.MWC          as MWC
 
 {-| Generate matrix as function of its indices -}
 fromIndices :: (
@@ -45,10 +47,10 @@ fromIndices :: (
     -> Tensor i a     -- ^ Generated matrix
 
 fromIndices [u,d] su sd f =
-    Tensor (Contravariant su [u]) 
-      [Tensor (Covariant sd [d]) 
-        [Scalar $ f x y 
-      | y <- [0 .. sd - 1] ] 
+    Tensor (Contravariant su [u])
+      [Tensor (Covariant sd [d])
+        [Scalar $ f x y
+      | y <- [0 .. sd - 1] ]
     | x <- [0 .. su - 1] ]
 fromIndices _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
 
@@ -65,11 +67,23 @@ const :: (
 const [u,d] su sd v =
     Tensor (Contravariant su [u]) $
       replicate (fromIntegral su) $
-        Tensor (Covariant sd [d]) $ 
+        Tensor (Covariant sd [d]) $
           replicate (fromIntegral sd) $ Scalar v
 const _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
 
-{-| Generate matrix with random real components with given probability distribution. The matrix is wrapped in the IO monad. -}
+{-| Generate matrix with random real components with given probability distribution.
+The matrix is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDouble :: (
     Eq i, Show i, Integral i,
     ContGen d
@@ -80,20 +94,26 @@ randomDouble :: (
     -> IO (Tensor i Double)  -- ^ Generated matrix
 
 randomDouble [u,d] su sd dist = do
-  components <- 
-    sequence [ 
-      sequence [ 
-        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen 
-      | _ <- [1..sd] ] 
+  components <-
+    sequence [
+      sequence [
+        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
+      | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $ 
-    Tensor (Contravariant su [u]) $ (\x -> 
+  return $
+    Tensor (Contravariant su [u]) $ (\x ->
       Tensor (Covariant sd [d]) $ Scalar <$> x
     ) <$> components
 randomDouble _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
-{-| Generate matrix with random integer components with given probability distribution. The matrix is wrapped in the IO monad. -}
+{-| Generate matrix with random integer components with given probability distribution.
+The matrix is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomInt :: (
     Eq i, Show i, Integral i,
     DiscreteGen d
@@ -104,20 +124,32 @@ randomInt :: (
     -> IO (Tensor i Double)  -- ^ Generated matrix
 
 randomInt [u,d] su sd dist = do
-  components <- 
-    sequence [ 
-      sequence [ 
-        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen 
-      | _ <- [1..sd] ] 
+  components <-
+    sequence [
+      sequence [
+        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
+      | _ <- [1..sd] ]
     | _ <- [1..su] ]
-    
-  return $ 
-    Tensor (Contravariant su [u]) $ (\x -> 
+
+  return $
+    Tensor (Contravariant su [u]) $ (\x ->
       Tensor (Covariant sd [d]) $ Scalar <$> x
     ) <$> components
 randomInt _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
-{-| Generate matrix with random real components with given probability distribution and given seed. The matrix is wrapped in the a monad. -}
+{-| Generate matrix with random real components with given probability distribution and given seed.
+The matrix is wrapped in the a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDoubleSeed :: (
     Eq i, Show i, Integral i,
     ContGen d, Integral i2, PrimMonad m
@@ -130,20 +162,26 @@ randomDoubleSeed :: (
 
 randomDoubleSeed [u,d] su sd dist seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
-  components <- 
-    sequence [ 
-      sequence [ 
-        genContVar dist gen 
-      | _ <- [1..sd] ] 
+  components <-
+    sequence [
+      sequence [
+        genContVar dist gen
+      | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $ 
-    Tensor (Contravariant su [u]) $ (\x -> 
+  return $
+    Tensor (Contravariant su [u]) $ (\x ->
       Tensor (Covariant sd [d]) $ Scalar <$> x
     ) <$> components
 randomDoubleSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
-{-| Generate matrix with random integer components with given probability distribution. and given seed. The matrix is wrapped in a monad. -}
+{-| Generate matrix with random integer components with given probability distribution. and given seed.
+The matrix is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomIntSeed :: (
     Eq i, Show i, Integral i,
     DiscreteGen d, Integral i2, PrimMonad m
@@ -156,15 +194,15 @@ randomIntSeed :: (
 
 randomIntSeed [u,d] su sd dist seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
-  components <- 
-    sequence [ 
-      sequence [ 
-        genDiscreteVar dist gen 
-      | _ <- [1..sd] ] 
+  components <-
+    sequence [
+      sequence [
+        genDiscreteVar dist gen
+      | _ <- [1..sd] ]
     | _ <- [1..su] ]
-    
-  return $ 
-    Tensor (Contravariant su [u]) $ (\x -> 
+
+  return $
+    Tensor (Contravariant su [u]) $ (\x ->
       Tensor (Covariant sd [d]) $ Scalar <$> x
     ) <$> components
 randomIntSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
@@ -183,8 +221,8 @@ fromCSV [u,d] fileName separator = do
   let rows = length components
   let columns = if rows > 0 then length $ rights (head components) else 0
   if rows > 0 && columns > 0
-  then return $ 
-    Tensor (Contravariant rows [u]) $ (\x -> 
+  then return $
+    Tensor (Contravariant rows [u]) $ (\x ->
       Tensor (Covariant columns [d]) $ Scalar <$> rights x
     ) <$> components
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
@@ -192,17 +230,17 @@ fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structur
 
 {-| Write matrix to CSV file. -}
 toCSV :: (
-    Eq i, Show i, Integral i, Serialize i, 
+    Eq i, Show i, Integral i, Serialize i,
     Eq a, Show a, Num a, Bits a, Serialize a
   ) => Tensor i a  -- ^ Matrix to serialize
     -> String      -- ^ CSV file name
     -> Char        -- ^ Separator expected to be used in this CSV file
     -> IO Int      -- ^ Number of rows written
 
-toCSV t@(Tensor (Contravariant _ _) rows) fileName separator = 
+toCSV t@(Tensor (Contravariant _ _) rows) fileName separator =
   let elems = tensorData <$> rows
       encodedElems = (encode . scalarVal <$>) <$> elems
-  in  
+  in
     if length (indices t) == 2 && isCovariant (indices t !! 1)
     then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
     else return 0
