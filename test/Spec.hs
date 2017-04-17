@@ -13,8 +13,9 @@ module Main (
     main
 ) where
 
-import qualified Multilinear.Tensor         as Tensor
 import qualified Multilinear.Generic.AsList as List
+import           Multilinear.Library
+import qualified Multilinear.Tensor         as Tensor
 import           Prelude                    as P
 
 m1 :: List.Tensor Int Int

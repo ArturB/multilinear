@@ -1,6 +1,6 @@
 {-|
 Module      : Multilinear.NVector.Seq
-Description : 
+Description :
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : 3-clause BSD
 Maintainer  : artur.brodzki@gmail.com
@@ -9,7 +9,8 @@ Portability : Windows/POSIX
 
 -}
 
-{-# LANGUAGE Strict, GADTs #-}
+{-# LANGUAGE GADTs  #-}
+{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
 module Multilinear.NVector.Seq (

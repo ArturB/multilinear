@@ -13,12 +13,12 @@ module Main (
     main
 ) where
 
+import           Criterion.Main
+import           Criterion.Measurement      as Meas
+import           Criterion.Types
+import qualified Multilinear.Generic.AsList as List
 import qualified Multilinear.Tensor         as Tensor
 import qualified Multilinear.Vector         as Vector
-import qualified Multilinear.Generic.AsList as List
-import           Criterion.Measurement      as Meas
-import           Criterion.Main
-import           Criterion.Types
 
 m1 :: List.Tensor Int Int
 m1 = Tensor.fromIndices ("i",[500]) ("j",[500]) $ \[i] [j] -> i+j

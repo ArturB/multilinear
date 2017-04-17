@@ -1,6 +1,6 @@
 {-|
 Module      : Multilinear.Tensor.Seq
-Description : 
+Description :
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : 3-clause BSD
 Maintainer  : artur.brodzki@gmail.com
@@ -9,18 +9,19 @@ Portability : Windows/POSIX
 
 -}
 
-{-# LANGUAGE Strict, GADTs #-}
+{-# LANGUAGE GADTs  #-}
+{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
 module Multilinear.Tensor.Seq (
-  
+
 ) where
 
 {-import           Multilinear.ListTensor
 
 {-| Concise constructor for a tensor memoized sequence -}
 tensorseq :: (Show i, Integral i) => (String,[i]) -> (String,[i]) -> (String,i) -> ([i] -> [i] -> i -> a) -> Tensor i a
-tensorseq ([],[]) ([],[]) ([i],is) f = 
+tensorseq ([],[]) ([],[]) ([i],is) f =
   Tensor (Indifferent is [i]) [Scalar $ f [] [] x | x <- [0 .. is - 1] ]
 tensorseq (u:us,s:size) d (i,is) f =
     Tensor (Contravariant s [u]) [tensorseq (us,size) d (i,is) (\uss dss -> f (x:uss) dss) | x <- [0 .. s - 1] ]

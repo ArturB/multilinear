@@ -2,19 +2,25 @@
 Module      : Multilinear
 Description : Provides efficient and generic implementation of linear algebra operation using Ricci - Einstein tensor formalism
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
+- This module contains implementation of tensor defined as nested list of its components.
+- The other implementation "Multilinear.Generic.AsArray" uses an array insted of list.
+- Array implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
+- List implementation is slower but lazy and when tensor is generated from indices or randomly, it does not generate all elements at once if not necessary,
+so it may operate in smaller memory (e.g. linear instead of quadratic when multiplying matrix by vector or form).
+
 -}
 
-{-# LANGUAGE GADTs  #-}
-{-# LANGUAGE Strict  #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE Strict                #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.Generic.AsArray (
@@ -25,81 +31,94 @@ module Multilinear.Generic.AsArray (
     Multilinear.Generic.AsArray.fromJSON, fromJSONFile
 ) where
 
-import           GHC.Generics
-import           Data.Binary
-import           Data.List
-import           Data.Hashable
-import           Data.Maybe
-import           Data.Bits
-import           Data.Aeson
 import           Codec.Compression.GZip
-import qualified Data.ByteString.Lazy as ByteString
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Either
+import           Data.Aeson
+import           Data.Bits
+import qualified Data.ByteString.Lazy       as ByteString
+import           Data.Hashable
+import           Data.List
+import           Data.Maybe
+import           Data.Serialize
+import           GHC.Generics
 import           Multilinear
 
-{- ERROR MESSAGES -}
+{-| ERROR MESSAGES -}
 incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
 
-{- Tensor defined recursively as scalar or list of other tensors -}
+{-| Tensor defined recursively as scalar or list of other tensors -}
 data Tensor i a =
-    {-| Tensor may be a scalar -}
+    {-| Scalar -}
     Scalar {
+        {-| value of scalar -}
         scalarVal :: a
     } |
-    {-| Or a list of other tensors -}
+    {-| List of other tensors -}
     Tensor {
+        {-| Index "Mutltilinear.Index" of tensor -}
         tensorIndex :: TIndex i,
+        {-| List of tensors on deeper recursion level -}
         tensorData  :: [Tensor i a]
     } |
     {-| Operations on tensors may throw an error -}
     Err {
+        {-| Error message -}
         errMessage :: String
     } deriving (Eq, Generic)
 
--- Recursive indexing
-(!) :: (Eq i, Show i, Integral i, Eq a, Show a, Num a) => Tensor i a -> i -> Tensor i a
-(!) (Scalar _) _ = Err "Scalar has no indices!"
-(!) (Err msg) _ = Err msg
+{-|
+    Recursive indexing.
+    @t ! i = t[i]@
+-}
+(!) :: Integral i =>
+       Tensor i a -- ^ tensor @t@
+    -> i          -- ^ index @i@
+    -> Tensor i a -- ^ tensor @t[i]@
+
+(!) (Scalar _) _    = Err "Scalar has no indices!"
+(!) (Err msg) _     = Err msg
 (!) (Tensor _ ts) i = ts !! fromIntegral i
 
 {-| Binary serialization and deserialization -}
-instance (Binary i, Binary a) => Binary (Tensor i a)
+instance (Serialize i, Serialize a) => Serialize (Tensor i a)
 
-{-| Serialize to binary string |-}
-toBinary :: (Binary i, Binary a) => Tensor i a -> ByteString.ByteString
-toBinary = Data.Binary.encode
+{-| Serialize to binary string -}
+toBinary :: (Serialize i, Serialize a) => Tensor i a -> ByteString.ByteString
+toBinary = Data.Serialize.encodeLazy
 
-{-| Write to binary file. Uses compression with gzip |-}
-toBinaryFile :: (Binary i, Binary a) => String -> Tensor i a -> IO ()
+{-| Write to binary file. Uses compression with gzip -}
+toBinaryFile :: (Serialize i, Serialize a) => String -> Tensor i a -> IO ()
 toBinaryFile name = ByteString.writeFile name . compress . toBinary
 
-{-| Deserialize from binary string |-}
-fromBinary :: (Binary i, Binary a) => ByteString.ByteString -> Tensor i a
-fromBinary = Data.Binary.decode
+{-| Deserialize from binary string -}
+fromBinary :: (Serialize i, Serialize a) => ByteString.ByteString -> Either String (Tensor i a)
+fromBinary = Data.Serialize.decodeLazy
 
-{-| Read from binary file |-}
-fromBinaryFile :: (Binary i, Binary a) => String -> IO (Tensor i a)
+{-| Read from binary file -}
+fromBinaryFile :: (Serialize i, Serialize a) => String -> EitherT String IO (Tensor i a)
 fromBinaryFile name = do
-    contents <- ByteString.readFile name
-    return $ fromBinary $ decompress contents
+    contents <- lift $ ByteString.readFile name
+    EitherT $ return $ fromBinary $ decompress contents
 
-{-| Serialization to and from JSON |-}
+{-| Serialization to and from JSON -}
 instance (FromJSON i, FromJSON a) => FromJSON (Tensor i a)
 instance (  ToJSON i,   ToJSON a) =>   ToJSON (Tensor i a)
 
-{-| Serialize to JSON string |-}
+{-| Serialize to JSON string -}
 toJSON :: (ToJSON i, ToJSON a) => Tensor i a -> ByteString.ByteString
 toJSON = Data.Aeson.encode
 
-{-| Write to JSON file |-}
+{-| Write to JSON file -}
 toJSONFile :: (ToJSON i, ToJSON a) => String -> Tensor i a -> IO ()
 toJSONFile name = ByteString.writeFile name . Multilinear.Generic.AsArray.toJSON
 
-{-| Deserialize from JSON string |-}
+{-| Deserialize from JSON string -}
 fromJSON :: (FromJSON i, FromJSON a) => ByteString.ByteString -> Maybe (Tensor i a)
 fromJSON = Data.Aeson.decode
 
-{-| Read from JSON file |-}
+{-| Read from JSON file -}
 fromJSONFile :: (FromJSON i, FromJSON a) => String -> IO (Maybe (Tensor i a))
 fromJSONFile name = do
     contents <- ByteString.readFile name
@@ -109,7 +128,7 @@ fromJSONFile name = do
 instance (Show i, Show a) => Show (Tensor i a) where
     -- merge errors first and then print tensor
     show t = show' $ _mergeErr t
-        where 
+        where
         -- Scalar is showed simply as its value
         show' (Scalar x) = show x
         -- Covariant components are shown horizontally
@@ -134,7 +153,7 @@ instance (Show i, Show a) => Show (Tensor i a) where
             -- and return this error if found, whole tensor otherwise
             in fromMaybe t1 err
         -- in scalars cannot be any error
-        _mergeErr (Scalar x) = Scalar x 
+        _mergeErr (Scalar x) = Scalar x
 
         -- return True if tensor is an error
         _isErrTensor :: Tensor i a -> Bool
@@ -160,7 +179,7 @@ instance Functor (Tensor i) where
 
 -- Tensors can be compared lexigographically
 instance (
-    Eq i, Ord i, 
+    Eq i, Ord i,
     Eq a, Ord a
     ) => Ord (Tensor i a) where
 
@@ -182,8 +201,8 @@ instance (Hashable i, Hashable a) => Hashable (Tensor i a)
 
 -- Tensors can be added, subtracted and multiplicated
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => Num (Tensor i a) where
 
     -- Adding - element by element
@@ -192,7 +211,7 @@ instance (
     t + Scalar x = (+x) <$> t
     t1@(Tensor index1 v1) + t2@(Tensor index2 v2)
         | index1 == index2 = Tensor index1 $ Data.List.zipWith (+) v1 v2
-        | index1 `Data.List.elem` indices t2 = 
+        | index1 `Data.List.elem` indices t2 =
             let t1' = t1 |>>> indexName index1
                 t2' = t2 |>>> indexName index1
             in  t1' + t2'
@@ -206,7 +225,7 @@ instance (
     t - Scalar x = (\e -> e - x) <$> t
     t1@(Tensor index1 v1) - t2@(Tensor index2 v2)
         | index1 == index2 = Tensor index1 $ Data.List.zipWith (-) v1 v2
-        | index1 `Data.List.elem` indices t2 = 
+        | index1 `Data.List.elem` indices t2 =
             let t1' = t1 |>>> indexName index1
                 t2' = t2 |>>> indexName index1
             in  t1' - t2'
@@ -262,8 +281,8 @@ instance (
 
 -- Bit operations on tensors
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i, 
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => Bits (Tensor i a) where
 
     -- Bit sum
@@ -272,7 +291,7 @@ instance (
     t .|. Scalar x = (.|. x) <$> t
     t1@(Tensor index1 v1) .|. t2@(Tensor index2 v2)
         | index1 == index2 = Tensor index1 $ Data.List.zipWith (.|.) v1 v2
-        | index1 `Data.List.elem` indices t2 = 
+        | index1 `Data.List.elem` indices t2 =
             let t1' = t1 |>>> indexName index1
                 t2' = t2 |>>> indexName index1
             in  t1' .|. t2'
@@ -319,7 +338,7 @@ instance (
     t `xor` Scalar x = (`xor` x) <$> t
     t1@(Tensor index1 v1) `xor` t2@(Tensor index2 v2)
         | index1 == index2 = Tensor index1 $ Data.List.zipWith xor v1 v2
-        | index1 `Data.List.elem` indices t2 = 
+        | index1 `Data.List.elem` indices t2 =
             let t1' = t1 |>>> indexName index1
                 t2' = t2 |>>> indexName index1
             in  t1' `xor` t2'
@@ -357,8 +376,8 @@ instance (
     -- bit i is a scalar value with the ith bit set and all other bits clear.
     bit i = Scalar (bit i)
 
-    -- Test bit - shoud retur True, if bit n if equal to 1. 
-    -- Tensors are entities with many elements, so this function always returns False. 
+    -- Test bit - shoud retur True, if bit n if equal to 1.
+    -- Tensors are entities with many elements, so this function always returns False.
     -- Do not use it, it is implemented only for legacy purposes.
     testBit _ _ = False
 
@@ -367,8 +386,8 @@ instance (
 
 -- Tensors can be divided by each other
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i, 
-    Eq a, Show a, Fractional a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Fractional a, Bits a
     ) => Fractional (Tensor i a) where
 
     -- Scalar division return result of division of its values
@@ -391,8 +410,8 @@ instance (
 -- Function of tensor is a tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i, 
-    Eq a, Show a, Floating a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Floating a, Bits a
     ) => Floating (Tensor i a) where
 
     pi = Scalar pi
@@ -447,8 +466,8 @@ instance (
 
 -- Multilinear operations
 instance (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
     ) => Multilinear Tensor i a where
 
     -- Add scalar left
@@ -482,7 +501,7 @@ instance (
     -- Get list of all tensor indices
     indices (Scalar _)        = []
     indices (Tensor index ts) = index : indices (Data.List.head ts)
-    indices (Err _)           = []    
+    indices (Err _)           = []
 
     -- Rename tensor index
     rename (Scalar x) _ _ = Scalar x
@@ -500,22 +519,22 @@ instance (
     -- Raise an index
     Scalar x /\ _ = Scalar x
     Tensor index ts /\ n
-        | indexName index == n = 
+        | indexName index == n =
             Tensor (Contravariant (indexSize index) n) [t /\ n | t <- ts]
-        | otherwise = 
+        | otherwise =
             Tensor index [t /\ n | t <- ts]
     Err msg /\ _ = Err msg
 
     -- Lower an index
     Scalar x \/ _ = Scalar x
     Tensor index ts \/ n
-        | indexName index == n = 
+        | indexName index == n =
             Tensor (Covariant (indexSize index) n) [t /\ n | t <- ts]
-        | otherwise = 
+        | otherwise =
             Tensor index [t /\ n | t <- ts]
     Err msg \/ _ = Err msg
 
-    {-| Transpose a tensor (switch all indices types) |-}
+    {-| Transpose a tensor (switch all indices types) -}
     transpose (Scalar x) = Scalar x
     transpose (Tensor (Covariant count name) ts) =
         Tensor (Contravariant count name) (Multilinear.transpose <$> ts)
@@ -525,10 +544,10 @@ instance (
         Tensor (Indifferent count name) (Multilinear.transpose <$> ts)
     transpose (Err msg) = Err msg
 
-    {-| Accessing tensor elements |-}
+    {-| Accessing tensor elements -}
     el [] t _                      = t
     el _ (Scalar x) _              = Scalar x
-    el inds (Tensor index ts) vals = 
+    el inds (Tensor index ts) vals =
         let indval = zip inds vals
             val = find (\(i,_) -> i == indexName index) indval
         in  if isJust val
@@ -536,21 +555,19 @@ instance (
             else Tensor index [el inds t vals | t <- ts]
     el _ (Err msg) _               = Err msg
 
-    {-| Mapping with indices. |-}
+    {-| Mapping with indices. -}
     iMap f t = iMap' t zeroList
-        where 
+        where
         zeroList = 0:zeroList
 
         iMap' (Scalar x) inds        = Scalar $ f inds x
         iMap' (Tensor index ts) inds = Tensor index [iMap' (fst tind) $ inds ++ [snd tind] | tind <- zip ts [0..] ]
         iMap' (Err msg) _            = Err msg
-        
-    
 
     {-| Concatenation of two tensor with given index or by creating a new one -}
-    augment t1@(Tensor _ _) t2@(Tensor _ _) ind = 
+    augment t1@(Tensor _ _) t2@(Tensor _ _) ind =
         if indices t1 == indices t2
-        then 
+        then
             let t1' = t1 <<<| ind
                 t2' = t2 <<<| ind
             in  Tensor (tensorIndex t1') $ tensorData t1' ++ tensorData t2'
@@ -560,12 +577,12 @@ instance (
     augment (Scalar _) _ _ = Err "Scalars cannot be augmented!"
     augment _ (Scalar _) _ = Err "Cannot augment by scalar!"
 
-    {-| Shift tensor index right |-}
-    {-| Moves given index one level deeper in recursion |-}
+    {-| Shift tensor index right -}
+    {-| Moves given index one level deeper in recursion -}
     Err msg |>> _  = Err msg
     Scalar x |>> _ = Scalar x
     t1@(Tensor index1 ts1) |>> ind
-        | Data.List.length (indices t1) > 1 && indexName index1 /= ind = 
+        | Data.List.length (indices t1) > 1 && indexName index1 /= ind =
             Tensor index1 [t |>> ind | t <- ts1]
         | Data.List.length (indices t1) > 1 && indexName index1 == ind =
             let index2 = tensorIndex (Data.List.head ts1)

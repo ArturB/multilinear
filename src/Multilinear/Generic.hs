@@ -7,9 +7,9 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module contains implementation of tensor defined as nested list of its components.
-- The other implementation "Multilinear.Generic.AsArray" uses an array insted of list.
-- Array implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
+- This module contains implementation of tensor defined as nested container of its components.
+- Choice of container type has great impact on library performance in particular use cases
+- Array ("Data.Vector") implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
 - List implementation is slower but lazy and when tensor is generated from indices or randomly, it does not generate all elements at once if not necessary,
 so it may operate in smaller memory (e.g. linear instead of quadratic when multiplying matrix by vector or form).
 
@@ -23,12 +23,12 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE Strict                #-}
 {-# OPTIONS_GHC -O2 #-}
 
-module Multilinear.Generic.AsList (
+module Multilinear.Generic (
     Tensor(..), (!),
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
-    Multilinear.Generic.AsList.toJSON, toJSONFile,
-    Multilinear.Generic.AsList.fromJSON, fromJSONFile
+    Multilinear.Generic.toJSON, toJSONFile,
+    Multilinear.Generic.fromJSON, fromJSONFile
 ) where
 
 import           Codec.Compression.GZip
@@ -48,19 +48,20 @@ import           Multilinear
 incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
 
-{-| Tensor defined recursively as scalar or list of other tensors -}
-data Tensor i a =
+{-| Tensor defined recursively as scalar or container of other tensors -}
+{-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
+data Tensor c i a =
     {-| Scalar -}
     Scalar {
         {-| value of scalar -}
         scalarVal :: a
     } |
-    {-| List of other tensors -}
+    {-| Container of other tensors -}
     Tensor {
         {-| Index "Mutltilinear.Index" of tensor -}
         tensorIndex :: TIndex i,
-        {-| List of tensors on deeper recursion level -}
-        tensorData  :: [Tensor i a]
+        {-| Containter of tensors on deeper recursion level -}
+        tensorData  :: c (Tensor c i a)
     } |
     {-| Operations on tensors may throw an error -}
     Err {
@@ -69,20 +70,20 @@ data Tensor i a =
     } deriving (Eq, Generic)
 
 {-|
-    Recursive indexing.
+    Recursive indexing on list tensor
     @t ! i = t[i]@
 -}
-(!) :: Integral i =>
-       Tensor i a -- ^ tensor @t@
-    -> i          -- ^ index @i@
-    -> Tensor i a -- ^ tensor @t[i]@
+(!) :: Integral i 
+    => Tensor [] i a      -- ^ tensor @t@
+    -> i                  -- ^ index @i@
+    -> Tensor [] i a      -- ^ tensor @t[i]@
 
 (!) (Scalar _) _    = Err "Scalar has no indices!"
 (!) (Err msg) _     = Err msg
 (!) (Tensor _ ts) i = ts !! fromIntegral i
 
 {-| Binary serialization and deserialization -}
-instance (Serialize i, Serialize a) => Serialize (Tensor i a)
+instance (Serialize i, Serialize a) => Serialize (Tensor c i a)
 
 {-| Serialize to binary string -}
 toBinary :: (Serialize i, Serialize a) => Tensor i a -> ByteString.ByteString
@@ -103,8 +104,8 @@ fromBinaryFile name = do
     EitherT $ return $ fromBinary $ decompress contents
 
 {-| Serialization to and from JSON -}
-instance (FromJSON i, FromJSON a) => FromJSON (Tensor i a)
-instance (  ToJSON i,   ToJSON a) =>   ToJSON (Tensor i a)
+instance (FromJSON i, FromJSON a) => FromJSON (Tensor c i a)
+instance (  ToJSON i,   ToJSON a) =>   ToJSON (Tensor c i a)
 
 {-| Serialize to JSON string -}
 toJSON :: (ToJSON i, ToJSON a) => Tensor i a -> ByteString.ByteString
@@ -112,7 +113,7 @@ toJSON = Data.Aeson.encode
 
 {-| Write to JSON file -}
 toJSONFile :: (ToJSON i, ToJSON a) => String -> Tensor i a -> IO ()
-toJSONFile name = ByteString.writeFile name . Multilinear.Generic.AsList.toJSON
+toJSONFile name = ByteString.writeFile name . Multilinear.Generic.toJSON
 
 {-| Deserialize from JSON string -}
 fromJSON :: (FromJSON i, FromJSON a) => ByteString.ByteString -> Maybe (Tensor i a)
@@ -122,10 +123,10 @@ fromJSON = Data.Aeson.decode
 fromJSONFile :: (FromJSON i, FromJSON a) => String -> IO (Maybe (Tensor i a))
 fromJSONFile name = do
     contents <- ByteString.readFile name
-    return $ Multilinear.Generic.AsList.fromJSON contents
+    return $ Multilinear.Generic.fromJSON contents
 
 -- Print tensor
-instance (Show i, Show a) => Show (Tensor i a) where
+instance (Show i, Show a) => Show (Tensor c i a) where
     -- merge errors first and then print tensor
     show t = show' $ _mergeErr t
         where
@@ -168,7 +169,7 @@ instance (Show i, Show a) => Show (Tensor i a) where
             where vShowed = (\x -> "| " ++ show x ++ "\n  ") <$> v :: [String]
 
 -- Tensor is a functor
-instance Functor (Tensor i) where
+instance Functor (Tensor c i) where
     -- Mapping scalars simply maps its value
     fmap f (Scalar v_) = Scalar (f v_)
     -- Mapping tensors does mapping element by element

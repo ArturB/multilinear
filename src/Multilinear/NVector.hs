@@ -1,54 +1,177 @@
 {-|
 Module      : Multilinear.NVector
-Description : 
+Description : N-Vectors
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : 3-clause BSD
+License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
+This module provides convenient constructors that generate a n-vector (tensor with n upper indices). 
+
 -}
 
-{-# LANGUAGE Strict, GADTs #-}
+{-# LANGUAGE GADTs  #-}
+{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC #-}
 
 module Multilinear.NVector (
-  fromIndices, 
-  Multilinear.NVector.const
-  --elnv
+  fromIndices, Multilinear.NVector.const,
+  randomDouble, randomDoubleSeed,
+  randomInt, randomIntSeed
 ) where
 
-
-import           Multilinear.Generic.AsList
-import           Multilinear.Index
-import           Data.Hashable
+import           Control.Monad.Primitive
 import           Data.Bits
+import qualified Data.Vector                as Vector
+import           Multilinear
+import           Multilinear.Generic.AsList
+import           Statistics.Distribution
+import qualified System.Random.MWC          as MWC
 
-{-| Generate n-vector as function of its indices -}
+{-| Generate N-form as function of its indices -}
 fromIndices :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
-  ) => String -> [i] -> ([i] -> a) -> Tensor i a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
+  ) => String      -- ^ Indices names (one characted per index)
+    -> [i]         -- ^ Indices sizes
+    -> ([i] -> a)  -- ^ Generator function
+    -> Tensor i a  -- ^ Generated N-form
 
 fromIndices [] [] f = Scalar $ f []
 fromIndices (d:ds) (s:size) f =
     Tensor (Contravariant s [d]) [fromIndices ds size (\dss -> f (x:dss)) | x <- [0 .. s - 1] ]
-fromIndices _ _ _ = error "Indices and its sizes incompatible with n-vector structure!"
+fromIndices _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
-{-| Generate n-vector with all components equal to v -}
+{-| Generate N-form with all components equal to @v@ -}
 const :: (
-    Eq i, Show i, Integral i, Ord i, Hashable i,
-    Eq a, Show a, Num a, Ord a, Hashable a, Bits a
-  ) => String -> [i] -> a -> Tensor i a
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
+  ) => String      -- ^ Indices names (one characted per index)
+    -> [i]         -- ^ Indices sizes
+    -> a           -- ^ N-form elements value
+    -> Tensor i a  -- ^ Generated N-form
 
 const [] [] v = Scalar v
 const (d:ds) (s:size) v =
     Tensor (Contravariant s [d]) $ replicate (fromIntegral s) $ Multilinear.NVector.const ds size v
-const _ _ _ = error "Indices and its sizes incompatible with n-vector structure!"
+const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
-{-| Concise getter for a n-vector -}
-{-elnv :: Integral i => Tensor i a -> [i] -> a
-elnv (Scalar x) [] = x
-elnv (Err msg) _ = error msg
-elnv t@(Tensor (Contravariant _ _) _) (d:ds) = elnv (t ! d) ds
-elnv _ _ = error "Given indices incompatible with n-vector structure!"-}
+{-| Generate n-vector with random real components with given probability distribution.
+The n-vector is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDouble :: (
+    Eq i, Show i, Integral i,
+    ContGen d
+  ) => String                -- ^ Indices names (one character per index)
+    -> [i]                   -- ^ Indices sizes
+    -> d                     -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> IO (Tensor i Double)  -- ^ Generated linear functional
+
+randomDouble [] [] d = do
+    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen
+    return $ Scalar component
+
+randomDouble (d:ds) (s:size) distr = do
+  tensors <- sequence [randomDouble ds size distr | _ <- [0 .. s - 1] ]
+  return $ Tensor (Contravariant s [d]) tensors
+
+randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+
+{-| Generate n-vector with random integer components with given probability distribution.
+The n-vector is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomInt :: (
+    Eq i, Show i, Integral i,
+    DiscreteGen d
+  ) => String                -- ^ Indices names (one character per index)
+    -> [i]                   -- ^ Indices sizes
+    -> d                     -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (Tensor i Int)     -- ^ Generated n-vector
+
+randomInt [] [] d = do
+    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen
+    return $ Scalar component
+
+randomInt (d:ds) (s:size) distr = do
+  tensors <- sequence [randomInt ds size distr | _ <- [0 .. s - 1] ]
+  return $ Tensor (Contravariant s [d]) tensors
+
+randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+
+{-| Generate n-vector with random real components with given probability distribution and given seed.
+The form is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDoubleSeed :: (
+    Eq i, Show i, Integral i,
+    ContGen d, Integral i2, PrimMonad m
+  ) => String              -- ^ Index name (one character)
+    -> [i]                 -- ^ Number of elements
+    -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> i2                  -- ^ Randomness seed
+    -> m (Tensor i Double) -- ^ Generated n-vector
+
+randomDoubleSeed [] [] d seed = do
+    gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+    component <- genContVar d gen
+    return $ Scalar component
+
+randomDoubleSeed (d:ds) (s:size) distr seed = do
+  tensors <- sequence [randomDoubleSeed ds size distr seed | _ <- [0 .. s - 1] ]
+  return $ Tensor (Contravariant s [d]) tensors
+
+randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+
+{-| Generate n-vector with random integer components with given probability distribution and given seed.
+The form is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomIntSeed :: (
+    Eq i, Show i, Integral i,
+    DiscreteGen d, Integral i2, PrimMonad m
+  ) => String              -- ^ Index name (one character)
+    -> [i]                 -- ^ Number of elements
+    -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> i2                  -- ^ Randomness seed
+    -> m (Tensor i Int)    -- ^ Generated n-vector
+
+randomIntSeed [] [] d seed = do
+    gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+    component <- genDiscreteVar d gen
+    return $ Scalar component
+
+randomIntSeed (d:ds) (s:size) distr seed = do
+  tensors <- sequence [randomIntSeed ds size distr seed | _ <- [0 .. s - 1] ]
+  return $ Tensor (Contravariant s [d]) tensors
+
+randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+
