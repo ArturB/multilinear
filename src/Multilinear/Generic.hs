@@ -7,9 +7,9 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module contains implementation of tensor defined as nested list of its components.
-- The other implementation "Multilinear.Generic.AsArray" uses an array insted of list.
-- Array implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
+- This module contains implementation of tensor defined as nested container of its components.
+- Choice of container type has great impact on library performance in particular use cases
+- Array ("Data.Vector") implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
 - List implementation is slower but lazy and when tensor is generated from indices or randomly, it does not generate all elements at once if not necessary,
 so it may operate in smaller memory (e.g. linear instead of quadratic when multiplying matrix by vector or form).
 
@@ -49,7 +49,7 @@ incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
 
 {-| Tensor defined recursively as scalar or container of other tensors -}
-{-| @c@ is type of a container (affects performance), @i@ is type of index size and @a@ is type of tensor elements -}
+{-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
 data Tensor c i a =
     {-| Scalar -}
     Scalar {
@@ -70,13 +70,13 @@ data Tensor c i a =
     } deriving (Eq, Generic)
 
 {-|
-    Recursive indexing.
+    Recursive indexing on list tensor
     @t ! i = t[i]@
 -}
-(!) :: Integral i =>
-       Tensor i a -- ^ tensor @t@
-    -> i          -- ^ index @i@
-    -> Tensor i a -- ^ tensor @t[i]@
+(!) :: Integral i 
+    => Tensor [] i a      -- ^ tensor @t@
+    -> i                  -- ^ index @i@
+    -> Tensor [] i a      -- ^ tensor @t[i]@
 
 (!) (Scalar _) _    = Err "Scalar has no indices!"
 (!) (Err msg) _     = Err msg

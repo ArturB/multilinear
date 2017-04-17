@@ -173,7 +173,7 @@ randomDoubleSeed [u,d] su sd dist seed = do
     Tensor (Contravariant su [u]) $ (\x ->
       Tensor (Covariant sd [d]) $ Scalar <$> x
     ) <$> components
-randomDoubleSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomDoubleSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
 {-| Generate matrix with random integer components with given probability distribution. and given seed.
 The matrix is wrapped in a monad. -}
@@ -226,7 +226,7 @@ fromCSV [u,d] fileName separator = do
       Tensor (Covariant columns [d]) $ Scalar <$> rights x
     ) <$> components
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
-fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
 {-| Write matrix to CSV file. -}
 toCSV :: (

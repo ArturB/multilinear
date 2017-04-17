@@ -17,7 +17,7 @@ This module provides convenient constructors that generates n-forms (tensors wit
 
 module Multilinear.NForm (
   fromIndices, Multilinear.NForm.const,
-  {-randomDouble,-} randomDoubleSeed,
+  randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
   dot, cross
 ) where
@@ -84,7 +84,7 @@ cross [i,j,k] size =
     (\[_] [_,_] -> 0)
 cross _ _ = Err "Indices and its sizes incompatible with cross product!"
 
-{-| Generate linear functional with random real components with given probability distribution.
+{-| Generate n-form with random real components with given probability distribution.
 The form is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -104,19 +104,19 @@ randomDouble :: (
   ) => String                -- ^ Indices names (one character per index)
     -> [i]                   -- ^ Indices sizes
     -> d                     -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor i Double)  -- ^ Generated linear functional
+    -> IO (Tensor i Double)  -- ^ Generated n-form
 
 randomDouble [] [] d = do
     component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen
     return $ Scalar component
 
-randomDouble [i] s d = do
-  components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..s] ]
-  return $ Tensor (Covariant s [i]) $ Scalar <$> components
+randomDouble (d:ds) (s:size) distr = do
+  tensors <- sequence [randomDouble ds size distr | _ <- [0 .. s - 1] ]
+  return $ Tensor (Covariant s [d]) tensors
 
-randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
 
-{-| Generate linear functional with random integer components with given probability distribution.
+{-| Generate n-form with random integer components with given probability distribution.
 The form is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -126,17 +126,22 @@ The form is wrapped in the IO monad. -}
 randomInt :: (
     Eq i, Show i, Integral i,
     DiscreteGen d
-  ) => String             -- ^ Index name (one character)
-    -> i                  -- ^ Number of elements
-    -> d                  -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor i Int)  -- ^ Generated linear functional
+  ) => String                -- ^ Indices names (one character per index)
+    -> [i]                   -- ^ Indices sizes
+    -> d                     -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (Tensor i Int)     -- ^ Generated n-form
 
-randomInt [i] s d = do
-  components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..s] ]
-  return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomInt [] [] d = do
+    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen
+    return $ Scalar component
 
-{-| Generate linear functional with random real components with given probability distribution and given seed.
+randomInt (d:ds) (s:size) distr = do
+  tensors <- sequence [randomInt ds size distr | _ <- [0 .. s - 1] ]
+  return $ Tensor (Covariant s [d]) tensors
+
+randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
+
+{-| Generate n-form with random real components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -154,18 +159,23 @@ randomDoubleSeed :: (
     Eq i, Show i, Integral i,
     ContGen d, Integral i2, PrimMonad m
   ) => String              -- ^ Index name (one character)
-    -> i                   -- ^ Number of elements
+    -> [i]                 -- ^ Number of elements
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> i2                  -- ^ Randomness seed
-    -> m (Tensor i Double) -- ^ Generated linear functional
+    -> m (Tensor i Double) -- ^ Generated n-form
 
-randomDoubleSeed [i] s d seed = do
-  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
-  components <- sequence [ genContVar d gen | _ <- [1..s] ]
-  return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomDoubleSeed [] [] d seed = do
+    gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+    component <- genContVar d gen
+    return $ Scalar component
 
-{-| Generate linear functional with random integer components with given probability distribution and given seed.
+randomDoubleSeed (d:ds) (s:size) distr seed = do
+  tensors <- sequence [randomDoubleSeed ds size distr seed | _ <- [0 .. s - 1] ]
+  return $ Tensor (Covariant s [d]) tensors
+
+randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
+
+{-| Generate n-form with random integer components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -175,15 +185,20 @@ The form is wrapped in a monad. -}
 randomIntSeed :: (
     Eq i, Show i, Integral i,
     DiscreteGen d, Integral i2, PrimMonad m
-  ) => String             -- ^ Index name (one character)
-    -> i                  -- ^ Number of elements
-    -> d                  -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> i2                 -- ^ Randomness seed
-    -> m (Tensor i Int)   -- ^ Generated linear functional
+  ) => String              -- ^ Index name (one character)
+    -> [i]                 -- ^ Number of elements
+    -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> i2                  -- ^ Randomness seed
+    -> m (Tensor i Int)    -- ^ Generated linear functional
 
-randomIntSeed [i] s d seed = do
-  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
-  components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
-  return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomIntSeed [] [] d seed = do
+    gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+    component <- genDiscreteVar d gen
+    return $ Scalar component
+
+randomIntSeed (d:ds) (s:size) distr seed = do
+  tensors <- sequence [randomIntSeed ds size distr seed | _ <- [0 .. s - 1] ]
+  return $ Tensor (Covariant s [d]) tensors
+
+randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
 

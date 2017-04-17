@@ -44,7 +44,7 @@ fromIndices :: (
 
 fromIndices [d] s f =
     Tensor (Covariant s [d]) [Scalar $ f x | x <- [0 .. s - 1] ]
-fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of 1-form!"
+fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with all components equal to some @v@ -}
 const :: (
@@ -57,7 +57,7 @@ const :: (
 
 const [d] s v =
     Tensor (Covariant s [d]) $ replicate (fromIntegral s) (Scalar v)
-const _ _ _ = Err "Indices and its sizes not compatible with structure of 1-form!"
+const _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random real components with given probability distribution.
 The functional is wrapped in the IO monad. -}
@@ -83,7 +83,7 @@ randomDouble :: (
 randomDouble [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..s] ]
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random integer components with given probability distribution.
 The functional is wrapped in the IO monad. -}
@@ -103,7 +103,7 @@ randomInt :: (
 randomInt [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..s] ]
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random real components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
@@ -131,7 +131,7 @@ randomDoubleSeed [i] s d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genContVar d gen | _ <- [1..s] ]
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random integer components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
@@ -153,7 +153,7 @@ randomIntSeed [i] s d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
   return $ Tensor (Covariant s [i]) $ Scalar <$> components
-randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Read linear functional components from CSV file. Reads only the first row of the file. -}
 fromCSV :: (
@@ -171,7 +171,7 @@ fromCSV [i] fileName separator = do
   if size > 0
   then return $ Tensor (Covariant size [i]) (Scalar <$> rights components)
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
-fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
+fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Write linear functional to CSV file. -}
 toCSV :: (
