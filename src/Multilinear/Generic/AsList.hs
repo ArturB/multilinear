@@ -28,7 +28,9 @@ module Multilinear.Generic.AsList (
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
     Multilinear.Generic.AsList.toJSON, toJSONFile,
-    Multilinear.Generic.AsList.fromJSON, fromJSONFile
+    Multilinear.Generic.AsList.fromJSON, fromJSONFile,
+    elements,
+    indices
 ) where
 
 import           Codec.Compression.GZip
@@ -39,10 +41,13 @@ import           Data.Bits
 import qualified Data.ByteString.Lazy       as ByteString
 import           Data.Hashable
 import           Data.List
+import           Data.Set
 import           Data.Maybe
 import           Data.Serialize
 import           GHC.Generics
 import           Multilinear
+import           Multilinear.Index
+import           Multilinear.Index.Finite
 
 {-| ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -58,7 +63,7 @@ data Tensor i a =
     {-| List of other tensors -}
     Tensor {
         {-| Index "Mutltilinear.Index" of tensor -}
-        tensorIndex :: TIndex i,
+        tensorIndex :: Finite i,
         {-| List of tensors on deeper recursion level -}
         tensorData  :: [Tensor i a]
     } |
@@ -123,6 +128,22 @@ fromJSONFile :: (FromJSON i, FromJSON a) => String -> IO (Maybe (Tensor i a))
 fromJSONFile name = do
     contents <- ByteString.readFile name
     return $ Multilinear.Generic.AsList.fromJSON contents
+
+
+-- Get list of all tensor indices
+indices ::
+    Tensor i a   -- ^ A tensor @t@
+ -> [Finite i]   -- ^ List of indices of tensor @t@
+indices (Scalar _)        = []
+indices (Tensor index ts) = index : indices (Data.List.head ts)
+indices (Err _)           = []
+
+{-| Number of tensor elements -}
+{-| E.g. matrix 5x5 has 25 elements -}
+elements :: Num i =>
+    Tensor i a    -- ^ Tensor @t@
+ -> i             -- ^ Number of elements of tensor @t@
+elements t = product $ indexSize <$> indices t
 
 -- Print tensor
 instance (Show i, Show a) => Show (Tensor i a) where
@@ -468,7 +489,7 @@ instance (
 instance (
     Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-    ) => Multilinear Tensor i a where
+    ) => Multilinear (Tensor i) a where
 
     -- Add scalar left
     x .+ t = (x+) <$> t
@@ -488,6 +509,9 @@ instance (
     -- Multiplicate by scalar right
     t *. x = (*x) <$> t
 
+    -- List of tensor indices names
+    indicesNames t = indexName <$> indices t
+
     -- Get tensor order [ (contravariant,covariant)-type ]
     order (Scalar _) = (0,0)
     order (Tensor (Contravariant _ _) t) = (cnvr+1,covr)
@@ -498,10 +522,8 @@ instance (
         where (cnvr,covr) = order $ Data.List.head t
     order (Err _) = (-1,-1)
 
-    -- Get list of all tensor indices
-    indices (Scalar _)        = []
-    indices (Tensor index ts) = index : indices (Data.List.head ts)
-    indices (Err _)           = []
+    -- Check if tensors are equivalent (have same indices but in different order)
+    equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
 
     -- Rename tensor index
     rename (Scalar x) _ _ = Scalar x
@@ -544,17 +566,6 @@ instance (
         Tensor (Indifferent count name) (Multilinear.transpose <$> ts)
     transpose (Err msg) = Err msg
 
-    {-| Accessing tensor elements -}
-    el [] t _                      = t
-    el _ (Scalar x) _              = Scalar x
-    el inds (Tensor index ts) vals =
-        let indval = zip inds vals
-            val = find (\(i,_) -> i == indexName index) indval
-        in  if isJust val
-            then el inds (ts !! fromIntegral (snd $ fromJust val)) vals
-            else Tensor index [el inds t vals | t <- ts]
-    el _ (Err msg) _               = Err msg
-
     {-| Mapping with indices. -}
     iMap f t = iMap' t zeroList
         where
@@ -591,6 +602,21 @@ instance (
                 | i <- [0 .. indexSize index2 - 1]]
         | otherwise = t1
 
+{-| List allows for random access of its elements, so AsList.Tensor is an Accessible instance -}
+instance (
+    Eq i, Show i, Integral i,
+    Eq a, Show a, Num a, Bits a
+    ) => Accessible (Tensor i) a where
 
+    {-| Accessing tensor elements -}
+    el [] t _                      = t
+    el _ (Scalar x) _              = Scalar x
+    el inds (Tensor index ts) vals =
+        let indval = zip inds vals
+            val = find (\(i,_) -> i == indexName index) indval
+        in  if isJust val
+            then el inds (ts !! fromIntegral (snd $ fromJust val)) vals
+            else Tensor index [el inds t vals | t <- ts]
+    el _ (Err msg) _               = Err msg
 
 

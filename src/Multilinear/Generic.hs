@@ -21,6 +21,7 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Strict                #-}
+--{-# LANGUAGE StandaloneDeriving    #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.Generic (
@@ -28,7 +29,7 @@ module Multilinear.Generic (
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
     Multilinear.Generic.toJSON, toJSONFile,
-    Multilinear.Generic.fromJSON, fromJSONFile
+    Multilinear.Generic.fromJSON, fromJSONFile,
 ) where
 
 import           Codec.Compression.GZip
@@ -43,6 +44,8 @@ import           Data.Maybe
 import           Data.Serialize
 import           GHC.Generics
 import           Multilinear
+import           Multilinear.Index
+import           Multilinear.Index.Finite
 
 {-| ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -57,9 +60,9 @@ data Tensor c i a =
         scalarVal :: a
     } |
     {-| Container of other tensors -}
-    Tensor {
-        {-| Index "Mutltilinear.Index" of tensor -}
-        tensorIndex :: TIndex i,
+    FiniteTensor {
+        {-| Finite index "Mutltilinear.Index.Finite" of tensor -}
+        tensorIndex :: Finite i,
         {-| Containter of tensors on deeper recursion level -}
         tensorData  :: c (Tensor c i a)
     } |
@@ -67,7 +70,7 @@ data Tensor c i a =
     Err {
         {-| Error message -}
         errMessage :: String
-    } deriving (Eq, Generic)
+    } deriving (Eq,Generic)
 
 {-|
     Recursive indexing on list tensor
@@ -182,7 +185,7 @@ instance Functor (Tensor c i) where
 instance (
     Eq i, Ord i,
     Eq a, Ord a
-    ) => Ord (Tensor i a) where
+    ) => Ord (Tensor c i a) where
 
     -- Error is smaller by other tensors, so when printing ordered containers, all erorrs will be printed first
     -- Two errors are compared by they messages lexigographically
@@ -198,13 +201,13 @@ instance (
     Tensor _ ts1 <= Tensor _ ts2 = ts1 <= ts2
 
 -- You can compute a hash value from tensor
-instance (Hashable i, Hashable a) => Hashable (Tensor i a)
+instance (Hashable i, Hashable a) => Hashable (Tensor c i a)
 
 -- Tensors can be added, subtracted and multiplicated
 instance (
     Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-    ) => Num (Tensor i a) where
+    ) => Num (Tensor c i a) where
 
     -- Adding - element by element
     Scalar x1 + Scalar x2 = Scalar $ x1 + x2
@@ -284,7 +287,7 @@ instance (
 instance (
     Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-    ) => Bits (Tensor i a) where
+    ) => Bits (Tensor c i a) where
 
     -- Bit sum
     Scalar x1 .|. Scalar x2 = Scalar $ x1 .|. x2
@@ -389,7 +392,7 @@ instance (
 instance (
     Eq i, Show i, Integral i,
     Eq a, Show a, Fractional a, Bits a
-    ) => Fractional (Tensor i a) where
+    ) => Fractional (Tensor c i a) where
 
     -- Scalar division return result of division of its values
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
@@ -413,7 +416,7 @@ instance (
 instance (
     Eq i, Show i, Integral i,
     Eq a, Show a, Floating a, Bits a
-    ) => Floating (Tensor i a) where
+    ) => Floating (Tensor c i a) where
 
     pi = Scalar pi
 
@@ -469,7 +472,7 @@ instance (
 instance (
     Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-    ) => Multilinear Tensor i a where
+    ) => Multilinear (Tensor c) i a where
 
     -- Add scalar left
     x .+ t = (x+) <$> t

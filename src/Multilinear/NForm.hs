@@ -25,8 +25,8 @@ module Multilinear.NForm (
 import           Control.Monad.Primitive
 import           Data.Bits
 import qualified Data.Vector                as Vector
-import           Multilinear
 import           Multilinear.Generic.AsList
+import           Multilinear.Index.Finite
 import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
