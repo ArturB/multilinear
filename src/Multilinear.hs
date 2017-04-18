@@ -146,98 +146,90 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear (
-    Multilinear(..), 
-    module Multilinear.Index
+    Multilinear(..),
+    Accessible(..)
 ) where
 
 import Data.Maybe
-import Data.Set
-import Multilinear.Index
+--import Data.Set
+--import Multilinear.Index
 import Data.Bits
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
-  Num (t i a),        -- Tensors may be added, subtracted and multiplicated
-  Integral i,         -- Indices of tensors must be of integral type
-  Bits (t i a),       -- Also bit operations can be performed on tensors
-  Functor (t i)       -- Tensor should be a Functor for convenience
-  ) => Multilinear t i a where
+  Num (t a),     -- Tensors may be added, subtracted and multiplicated
+  Bits (t a),    -- Also bit operations can be performed on tensors
+  Functor t      -- Tensor should be a Functor for convenience
+  ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
     infixl 7 .+
-    (.+) :: a -> t i a -> t i a
+    (.+) :: a -> t a -> t a
 
     {-| Subtract each element of tensor @t@ from scalar scalar left -}
     infixl 7 .-
-    (.-) :: a -> t i a -> t i a
+    (.-) :: a -> t a -> t a
 
     {-| Multiply scalar @a@ by each element of tensor @t@ -}
     infixl 8 .*
-    (.*) :: a -> t i a -> t i a
+    (.*) :: a -> t a -> t a
 
     {-| Add each element of tensor @t@ to scalar @a@ -}
     infixl 7 +.
-    (+.) :: t i a -> a -> t i a
+    (+.) :: t a -> a -> t a
 
     {-| Subtract scalar @a@ to each element of tensor @t@ -}
     infixl 7 -.
-    (-.) :: t i a -> a -> t i a
+    (-.) :: t a -> a -> t a
 
     {-| Multiply each element of tensor @t@ by scalar @a@ -}
     infixl 8 *.
-    (*.) :: t i a -> a -> t i a
-
-    -- @indices t@ return list of all indices of tensor @t@. 
-    indices :: t i a       -- ^ tensor @t@
-            -> [TIndex i]  -- ^ list of indices of tensor @t@
-        
-    {-| Number of tensor elements -}
-    {-| E.g. matrix 5x5 has 25 elements -}
-    elements :: t i a -> i
-    elements t = Prelude.foldl (*) 0 (Prelude.map indexSize $ indices t)
+    (*.) :: t a -> a -> t a
 
     {-| List of tensor indices names -}
-    {-| Equivalent to @map indexName . indices@ -}
-    indicesNames :: t i a -> [String]
-    indicesNames = Prelude.map indexName . indices
+    indicesNames :: t a -> [String]
     
     {-| Tensor order - number of covariant and contravariant indices -}
     {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
-    order :: t i a -> (Int,Int)
+    order :: t a -> (Int,Int)
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
-    equiv :: Ord a => t i a -> t i a -> Bool
-    equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
+    equiv :: Ord a => t a -> t a -> Bool
+    
 
-    {-| Infix equivalent of 'equiv' |-}
-    (|==|) :: Ord a => t i a -> t i a -> Bool
+    {-| Infix equivalent of 'equiv'. Has low priority equal to 1. |-}
+    infixl 1 |==|
+    (|==|) :: Ord a => t a -> t a -> Bool
     t1 |==| t2 = equiv t1 t2
 
     {-| @rename t "i" "j"@ renames index @i@ of tensor @t@ to @j@ -}
-    rename :: t i a -> String -> String -> t i a
+    rename :: t a -> String -> String -> t a
 
     {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
-    raise :: t i a -> String -> t i a
+    raise :: t a -> String -> t a
     raise t i = t /\ i
 
     {-| Infix equivalent of 'raise' -}
-    (/\) :: t i a -> String -> t i a
+    infixl 8 /\
+    (/\) :: t a -> String -> t a
     t /\ i = raise t i
 
     {-| @lower t "i"@ lowers an index @i@ of tensor @t@ -}
-    lower :: t i a -> String -> t i a
+    lower :: t a -> String -> t a
     lower t i = t \/ i
 
     {-| Infix equivalent of 'lower' -}
-    (\/) :: t i a -> String -> t i a
+    infixl 8 \/
+    (\/) :: t a -> String -> t a
     t \/ i = lower t i
 
     {-| Switch all indices of tensor @t@ - upper indices becomes lower and vice versa -}
-    transpose :: t i a -> t i a
+    transpose :: t a -> t a
 
     {-| Shift tensor index right -}
-    {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion. Elements of tensor as indexed with indices names becomes unchanged. -}
-    shiftRight :: t i a -> String -> t i a
+    {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion. 
+        Elements of tensor as indexed with indices names becomes unchanged. -}
+    shiftRight :: t a -> String -> t a
     -- ^ Right shift of an index is equivalent to left shift of its successor in recursion @s@, if only @s@ exists, so:
     -- Given a tensor @t[i1,i2,i3,...]@: @shiftRight t "i2" == t[i1,i3,i2,...] == shiftLeft t "i3"@
     shiftRight t n
@@ -249,22 +241,25 @@ class (
 
     {-| Infix equivalent of 'shiftRight' -}
     {-| @t |>> "i"@ moves index @i@ of tensor @t@ one level depeer in recursion -}
-    (|>>) :: t i a -> String -> t i a
+    infixl 9 |>>
+    (|>>) :: t a -> String -> t a
     t |>> n = shiftRight t n
 
     {-| Shift tensor index rightmost -}
-    {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion. Elements of tensor as indexed with indices names becomes unchanged.  -}
-    shiftRightmost :: t i a -> String -> t i a
+    {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion. 
+        Elements of tensor as indexed with indices names becomes unchanged.  -}
+    shiftRightmost :: t a -> String -> t a
     shiftRightmost t n = until (\x -> n == last (indicesNames x)) (|>> n) t
 
     {-| Infix equivalent of 'shiftRightmost' -}
     {-| @t |>>> "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion -}
-    (|>>>) :: t i a -> String -> t i a
+    infixl 9 |>>>
+    (|>>>) :: t a -> String -> t a
     t |>>> n = shiftRightmost t n
 
     {-| Shift tensor index left. Elements of tensor as indexed with indices names becomes unchanged. -}
     {-| @shiftLeft t "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
-    shiftLeft :: t i a -> String -> t i a
+    shiftLeft :: t a -> String -> t a
     -- ^ Left shift of an index is equivalent to right shift of its predecessor in recursion @p@, if only @p@ exists, so:
     -- Given a tensor t[i1,i2,i3,...]: @shiftLeft t "i3" == t[i1,i3,i2,...] == shiftRight t "i2"@
     shiftLeft t n
@@ -276,33 +271,43 @@ class (
 
     {-| Infix equivalent to 'shiftLeft' -}
     {-| @t <<| "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
-    (<<|) :: t i a -> String -> t i a
+    infixl 9 <<|
+    (<<|) :: t a -> String -> t a
     t <<| n = shiftRight t n
 
     {-| Shift tensor index leftmost. Elements of tensor as indexed with indices names becomes unchanged. -}
     {-| @shiftLeftmost t "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
-    shiftLeftmost :: t i a -> String -> t i a
+    shiftLeftmost :: t a -> String -> t a
     shiftLeftmost t n = until (\x -> n == last (indicesNames x)) (<<| n) t
 
     {-| Infix equivalent of 'shiftLeftmost' -}
     {-| @t <<<| "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
-    (<<<|) :: t i a -> String -> t i a
+    infixl 9 <<<|
+    (<<<|) :: t a -> String -> t a
     t <<<| n = shiftLeftmost t n
 
     {-| Concatenation of two tensors by common index -}
     {-| Tensors must be equivalent: 'equiv' t1 t2 == True -}
-    augment ::  t i a -> t i a -> String -> t i a
-
-    {-| Accessing tensor elements -}
-    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5. Values of other indices are insignificant -}
-    {-| If given index value is out of range, then modulo operation is performed: el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
-    el :: [String] -> t i a -> [i] -> t i a
+    augment ::  t a -> t a -> String -> t a
 
     {-| Simple mapping -}
     {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
-    map :: (a -> b) -> t i a -> t i b
+    map :: (a -> b) -> t a -> t b
     map = fmap
 
     {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
     {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
-    iMap :: ([i] -> a -> b) -> t i a -> t i b
+    iMap :: Integral i => ([i] -> a -> b) -> t a -> t b
+
+
+{-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
+class Multilinear t a => Accessible t a where
+
+    {-| Accessing tensor elements -}
+    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5. 
+        Values of other indices are insignificant -}
+    {-| If given index value is out of range, then modulo operation is performed: 
+        el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
+    el :: [String] -> t a -> [Int] -> t a
+
+

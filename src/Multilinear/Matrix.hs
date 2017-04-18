@@ -31,8 +31,9 @@ import           Data.CSV.Enumerator
 import           Data.Either
 import           Data.Serialize
 import qualified Data.Vector                as Vector
-import           Multilinear
 import           Multilinear.Generic.AsList
+import           Multilinear.Index
+import           Multilinear.Index.Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 

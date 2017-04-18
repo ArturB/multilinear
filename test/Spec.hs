@@ -13,8 +13,12 @@ module Main (
     main
 ) where
 
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Maybe
+import           Data.Maybe
 import qualified Multilinear.Generic.AsList as List
-import           Multilinear.Library
+import qualified Multilinear.Generic        as Generic
+import           Multilinear.Index.Finite
 import qualified Multilinear.Tensor         as Tensor
 import           Prelude                    as P
 
@@ -27,9 +31,25 @@ m2 = Tensor.fromIndices ("j",[100]) ("k",[100]) $ \[i] [j] -> i+j
 v :: List.Tensor Int Int
 v = Tensor.fromIndices ("k",[100]) ([],[]) $ \[k] _ -> k
 
+ten1 :: Generic.Tensor [] Integer Integer
+ten1 = Generic.FiniteTensor (Contravariant 10 "i") [Generic.Scalar x | x <- [2..101]]
+
+ten2 = Generic.FiniteTensor (Contravariant 10 "i") [Generic.Scalar (x + 1) | x <- [1..100]]
+
+--readTen = do
+    
+
 main :: IO ()
 main = do
     putStrLn "Start..."
     print $ m1 * m2 * v
     putStrLn "End."
+
+    Generic.toJSONFile "jsontest.json" ten1
+
+    tenr <- runMaybeT $ Generic.fromJSONFile "jsontest.json"
+    print $ tenr <= Just ((\e -> e - 1) <$> ten1)
+
+    --print $ fromJust tenr
+    
 
