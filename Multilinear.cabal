@@ -16,30 +16,30 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Multilinear
-                    ,  Multilinear.Generic.AsList
-                    --,  Multilinear.Generic.AsArray
                     ,  Multilinear.Form
-                    --,  Multilinear.Form.Seq
-                    --,  Multilinear.Form.Field
+                    ,  Multilinear.Form.AsList
+                    ,  Multilinear.Form.AsArray
                     ,  Multilinear.Generic
+                    ,  Multilinear.Generic.AsList
+                    ,  Multilinear.Generic.AsArray
                     ,  Multilinear.Index
                     ,  Multilinear.Index.Finite
                     ,  Multilinear.Index.Infinite
                     ,  Multilinear.Matrix
-                    --,  Multilinear.Matrix.Seq
-                    --,  Multilinear.Matrix.Field
+                    ,  Multilinear.Matrix.AsList
+                    ,  Multilinear.Matrix.AsArray
                     ,  Multilinear.NForm
-                    --,  Multilinear.NForm.Seq
-                    --,  Multilinear.NForm.Field
+                    ,  Multilinear.NForm.AsList
+                    ,  Multilinear.NForm.AsArray
                     ,  Multilinear.NVector
-                    --,  Multilinear.NVector.Seq
-                    --,  Multilinear.NVector.Field
+                    ,  Multilinear.NVector.AsList
+                    ,  Multilinear.NVector.AsArray
                     ,  Multilinear.Tensor
-                    --,  Multilinear.Tensor.Seq
-                    --,  Multilinear.Tensor.Field
+                    ,  Multilinear.Tensor.AsList
+                    ,  Multilinear.Tensor.AsArray
                     ,  Multilinear.Vector
-                    --,  Multilinear.Vector.Seq
-                    --,  Multilinear.Vector.Field
+                    ,  Multilinear.Vector.AsList
+                    ,  Multilinear.Vector.AsArray
   build-depends:       base >= 4.7 && < 5
                     ,  cereal
                     ,  containers
