@@ -13,10 +13,12 @@ Type family for all tensor-like types.
 
 
 {-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE Strict                     #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
@@ -32,6 +34,7 @@ module Multilinear.Generic (
 
 import           Control.Applicative
 import           Control.Monad
+import           GHC.Generics
 import qualified Data.Vector         as Boxed
 import qualified Data.Vector.Unboxed as Unboxed
 
@@ -40,25 +43,28 @@ data family Tensor :: (* -> *) -> * -> *
 
 {-| List implementation of tensor must be done with ZipList -}
 {-| Common List Applicative instance is invalid -}
-type ListTensor a = Tensor ZipList
+type ListTensor = Tensor ZipList
+
+{-| ZipList must be a Monoid instance to work with it on tensors -}
+deriving instance Monoid (ZipList a)
 
 {-| List implementation of tensor must be done with ZipList -}
 {-| Common List Applicative instance is invalid -}
-type VectorTensor a = Tensor ZipVector
+type VectorTensor = Tensor ZipVector
 
 {-| List implementation of tensor must be done with ZipList -}
 {-| Common List Applicative instance is invalid -}
-type UnboxedVectorTensor a = Tensor ZipUnboxedVector
+type UnboxedVectorTensor = Tensor ZipUnboxedVector
 
 {-| Newtype wrapper for boxed Vector, providing proper Applicative instance -}
 newtype ZipVector a = 
     ZipVector {
-        getVector :: Boxed.Vector a
+        getZipVector :: Boxed.Vector a
      } deriving (
          Eq, Show, Read, Ord, 
          Monad, MonadPlus, Alternative,
          Functor, Foldable, 
-         Monoid)
+         Monoid, Generic)
 
 {-| ZipVector Applicative instance -}
 instance Applicative ZipVector where
@@ -73,7 +79,7 @@ instance Applicative ZipVector where
 {-| Newtype wrapper for unboxed Vector, provising Applicative instance -}
 newtype ZipUnboxedVector a = 
     ZipUnboxedVector {
-        getUnboxedVector :: Unboxed.Vector a
+        getZipUnboxedVector :: Unboxed.Vector a
      } deriving (
          Eq, Show, Read, Ord,
-         Monoid)
+         Monoid, Generic)

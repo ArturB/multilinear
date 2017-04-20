@@ -1,6 +1,6 @@
 {-|
-Module      : Multilinear
-Description : Provides efficient and generic implementation of linear algebra operation using Ricci - Einstein tensor formalism
+Module      : Multilinear.Generic.AsList
+Description : Generic list tensor
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
@@ -26,16 +26,14 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 module Multilinear.Generic.AsList (
     Tensor(..), (!),
-    ListTensor,
-    ArrayTensor,
-    DefaultTensor,
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
-    Multilinear.Generic.toJSON, toJSONFile,
-    Multilinear.Generic.fromJSON, fromJSONFile
+    Multilinear.Generic.AsList.toJSON, toJSONFile,
+    Multilinear.Generic.AsList.fromJSON, fromJSONFile
 ) where
 
 import           Codec.Compression.GZip
+import           Control.Applicative
 import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Maybe
@@ -48,7 +46,6 @@ import           Data.List
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Serialize
-import qualified Data.Vector as Vector
 import           GHC.Generics
 import           Multilinear
 import           Multilinear.Generic
@@ -61,7 +58,7 @@ incompatibleTypes = "Incompatible tensor types!"
 
 {-| Tensor defined recursively as scalar or list of other tensors -}
 {-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
-data instance Tensor [] a =
+data instance Tensor ZipList a =
     {-| Scalar -}
     Scalar {
         {-| value of scalar -}
@@ -72,7 +69,7 @@ data instance Tensor [] a =
         {-| Finite index "Mutltilinear.Index.Finite" of tensor -}
         tensorIndex :: Finite,
         {-| Containter of tensors on deeper recursion level -}
-        tensorData  :: [] (Tensor [] a)
+        tensorData  :: ZipList (Tensor ZipList a)
     } |
     {-| Operations on tensors may throw an error -}
     Err {
@@ -80,103 +77,101 @@ data instance Tensor [] a =
         errMessage :: String
     } deriving (Eq, Generic)
 
-{-| Alias for list tensor -}
-type ListTensor a = Tensor [] a
-
 {-|
     Recursive indexing on list tensor
     @t ! i = t[i]@
 -}
-(!) :: Tensor [] a      -- ^ tensor @t@
-    -> Int              -- ^ index @i@
-    -> Tensor [] a      -- ^ tensor @t[i]@
+(!) :: ListTensor a      -- ^ tensor @t@
+    -> Int               -- ^ index @i@
+    -> ListTensor a      -- ^ tensor @t[i]@
 
-(!) (Scalar _) _          = Err "Scalar has no indices!"
-(!) (Err msg) _           = Err msg
-(!) (FiniteTensor _ ts) i = ts !! i
+(!) (Scalar _) _                    = Err "Scalar has no indices!"
+(!) (Err msg) _                     = Err msg
+(!) (FiniteTensor _ (ZipList ts)) i = ts !! i
 
 {-| Binary serialization and deserialization -}
+instance (Serialize a) => Serialize (ZipList a)
 instance (
-    Serialize a,
-    Serialize (c (Tensor c a))
-    ) => Serialize (Tensor c a)
+    Serialize a
+    ) => Serialize (ListTensor a)
 
 {-| Serialize to binary string -}
 toBinary :: (
-    Serialize a,
-    Serialize (c (Tensor c a))
-    ) => Tensor c a -> ByteString.ByteString
+    Serialize a
+    ) => ListTensor a            -- ^ Tensor to serialize
+      -> ByteString.ByteString   -- ^ Tensor serialized to binary string
 toBinary = Data.Serialize.encodeLazy
 
 {-| Write to binary file. Uses compression with gzip -}
 toBinaryFile :: (
-    Serialize a,
-    Serialize (c (Tensor c a))
-    ) => String -> Tensor c a -> IO ()
+    Serialize a
+    ) => String         -- ^ File name
+      -> ListTensor a   -- ^ Tensor to serialize
+      -> IO ()
 toBinaryFile name = ByteString.writeFile name . compress . toBinary
 
 {-| Deserialize from binary string -}
 fromBinary :: (
-    Serialize a,
-    Serialize (c (Tensor c a))
-    ) => ByteString.ByteString -> Either String (Tensor c a)
+    Serialize a
+    ) => ByteString.ByteString          -- ^ Binary string to deserialize
+      -> Either String (ListTensor a)   -- ^ Deserialized tensor or deserialization error message
 fromBinary = Data.Serialize.decodeLazy
 
 {-| Read from binary file -}
 fromBinaryFile :: (
-    Serialize a,
-    Serialize (c (Tensor c a))
-    ) => String -> EitherT String IO (Tensor c a)
+    Serialize a
+    ) => String                             -- ^ File name
+      -> EitherT String IO (ListTensor a)   -- ^ Deserialized tensor or deserialization error message - either way, wrapped in the IO monad
 fromBinaryFile name = do
     contents <- lift $ ByteString.readFile name
     EitherT $ return $ fromBinary $ decompress contents
 
 {-| Serialization to and from JSON -}
+instance FromJSON a => FromJSON (ZipList a)
 instance (
-    FromJSON a,
-    FromJSON (c (Tensor c a))
-    ) => FromJSON (Tensor c a)
+    FromJSON a
+    ) => FromJSON (ListTensor a)
 
+instance ToJSON a => ToJSON (ZipList a)
 instance (
-    ToJSON a,
-    ToJSON (c (Tensor c a))
-    ) =>   ToJSON (Tensor c a)
+    ToJSON a
+    ) =>   ToJSON (ListTensor a)
 
 {-| Serialize to JSON string -}
 toJSON :: (
-    ToJSON a,
-    ToJSON (c (Tensor c a))
-    ) => Tensor c a -> ByteString.ByteString
+    ToJSON a
+    ) => ListTensor a            -- ^ Tensor to serialize
+      -> ByteString.ByteString   -- ^ Binary string with JSON-encoded tensor
 toJSON = Data.Aeson.encode
 
 {-| Write to JSON file -}
 toJSONFile :: (
-    ToJSON a,
-    ToJSON (c (Tensor c a))
-    ) => String -> Tensor c a -> IO ()
-toJSONFile name = ByteString.writeFile name . Multilinear.Generic.toJSON
+    ToJSON a
+    ) => String          -- ^ File name
+      -> ListTensor a    -- ^ Tensor to serialize
+      -> IO ()
+toJSONFile name = ByteString.writeFile name . Multilinear.Generic.AsList.toJSON
 
 {-| Deserialize from JSON string -}
 fromJSON :: (
-    FromJSON a,
-    FromJSON (c (Tensor c a))
-    ) => ByteString.ByteString -> Maybe (Tensor c a)
+    FromJSON a
+    ) => ByteString.ByteString    -- ^ Binary string with JSON-encoded tensor
+      -> Maybe (ListTensor a)     -- ^ Deserialized tensor or an error
 fromJSON = Data.Aeson.decode
 
 {-| Read from JSON file -}
 fromJSONFile :: (
-    FromJSON a,
-    FromJSON (c (Tensor c a))
-    ) => String -> MaybeT IO (Tensor c a)
+    FromJSON a
+    ) => String                      -- ^ File name
+      -> MaybeT IO (ListTensor a)    -- ^ Deserialized tensor or an error, either way wrapped in the IO monad
 fromJSONFile name = do
     contents <- lift $ ByteString.readFile name
-    MaybeT $ return $ Multilinear.Generic.fromJSON contents
- 
+    MaybeT $ return $ Multilinear.Generic.AsList.fromJSON contents
+
 -- Print tensor
 instance (
     Show a
-    --Foldable c, Functor c
-    ) => Show (Tensor [] a) where
+    ) => Show (ListTensor a) where
 
     -- merge errors first and then print whole tensor
     show t = show' $ _mergeErr t
@@ -225,7 +220,7 @@ instance (
             "[" ++ tail (foldl' (\string e -> string ++ "," ++ show e) "" container) ++ "]"
 
 -- Tensor is a functor
-instance Functor c => Functor (Tensor c) where
+instance Functor ListTensor where
     -- Mapping scalars simply maps its value
     fmap f (Scalar v_) = Scalar (f v_)
     -- Mapping tensors does mapping element by element
@@ -237,9 +232,8 @@ instance Functor c => Functor (Tensor c) where
 -- Tensors can be compared lexigographically
 -- Allowes to put tensors in typical ordered containers
 instance (
-    Ord a,
-    Ord (c (Tensor c a))
-    ) => Ord (Tensor c a) where
+    Ord a
+    ) => Ord (ListTensor a) where
 
     -- Error is smaller by other tensors, so when printing ordered containers, all erorrs will be printed first
     -- Two errors are compared by they messages lexigographically
@@ -256,18 +250,15 @@ instance (
 
 -- You can compute a hash value from tensor
 -- Allows to put tensors to typical unordered containers
+instance Hashable a => Hashable (ZipList a)
 instance (
-    Hashable a,
-    Hashable (c (Tensor c a))
-    ) => Hashable (Tensor c a)
+    Hashable a
+    ) => Hashable (ListTensor a)
 
 -- Tensors concatenation makes them a monoid
 instance (
-    Num a, Bits a,
-    Eq (c (Tensor c a)),
-    Monoid (c (Tensor c a)),
-    Foldable c, Applicative c
-    ) => Monoid (Tensor c a) where
+    Num a, Bits a
+    ) => Monoid (ListTensor a) where
     -- Neutral element is a scalar as it has no indices and concatenation is by common inidces
     mempty = FiniteTensor (Indifferent 0 "i") mempty
 
@@ -284,11 +275,8 @@ instance (
 
 -- Tensors can be added, subtracted and multiplicated
 instance (
-    Num a, Bits a,
-    Eq (c (Tensor c a)),
-    Monoid (c (Tensor c a)),
-    Foldable c, Applicative c
-    ) => Num (Tensor c a) where
+    Num a, Bits a
+    ) => Num (ListTensor a) where
 
     -- Adding - element by element
     Scalar x1 + Scalar x2 = Scalar $ x1 + x2
@@ -362,11 +350,8 @@ instance (
 
 -- Bit operations on tensors
 instance (
-    Num a, Bits a,
-    Eq (c (Tensor c a)),
-    Monoid (c (Tensor c a)),
-    Foldable c, Applicative c
-    ) => Bits (Tensor c a) where
+    Num a, Bits a
+    ) => Bits (ListTensor a) where
 
     -- Bit sum - elem by elem
     Scalar x1 .|. Scalar x2 = Scalar $ x1 .|. x2
@@ -473,11 +458,8 @@ instance (
 
 -- Tensors can be divided by each other
 instance (
-    Fractional a, Bits a,
-    Eq (c (Tensor c a)),
-    Monoid (c (Tensor c a)),
-    Foldable c, Applicative c
-    ) => Fractional (Tensor c a) where
+    Fractional a, Bits a
+    ) => Fractional (ListTensor a) where
 
     -- Scalar division return result of division of its values
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
@@ -500,11 +482,8 @@ instance (
 -- Function of tensor is tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
 instance (
-    Floating a, Bits a,
-    Eq (c (Tensor c a)),
-    Monoid (c (Tensor c a)),
-    Applicative c, Foldable c
-    ) => Floating (Tensor c a) where
+    Floating a, Bits a
+    ) => Floating (ListTensor a) where
 
     pi = Scalar pi
 
@@ -558,11 +537,8 @@ instance (
 
 -- Multilinear operations
 instance (
-    Num a, Bits a,
-    Eq (c (Tensor c a)),
-    Monoid (c (Tensor c a)),
-    Foldable c, Applicative c
-    ) => Multilinear (Tensor c) a where
+    Num a, Bits a
+    ) => Multilinear ListTensor a where
 
     -- Add scalar left
     x .+ t = (x+) <$> t
@@ -585,6 +561,7 @@ instance (
     -- List of all tensor indices
     indices (Scalar _)          = []
     indices (FiniteTensor i ts) = toTIndex i : indices (head $ toList ts)
+    indices (Err _)             = []
 
     -- Get tensor order [ (contravariant,covariant)-type ]
     order (Scalar _) = (0,0)
@@ -595,10 +572,6 @@ instance (
     order (FiniteTensor (Indifferent _ _) t) = (cnvr,covr)
         where (cnvr,covr) = order $ Data.List.head (toList t)
     order (Err _) = (-1,-1)
-
-    -- Returns true if tensors are equivalent - have same indices but in different order
-    Scalar _ |==| Scalar _ = True
-    --FiniteTensor
 
     -- Rename tensor index
     rename (Scalar x) _ _ = Scalar x
@@ -654,7 +627,7 @@ instance (
             Err msg -}
 
     {-| Concatenation of two tensor with given index or by creating a new one -}
-    augment t1 t2 ind = 
+    augment t1 t2 ind =
         let t1' = t1 <<<| ind
             t2' = t2 <<<| ind
         in  t1' <> t2'
@@ -663,13 +636,13 @@ instance (
     {-| Moves given index one level deeper in recursion -}
     Err msg |>> _  = Err msg
     Scalar x |>> _ = Scalar x
-    t1@(FiniteTensor index1 ts1) |>> ind = t1
-        {-| Data.List.length (indicesNames t1) > 1 && indexName index1 /= ind =
-            FiniteTensor index1 $ (|>> ind) <$> ts1
+    t1@(FiniteTensor index1 (ZipList ts1)) |>> ind
+        | Data.List.length (indicesNames t1) > 1 && indexName index1 /= ind =
+            FiniteTensor index1 $ ZipList $ (|>> ind) <$> ts1
         | Data.List.length (indicesNames t1) > 1 && indexName index1 == ind =
             let index2 = tensorIndex (Data.List.head ts1)
-            in Tensor index2 [Tensor index1 [tensorData (ts1 !! fromIntegral j) !! fromIntegral i
+            in FiniteTensor index2 $ ZipList [FiniteTensor index1 $ ZipList [getZipList (tensorData (ts1 !! fromIntegral j)) !! fromIntegral i
                 | j <- [0 .. indexSize index1 - 1]]
                 | i <- [0 .. indexSize index2 - 1]]
-        | otherwise = t1-}
+        | otherwise = t1
 

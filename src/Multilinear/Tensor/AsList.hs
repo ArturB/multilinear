@@ -19,14 +19,16 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Tensor.AsList (
-  fromIndices, Multilinear.Tensor.const,
+  fromIndices, Multilinear.Tensor.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed
 ) where
 
+import           Control.Applicative
 import           Control.Monad.Primitive
 import           Data.Bits
 import qualified Data.Vector                as Vector
+import           Multilinear.Generic
 import           Multilinear.Generic.AsList
 import           Multilinear.Index.Finite
 import           Statistics.Distribution
@@ -34,34 +36,32 @@ import qualified System.Random.MWC          as MWC
 
 {-| Generate tensor as functions of its indices -}
 fromIndices :: (
-    Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-    ) => (String,[i])        -- ^ Upper indices names (one character per index) and its sizes
-      -> (String,[i])        -- ^ Lower indices names (one character per index) and its sizes
-      -> ([i] -> [i] -> a)   -- ^ Generator function (f [u1,u2,...] [d1,d2,...] returns a tensor element at t [u1,u2,...] [d1,d2,...])
-      -> Tensor i a          -- ^ Generated tensor
+    ) => (String,[Int])        -- ^ Upper indices names (one character per index) and its sizes
+      -> (String,[Int])        -- ^ Lower indices names (one character per index) and its sizes
+      -> ([Int] -> [Int] -> a)   -- ^ Generator function (f [u1,u2,...] [d1,d2,...] returns a tensor element at t [u1,u2,...] [d1,d2,...])
+      -> ListTensor a          -- ^ Generated tensor
 
 fromIndices ([],[]) ([],[]) f = Scalar $ f [] []
 fromIndices (u:us,s:size) d f =
-    Tensor (Contravariant s [u]) [fromIndices (us,size) d (\uss dss -> f (x:uss) dss) | x <- [0 .. s - 1] ]
+    FiniteTensor (Contravariant s [u]) $ ZipList [fromIndices (us,size) d (\uss dss -> f (x:uss) dss) | x <- [0 .. s - 1] ]
 fromIndices u (d:ds,s:size) f =
-    Tensor (Covariant s [d]) [fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) | x <- [0 .. s - 1] ]
+    FiniteTensor (Covariant s [d]) $ ZipList [fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) | x <- [0 .. s - 1] ]
 fromIndices us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
 {-| Generate tensor with all components equal to @v@ -}
 const :: (
-    Eq i, Show i, Integral i,
     Eq a, Show a, Num a, Bits a
-    ) => (String,[i])   -- ^ Upper indices names (one character per index) and its sizes
-      -> (String,[i])   -- ^ Lower indices names (one character per index) and its sizes
+    ) => (String,[Int])   -- ^ Upper indices names (one character per index) and its sizes
+      -> (String,[Int])   -- ^ Lower indices names (one character per index) and its sizes
       -> a              -- ^ Tensor elements value
-      -> Tensor i a     -- ^ Generated tensor
+      -> ListTensor a     -- ^ Generated tensor
 
 const ([],[]) ([],[]) v = Scalar v
 const (u:us,s:size) d v =
-    Tensor (Contravariant s [u]) $ replicate (fromIntegral s) $ Multilinear.Tensor.const (us,size) d v
+    FiniteTensor (Contravariant s [u]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const (us,size) d v
 const u (d:ds,s:size) v =
-    Tensor (    Covariant s [d]) $ replicate (fromIntegral s) $ Multilinear.Tensor.const u (ds,size) v
+    FiniteTensor (    Covariant s [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const u (ds,size) v
 const us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
 {-| Generate tensor with random real components with given probability distribution.
@@ -79,12 +79,11 @@ The tensor is wrapped in the IO monad. -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDouble :: (
-    Eq i, Show i, Integral i,
     ContGen d
-  ) => (String,[i])          -- ^ Upper indices names (one character per index) and its sizes
-    -> (String,[i])          -- ^ Lower indices names (one character per index) and its sizes
+  ) => (String,[Int])          -- ^ Upper indices names (one character per index) and its sizes
+    -> (String,[Int])          -- ^ Lower indices names (one character per index) and its sizes
     -> d                     -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor i Double)  -- ^ Generated tensor
+    -> IO (ListTensor Double)  -- ^ Generated tensor
 
 randomDouble ([],[]) ([],[]) distr = do
     component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar distr gen
@@ -92,11 +91,11 @@ randomDouble ([],[]) ([],[]) distr = do
 
 randomDouble (u:us,s:size) d distr = do
   tensors <- sequence [randomDouble (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ Tensor (Contravariant s [u]) tensors
+  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
 
 randomDouble u (d:ds,s:size) distr = do
   tensors <- sequence [randomDouble u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ Tensor (Covariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
 
 randomDouble us ds _ = 
     return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
@@ -109,12 +108,11 @@ The tensor is wrapped in the IO monad. -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomInt :: (
-    Eq i, Show i, Integral i,
     DiscreteGen d
-  ) => (String,[i])        -- ^ Upper indices names (one character per index) and its sizes
-    -> (String,[i])        -- ^ Lower indices names (one character per index) and its sizes
+  ) => (String,[Int])        -- ^ Upper indices names (one character per index) and its sizes
+    -> (String,[Int])        -- ^ Lower indices names (one character per index) and its sizes
     -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor i Int)   -- ^ Generated tensor
+    -> IO (ListTensor Int)   -- ^ Generated tensor
 
 randomInt ([],[]) ([],[]) distr = do
     component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar distr gen
@@ -122,11 +120,11 @@ randomInt ([],[]) ([],[]) distr = do
 
 randomInt (u:us,s:size) d distr = do
   tensors <- sequence [randomInt (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ Tensor (Contravariant s [u]) tensors
+  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
 
 randomInt u (d:ds,s:size) distr = do
   tensors <- sequence [randomInt u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ Tensor (Covariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
 
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -145,13 +143,12 @@ The tensor is wrapped in a monad. -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
 randomDoubleSeed :: (
-    Eq i, Show i, Integral i,
-    ContGen d, Integral i2, PrimMonad m
-  ) => (String,[i])        -- ^ Upper indices names (one character per index) and its sizes
-    -> (String,[i])        -- ^ Lower indices names (one character per index) and its sizes
+    ContGen d, PrimMonad m
+  ) => (String,[Int])        -- ^ Upper indices names (one character per index) and its sizes
+    -> (String,[Int])        -- ^ Lower indices names (one character per index) and its sizes
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> i2                  -- ^ Randomness seed
-    -> m (Tensor i Double) -- ^ Generated tensor
+    -> Int                  -- ^ Randomness seed
+    -> m (ListTensor Double) -- ^ Generated tensor
 
 randomDoubleSeed ([],[]) ([],[]) distr seed = do
     gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
@@ -160,11 +157,11 @@ randomDoubleSeed ([],[]) ([],[]) distr seed = do
 
 randomDoubleSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomDoubleSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ Tensor (Contravariant s [u]) tensors
+  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
 
 randomDoubleSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ Tensor (Covariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
 
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -176,13 +173,12 @@ The tensor is wrapped in a monad. -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 randomIntSeed :: (
-    Eq i, Show i, Integral i,
-    DiscreteGen d, Integral i2, PrimMonad m
-  ) => (String,[i])        -- ^ Index name (one character)
-    -> (String,[i])        -- ^ Number of elements
+    DiscreteGen d, PrimMonad m
+  ) => (String,[Int])        -- ^ Index name (one character)
+    -> (String,[Int])        -- ^ Number of elements
     -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> i2                  -- ^ Randomness seed
-    -> m (Tensor i Int)    -- ^ Generated tensor
+    -> Int                  -- ^ Randomness seed
+    -> m (ListTensor Int)    -- ^ Generated tensor
 
 randomIntSeed ([],[]) ([],[]) distr seed = do
     gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
@@ -191,10 +187,10 @@ randomIntSeed ([],[]) ([],[]) distr seed = do
 
 randomIntSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomIntSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ Tensor (Contravariant s [u]) tensors
+  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
 
 randomIntSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomIntSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ Tensor (Covariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
 
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"

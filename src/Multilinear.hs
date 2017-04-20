@@ -312,5 +312,5 @@ class Multilinear t a => Accessible t a where
 
     {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
     {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
-    iMap :: Integral i => ([i] -> a -> b) -> t a -> t b
+    iMap :: ([Int] -> a -> b) -> t a -> t b
     -- // TODO
