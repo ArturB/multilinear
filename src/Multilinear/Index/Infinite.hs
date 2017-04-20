@@ -51,21 +51,26 @@ instance Index Infinite where
 
     {-| Return true if index is covariant |-}
     isCovariant (Covariant _) = True
-    isCovariant _               = False
+    isCovariant _             = False
 
     {-| Return true if index is contravariant |-}
     isContravariant (Contravariant _) = True
-    isContravariant _                   = False
+    isContravariant _                 = False
 
     {-| Return true if index is indifferent |-}
     isIndifferent (Indifferent _) = True
-    isIndifferent _                 = False
-    
+    isIndifferent _               = False
+
     {-| Returns true if two indices are quivalent, i.e. differs only by name, but share same type. -}
-    equivI (Covariant _) (Covariant _) = True
+    equivI (Covariant _) (Covariant _)         = True
     equivI (Contravariant _) (Contravariant _) = True
-    equivI (Indifferent _) (Indifferent _) = True
-    equivI _ _ = False
+    equivI (Indifferent _) (Indifferent _)     = True
+    equivI _ _                                 = False
+
+    {-| Convert to TIndex -}
+    toTIndex (Covariant name)     = TCovariant Nothing name
+    toTIndex (Contravariant name) = TContravariant Nothing name
+    toTIndex (Indifferent name)   = TIndifferent Nothing name
 
 {-| Binary serialization and deserialization |-}
 instance Serialize Infinite

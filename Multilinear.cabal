@@ -16,30 +16,30 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Multilinear
-                    ,  Multilinear.Generic.AsList
-                    --,  Multilinear.Generic.AsArray
                     ,  Multilinear.Form
-                    --,  Multilinear.Form.Seq
-                    --,  Multilinear.Form.Field
+                    ,  Multilinear.Form.AsList
+                    ,  Multilinear.Form.AsArray
                     ,  Multilinear.Generic
+                    ,  Multilinear.Generic.AsList
+                    ,  Multilinear.Generic.AsArray
                     ,  Multilinear.Index
                     ,  Multilinear.Index.Finite
                     ,  Multilinear.Index.Infinite
                     ,  Multilinear.Matrix
-                    --,  Multilinear.Matrix.Seq
-                    --,  Multilinear.Matrix.Field
+                    ,  Multilinear.Matrix.AsList
+                    ,  Multilinear.Matrix.AsArray
                     ,  Multilinear.NForm
-                    --,  Multilinear.NForm.Seq
-                    --,  Multilinear.NForm.Field
+                    ,  Multilinear.NForm.AsList
+                    ,  Multilinear.NForm.AsArray
                     ,  Multilinear.NVector
-                    --,  Multilinear.NVector.Seq
-                    --,  Multilinear.NVector.Field
+                    ,  Multilinear.NVector.AsList
+                    ,  Multilinear.NVector.AsArray
                     ,  Multilinear.Tensor
-                    --,  Multilinear.Tensor.Seq
-                    --,  Multilinear.Tensor.Field
+                    ,  Multilinear.Tensor.AsList
+                    ,  Multilinear.Tensor.AsArray
                     ,  Multilinear.Vector
-                    --,  Multilinear.Vector.Seq
-                    --,  Multilinear.Vector.Field
+                    ,  Multilinear.Vector.AsList
+                    ,  Multilinear.Vector.AsArray
   build-depends:       base >= 4.7 && < 5
                     ,  cereal
                     ,  containers
@@ -51,11 +51,12 @@ library
                     ,  primitive
                     ,  statistics
                     ,  vector
+                    ,  cereal-vector
                     ,  csv-enumerator
                     ,  transformers
                     ,  either
   default-language:    Haskell2010
-  ghc-options:         -Wall -O2
+  ghc-options:         -Wall -O2 -Wno-orphans -Werror
   default-extensions:
 
 test-suite Multilinear-test
@@ -65,11 +66,9 @@ test-suite Multilinear-test
   build-depends:       base
                      , Multilinear
                      , transformers
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wno-orphans -Werror
   default-language:    Haskell2010
-  default-extensions:  FlexibleInstances
-                     , MultiParamTypeClasses
-                     , GADTs
+  default-extensions:  
 
 benchmark Multilinear-bench
   type:                exitcode-stdio-1.0
@@ -78,11 +77,9 @@ benchmark Multilinear-bench
   build-depends:       base
                      , Multilinear
                      , criterion
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wno-orphans -Werror
   default-language:    Haskell2010
-  default-extensions:  FlexibleInstances
-                     , MultiParamTypeClasses
-                     , GADTs
+  default-extensions:  
 
 source-repository head
   type:     git

@@ -15,7 +15,7 @@ Finite-dimensional tensor index.
 {-# LANGUAGE Strict        #-}
 
 module Multilinear.Index.Finite (
-    Finite(..)
+    Finite(..),
 ) where
 
 import           Data.Aeson
@@ -25,29 +25,29 @@ import           GHC.Generics
 import           Multilinear.Index
 
 {-| Index of finite-dimension tensor with specified size -}
-data Finite i =
+data Finite =
     Covariant {
-        indexSize :: i,
+        indexSize  :: Int,
         indexName' :: String
     } |
     Contravariant {
-        indexSize :: i,
+        indexSize  :: Int,
         indexName' :: String
     } |
     Indifferent {
-        indexSize :: i,
+        indexSize  :: Int,
         indexName' :: String
     }
     deriving (Eq, Generic)
 
 {-| Show instance of Finitwe -}
-instance Show i => Show (Finite i) where
+instance Show Finite where
     show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
     show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
 
 {-| Finite index is a Multilinear.Index instance -}
-instance Eq i => Index (Finite i) where
+instance Index Finite where
 
     {-| Index name -}
     indexName = indexName'
@@ -63,7 +63,7 @@ instance Eq i => Index (Finite i) where
     {-| Return true if index is indifferent |-}
     isIndifferent (Indifferent _ _) = True
     isIndifferent _                 = False
-    
+
     {-| Returns true if two indices are quivalent, i.e. differs only by name, but share same type and size. -}
     equivI (Covariant count1 _) (Covariant count2 _)
         | count1 == count2 = True
@@ -76,19 +76,24 @@ instance Eq i => Index (Finite i) where
         | otherwise = False
     equivI _ _ = False
 
+    {-| Convert to TIndex type -}
+    toTIndex (Covariant size name)     = TCovariant (Just size) name
+    toTIndex (Contravariant size name) = TContravariant (Just size) name
+    toTIndex (Indifferent size name)   = TIndifferent (Just size) name
+
 {-| Binary serialization and deserialization |-}
-instance Serialize i => Serialize (Finite i)
+instance Serialize Finite
 
 {-| Serialization to and from JSON |-}
-instance FromJSON i => FromJSON (Finite i)
-instance   ToJSON i =>   ToJSON (Finite i)
+instance FromJSON Finite
+instance   ToJSON Finite
 
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
-instance Ord i => Ord (Finite i) where
+instance Ord Finite where
     ind1 <= ind2 = indexSize ind1 <= indexSize ind2
 
 {-| Indices can be hashed by hash functions |-}
 {-| Used to allow to put tensors to typical unordered containers |-}
-instance Hashable i => Hashable (Finite i)
+instance Hashable Finite
 

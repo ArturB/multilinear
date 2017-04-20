@@ -151,14 +151,15 @@ module Multilinear (
 ) where
 
 import Data.Maybe
---import Data.Set
---import Multilinear.Index
+import Data.Set
+import Multilinear.Index
 import Data.Bits
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
   Num (t a),     -- Tensors may be added, subtracted and multiplicated
   Bits (t a),    -- Also bit operations can be performed on tensors
+  Monoid (t a),  -- Tensors are a monoid with concatenation as monoid operation
   Functor t      -- Tensor should be a Functor for convenience
   ) => Multilinear t a where
 
@@ -186,20 +187,24 @@ class (
     infixl 8 *.
     (*.) :: t a -> a -> t a
 
+    {-| List of all tensor indices -}
+    indices :: t a -> [TIndex]
+
     {-| List of tensor indices names -}
     indicesNames :: t a -> [String]
+    indicesNames t = indexName <$> indices t
     
     {-| Tensor order - number of covariant and contravariant indices -}
     {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
     order :: t a -> (Int,Int)
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
-    equiv :: Ord a => t a -> t a -> Bool
-    
+    equiv :: t a -> t a -> Bool
+    equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
 
     {-| Infix equivalent of 'equiv'. Has low priority equal to 1. |-}
     infixl 1 |==|
-    (|==|) :: Ord a => t a -> t a -> Bool
+    (|==|) :: t a -> t a -> Bool
     t1 |==| t2 = equiv t1 t2
 
     {-| @rename t "i" "j"@ renames index @i@ of tensor @t@ to @j@ -}
@@ -295,11 +300,6 @@ class (
     map :: (a -> b) -> t a -> t b
     map = fmap
 
-    {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
-    {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
-    iMap :: Integral i => ([i] -> a -> b) -> t a -> t b
-
-
 {-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
 class Multilinear t a => Accessible t a where
 
@@ -310,4 +310,7 @@ class Multilinear t a => Accessible t a where
         el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
     el :: [String] -> t a -> [Int] -> t a
 
-
+    {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
+    {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
+    iMap :: ([Int] -> a -> b) -> t a -> t b
+    -- // TODO

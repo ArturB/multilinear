@@ -1,643 +1,85 @@
 {-|
-Module      : Multilinear
-Description : Provides efficient and generic implementation of linear algebra operation using Ricci - Einstein tensor formalism
+Module      : Multilinear.Generic
+Description : Type family for all tensor-like datatypes
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module contains implementation of tensor defined as nested container of its components.
-- Choice of container type has great impact on library performance in particular use cases
-- Array ("Data.Vector") implementation is generally faster, however it is strict and always keeps all tensor elements in memory, so it may require large amount of RAM.
-- List implementation is slower but lazy and when tensor is generated from indices or randomly, it does not generate all elements at once if not necessary,
-so it may operate in smaller memory (e.g. linear instead of quadratic when multiplying matrix by vector or form).
+Type family for all tensor-like types.
 
 -}
 
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE GADTs                 #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE StandaloneDeriving    #-}
-{-# LANGUAGE Strict                #-}
-{-# LANGUAGE UndecidableInstances  #-}
-{-# OPTIONS_GHC -O2 #-}
+
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE Strict                     #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
 module Multilinear.Generic (
-    Tensor(..), (!),
-    toBinary, toBinaryFile,
-    fromBinary, fromBinaryFile,
-    Multilinear.Generic.toJSON, toJSONFile,
-    Multilinear.Generic.fromJSON, fromJSONFile
+    Tensor,
+    ListTensor,
+    VectorTensor,
+    UnboxedVectorTensor,
+    ZipVector(..),
+    ZipUnboxedVector(..)
 ) where
 
-import           Codec.Compression.GZip
-import           Control.Monad.Trans.Class
-import           Control.Monad.Trans.Either
-import           Control.Monad.Trans.Maybe
-import           Data.Aeson
-import           Data.Bits
-import qualified Data.ByteString.Lazy       as ByteString
-import           Data.Foldable
-import           Data.Hashable
-import           Data.List
-import           Data.Maybe
-import           Data.Serialize
+import           Control.Applicative
+import           Control.Monad
 import           GHC.Generics
-import           Multilinear
-import           Multilinear.Index
-import           Multilinear.Index.Finite
-
-{-| ERROR MESSAGES -}
-incompatibleTypes :: String
-incompatibleTypes = "Incompatible tensor types!"
-
-{-| Tensor defined recursively as scalar or container of other tensors -}
-{-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
-data Tensor c i a =
-    {-| Scalar -}
-    Scalar {
-        {-| value of scalar -}
-        scalarVal :: a
-    } |
-    {-| Container of other tensors -}
-    FiniteTensor {
-        {-| Finite index "Mutltilinear.Index.Finite" of tensor -}
-        tensorIndex :: Finite i,
-        {-| Containter of tensors on deeper recursion level -}
-        tensorData  :: c (Tensor c i a)
-    } |
-    {-| Operations on tensors may throw an error -}
-    Err {
-        {-| Error message -}
-        errMessage :: String
-    } deriving Generic
-
-deriving instance (Eq i, Eq a, Eq (c (Tensor c i a))) => Eq (Tensor c i a)
-
-{-|
-    Recursive indexing on list tensor
-    @t ! i = t[i]@
--}
-(!) :: Integral i
-    => Tensor [] i a      -- ^ tensor @t@
-    -> i                  -- ^ index @i@
-    -> Tensor [] i a      -- ^ tensor @t[i]@
-
-(!) (Scalar _) _          = Err "Scalar has no indices!"
-(!) (Err msg) _           = Err msg
-(!) (FiniteTensor _ ts) i = ts !! fromIntegral i
-
-{-| Binary serialization and deserialization -}
-instance (
-    Serialize i, Serialize a,
-    Serialize (c (Tensor c i a))
-    ) => Serialize (Tensor c i a)
-
-{-| Serialize to binary string -}
-toBinary :: (
-    Serialize i, Serialize a,
-    Serialize (c (Tensor c i a))
-    ) => Tensor c i a -> ByteString.ByteString
-toBinary = Data.Serialize.encodeLazy
-
-{-| Write to binary file. Uses compression with gzip -}
-toBinaryFile :: (
-    Serialize i, Serialize a,
-    Serialize (c (Tensor c i a))
-    ) => String -> Tensor c i a -> IO ()
-toBinaryFile name = ByteString.writeFile name . compress . toBinary
-
-{-| Deserialize from binary string -}
-fromBinary :: (
-    Serialize i, Serialize a,
-    Serialize (c (Tensor c i a))
-    ) => ByteString.ByteString -> Either String (Tensor c i a)
-fromBinary = Data.Serialize.decodeLazy
-
-{-| Read from binary file -}
-fromBinaryFile :: (
-    Serialize i, Serialize a,
-    Serialize (c (Tensor c i a))
-    ) => String -> EitherT String IO (Tensor c i a)
-fromBinaryFile name = do
-    contents <- lift $ ByteString.readFile name
-    EitherT $ return $ fromBinary $ decompress contents
-
-{-| Serialization to and from JSON -}
-instance (
-    FromJSON i, FromJSON a,
-    FromJSON (c (Tensor c i a))
-    ) => FromJSON (Tensor c i a)
-instance (
-    ToJSON i, ToJSON a,
-    ToJSON (c (Tensor c i a))
-    ) =>   ToJSON (Tensor c i a)
-
-{-| Serialize to JSON string -}
-toJSON :: (
-    ToJSON i, ToJSON a,
-    ToJSON (c (Tensor c i a))
-    ) => Tensor c i a -> ByteString.ByteString
-toJSON = Data.Aeson.encode
-
-{-| Write to JSON file -}
-toJSONFile :: (
-    ToJSON i, ToJSON a,
-    ToJSON (c (Tensor c i a))
-    ) => String -> Tensor c i a -> IO ()
-toJSONFile name = ByteString.writeFile name . Multilinear.Generic.toJSON
-
-{-| Deserialize from JSON string -}
-fromJSON :: (
-    FromJSON i, FromJSON a,
-    FromJSON (c (Tensor c i a))
-    ) => ByteString.ByteString -> Maybe (Tensor c i a)
-fromJSON = Data.Aeson.decode
-
-{-| Read from JSON file -}
-fromJSONFile :: (
-    FromJSON i, FromJSON a,
-    FromJSON (c (Tensor c i a))
-    ) => String -> MaybeT IO (Tensor c i a)
-fromJSONFile name = do
-    contents <- lift $ ByteString.readFile name
-    MaybeT $ return $ Multilinear.Generic.fromJSON contents
-
--- Print tensor
-instance (Show i, Show a, Foldable c, Functor c) => Show (Tensor c i a) where
-    -- merge errors first and then print tensor
-    show t = show' $ _mergeErr t
-        where
-        -- Scalar is showed simply as its value
-        show' (Scalar x) = show x
-        -- Covariant components are shown horizontally
-        show' (FiniteTensor index@(Covariant _ _) ts) =
-            show index ++ " " ++ _showHorizontal ts
-        -- Contravariant components are shown vertically
-        show' (FiniteTensor index@(Contravariant _ _) ts)=
-            show index ++ " " ++ _showVertical ts
-        -- Sequences are shown horizontally
-        show' (FiniteTensor index@(Indifferent _ _) ts) =
-            show index ++ " " ++ _showHorizontal ts
-        -- Error prints it error message
-        show' (Err msg) = show msg
-
-        -- Merge many errors in tensor to the first one
-        -- Error tensor is passed further
-        _mergeErr (Err msg) = Err msg
-        -- Tensor is merged to first error on deeper recursion level
-        _mergeErr t1@(FiniteTensor _ ts) =
-            -- find first error if present
-            let err = Data.List.find _isErrTensor (_mergeErr <$> ts)
-            -- and return this error if found, whole tensor otherwise
-            in fromMaybe t1 err
-        -- in scalars cannot be any error
-        _mergeErr (Scalar x) = Scalar x
-
-        -- return True if tensor is an error
-        _isErrTensor :: Tensor c i a -> Bool
-        _isErrTensor (Err _) = True
-        _isErrTensor _       = False
-
-        -- print container elements vertically
-        -- used to show contravariant components of tensor, which by convention are written vertically
-        _showVertical :: (Show a, Foldable c) => c a -> String
-        _showVertical container =
-            "\n" ++ tail (foldl' (\string e -> string ++ "\n  |" ++ show e) "" container)
-
-        -- print container elements horizontally
-        -- used to show contravariant components of tensor, which by convention are written vertically
-        _showHorizontal :: (Show a, Foldable c) => c a -> String
-        _showHorizontal container =
-            "[" ++ tail (foldl' (\string e -> string ++ "," ++ show e) "" container) ++ "]"
-
--- Tensor is a functor
-instance Functor c => Functor (Tensor c i) where
-    -- Mapping scalars simply maps its value
-    fmap f (Scalar v_) = Scalar (f v_)
-    -- Mapping tensors does mapping element by element
-    fmap f (FiniteTensor indexT ts) = FiniteTensor indexT v2
-        where v2 = fmap (fmap f) ts
-    -- Mapping errors changes nothing
-    fmap _ (Err msg) = Err msg
-
--- Tensors can be compared lexigographically
-instance (
-    Eq i, Ord i,
-    Eq a, Ord a,
-    Eq (c (Tensor c i a)),
-    Ord (c (Tensor c i a))
-    ) => Ord (Tensor c i a) where
-
-    -- Error is smaller by other tensors, so when printing ordered containers, all erorrs will be printed first
-    -- Two errors are compared by they messages lexigographically
-    Err msg1 <= Err msg2 = msg1 <= msg2
-    Err _ <= _ = True
-    _ <= Err _ = False
-    -- Scalar is smaller than any complex tensor
-    -- Two scalars are compared by they values
-    Scalar x1 <= Scalar x2 = x1 <= x2
-    Scalar _ <= _ = True
-    _ <= Scalar _ = False
-    -- Complex tensors are compared lexigographically
-    FiniteTensor _ ts1 <= FiniteTensor _ ts2 = ts1 <= ts2
-
--- You can compute a hash value from tensor
-instance (
-    Hashable i, Hashable a,
-    Hashable (c (Tensor c i a))
-    ) => Hashable (Tensor c i a)
-
--- Tensors can be added, subtracted and multiplicated
-instance (
-    Eq i, Show i, Integral i,
-    Eq a, Show a, Num a, Bits a,
-    Eq (c (Tensor c i a)),
-    Foldable c, Applicative c
-    ) => Num (Tensor c i a) where
-
-    -- Adding - element by element
-    Scalar x1 + Scalar x2 = Scalar $ x1 + x2
-    Scalar x + t = (x+) <$> t
-    t + Scalar x = (+x) <$> t
-    t1@(FiniteTensor index1 v1) + t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (+) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' + t2'
-        | otherwise = FiniteTensor index1 $ (+t2) <$> v1
-    Err msg + _ = Err msg
-    _ + Err msg = Err msg
-
-    -- Subtracting - element by element
-    Scalar x1 - Scalar x2 = Scalar $ x1 - x2
-    Scalar x - t = (\e -> x - e) <$> t
-    t - Scalar x = (\e -> e - x) <$> t
-    t1@(FiniteTensor index1 v1) - t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (-) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' - t2'
-        | otherwise = FiniteTensor index1 $ (\e -> e - t2) <$> v1
-    Err msg - _ = Err msg
-    _ - Err msg = Err msg
-
-    -- Multiplicating is treated as tensor product
-    -- Tensor product applies Einstein summation convention
-    -- Two scalars are multiplicated by their values
-    Scalar x1 * Scalar x2 = Scalar $ x1 * x2
-    -- Multiplicate by scalar is simply a map
-    Scalar x1 * t = (x1*) <$> t
-    t * Scalar x2 = (*x2) <$> t
-    -- Two tensors may be contracted or multiplicated elem by elem
-    t1@(FiniteTensor index1 ts1) * t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' * t2'
-        | otherwise = FiniteTensor index1 $ (* t2) <$> ts1
-        where
-        -- Contraction of covariant and contravariant index
-        FiniteTensor i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
-            | count1 == count2 = sum $ (*) <$> ts1' <*> ts2'
-            | otherwise = contractionErr i1 i2
-        _ `dot` _ = Err "Cannot compute a dot product!"
-        contractionErr i1' i2' = Err $
-                "Tensor product: " ++ incompatibleTypes ++
-                " - index1 is " ++ show i1' ++
-                " and index2 is " ++ show i2'
-    -- Multiplicating by error simply pushed this error forward
-    Err msg * _ = Err msg
-    _ * Err msg = Err msg
-
-    -- Absolute value - element by element
-    abs (Scalar x)              = Scalar $ abs x
-    abs (FiniteTensor index ts) = FiniteTensor index (abs <$> ts)
-    abs (Err msg)               = Err msg
-
-    -- Signum operation - element by element
-    signum (Scalar x)              = Scalar $ signum x
-    signum (FiniteTensor index ts) = FiniteTensor index (signum <$> ts)
-    signum (Err msg)               = Err msg
-
-    -- Simple integer can be conveted to Scalar
-    fromInteger x = Scalar $ fromInteger x
-
--- Bit operations on tensors
-instance (
-    Eq i, Show i, Integral i,
-    Eq a, Show a, Num a, Bits a,
-    Eq (c (Tensor c i a)),
-    Foldable c, Applicative c
-    ) => Bits (Tensor c i a) where
-
-    -- Bit sum
-    Scalar x1 .|. Scalar x2 = Scalar $ x1 .|. x2
-    Scalar x .|. t = (x .|.) <$> t
-    t .|. Scalar x = (.|. x) <$> t
-    t1@(FiniteTensor index1 v1) .|. t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (.|.) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' .|. t2'
-        | otherwise = FiniteTensor index1 $ (.|. t2) <$> v1
-    Err msg .|. _ = Err msg
-    _ .|. Err msg = Err msg
-
-    -- Bit tensor product
-    -- Summation and multiplication are replaced by its bit equivalents
-    -- Two scalars are multiplicated by their values
-    Scalar x1 .&. Scalar x2 = Scalar $ x1 .&. x2
-    -- Multiplicate by scalar is simply a map
-    Scalar x1 .&. t = (x1 .&.) <$> t
-    t .&. Scalar x2 = (.&. x2) <$> t
-    -- Two tensors may be contracted or multiplicated elem by elem
-    t1@(FiniteTensor index1 ts1) .&. t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' .&. t2'
-        | otherwise = FiniteTensor index1 $ (.&. t2) <$> ts1
-        where
-        -- Contraction of covariant and contravariant index
-        FiniteTensor i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
-            | count1 == count2 = foldl' (.|.) 0 $ (.&.) <$> ts1' <*> ts2'
-            | otherwise = contractionErr i1 i2
-        _ `dot` _ = Err "Cannot compute a bit dot product!"
-        contractionErr i1' i2' = Err $
-                "Tensor bit product: " ++ incompatibleTypes ++
-                " - index1 is " ++ show i1' ++
-                " and index2 is " ++ show i2'
-    -- Multiplicating by error simply pushed this error forward
-    Err msg .&. _ = Err msg
-    _ .&. Err msg = Err msg
-
-    -- Bit exclusive sum (XOR)
-    Scalar x1 `xor` Scalar x2 = Scalar $ x1 `xor` x2
-    Scalar x `xor` t = (x `xor`) <$> t
-    t `xor` Scalar x = (`xor` x) <$> t
-    t1@(FiniteTensor index1 v1) `xor` t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ xor <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' `xor` t2'
-        | otherwise = FiniteTensor index1 $ (`xor` t2) <$> v1
-    Err msg `xor` _ = Err msg
-    _ `xor` Err msg = Err msg
-
-    -- Bit complement
-    complement = Multilinear.map complement
-
-    -- Bit shift of all elements
-    shift t n = Multilinear.map (`shift` n) t
-
-    -- Bit rotating of all elements
-    rotate t n = Multilinear.map (`rotate` n) t
-
-    -- Returns number of bits of elements of tensor, -1 for elements of undefined size
-    bitSize (Scalar x)          = fromMaybe (-1) $ bitSizeMaybe x
-    bitSize (FiniteTensor _ ts) = 
-        if null ts
-        then (-1)
-        else let firstElem = head $ toList ts
-             in  fromMaybe (-1) $ bitSizeMaybe firstElem
-    bitSize (Err _)             = -1
-
-    -- Returns number of bits of elements of tensor
-    bitSizeMaybe (Scalar x)          = bitSizeMaybe x
-    bitSizeMaybe (FiniteTensor _ ts) = 
-        if null ts
-        then Nothing
-        else let firstElem = head $ toList ts
-             in  bitSizeMaybe firstElem
-    bitSizeMaybe (Err _)             = Nothing
-
-    -- Returns true if tensors element are signed
-    isSigned (Scalar x)          = isSigned x
-    isSigned (FiniteTensor _ ts) = 
-        not (null ts) &&
-        let firstElem = head $ toList ts
-        in  isSigned firstElem
-    isSigned (Err _)             = False
-
-    -- bit i is a scalar value with the ith bit set and all other bits clear.
-    bit i = Scalar (bit i)
-
-    -- Test bit - shoud retur True, if bit n if equal to 1.
-    -- Tensors are entities with many elements, so this function always returns False.
-    -- Do not use it, it is implemented only for legacy purposes.
-    testBit _ _ = False
-
-    -- Return the number of set bits in the argument. This number is known as the population count or the Hamming weight.
-    popCount = popCountDefault
-
--- Tensors can be divided by each other
-instance (
-    Eq i, Show i, Integral i,
-    Eq a, Show a, Fractional a, Bits a,
-    Eq (c (Tensor c i a)),
-    Foldable c, Applicative c
-    ) => Fractional (Tensor c i a) where
-
-    -- Scalar division return result of division of its values
-    Scalar x1 / Scalar x2 = Scalar $ x1 / x2
-    -- Tensor and scalar are divided value by value
-    Scalar x1 / t2 = (x1 /) <$> t2
-    t1 / Scalar x2 = (/ x2) <$> t1
-    -- Two complex tensors cannot be simply divided
-    t1@(FiniteTensor _ _) / t2@(FiniteTensor _ _) = Err $
-         "(/): " ++ incompatibleTypes ++
-        " tensor1 has type " ++ show (indicesNames t1) ++
-        " and tensor2 has type " ++ show (indicesNames t2)
-    Err msg / _ = Err msg
-    _ / Err msg = Err msg
-
-    -- Scalar can be generated from rational number
-    fromRational x = Scalar $ fromRational x
-
--- Real-number functions on tensors.
--- Function of tensor is a tensor of function of its elements
--- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (
-    Eq i, Show i, Integral i,
-    Eq a, Show a, Floating a, Bits a,
-    Eq (c (Tensor c i a)),
-    Applicative c, Foldable c
-    ) => Floating (Tensor c i a) where
-
-    pi = Scalar pi
-
-    exp (Scalar x)        = Scalar $ exp x
-    exp (FiniteTensor index ts) = FiniteTensor index (exp <$> ts)
-    exp (Err msg)         = Err msg
-
-    log (Scalar x)        = Scalar $ log x
-    log (FiniteTensor index ts) = FiniteTensor index (log <$> ts)
-    log (Err msg)         = Err msg
-
-    sin (Scalar x)        = Scalar $ sin x
-    sin (FiniteTensor index ts) = FiniteTensor index (sin <$> ts)
-    sin (Err msg)         = Err msg
-
-    cos (Scalar x)        = Scalar $ cos x
-    cos (FiniteTensor index ts) = FiniteTensor index (cos <$> ts)
-    cos (Err msg)         = Err msg
-
-    asin (Scalar x)        = Scalar $ asin x
-    asin (FiniteTensor index ts) = FiniteTensor index (asin <$> ts)
-    asin (Err msg)         = Err msg
-
-    acos (Scalar x)        = Scalar $ acos x
-    acos (FiniteTensor index ts) = FiniteTensor index (acos <$> ts)
-    acos (Err msg)         = Err msg
-
-    atan (Scalar x)        = Scalar $ atan x
-    atan (FiniteTensor index ts) = FiniteTensor index (atan <$> ts)
-    atan (Err msg)         = Err msg
-
-    sinh (Scalar x)        = Scalar $ sinh x
-    sinh (FiniteTensor index ts) = FiniteTensor index (sinh <$> ts)
-    sinh (Err msg)         = Err msg
-
-    cosh (Scalar x)        = Scalar $ cosh x
-    cosh (FiniteTensor index ts) = FiniteTensor index (cosh <$> ts)
-    cosh (Err msg)         = Err msg
-
-    asinh (Scalar x)        = Scalar $ asinh x
-    asinh (FiniteTensor index ts) = FiniteTensor index (asinh <$> ts)
-    asinh (Err msg)         = Err msg
-
-    acosh (Scalar x)        = Scalar $ acosh x
-    acosh (FiniteTensor index ts) = FiniteTensor index (acosh <$> ts)
-    acosh (Err msg)         = Err msg
-
-    atanh (Scalar x)        = Scalar $ atanh x
-    atanh (FiniteTensor index ts) = FiniteTensor index (atanh <$> ts)
-    atanh (Err msg)         = Err msg
-
--- Multilinear operations
-instance (
-    Eq i, Show i, Integral i,
-    Eq a, Show a, Num a, Bits a,
-    Eq (c (Tensor c i a)),
-    Foldable c, Applicative c
-    ) => Multilinear (Tensor c i) a where
-
-    -- Add scalar left
-    x .+ t = (x+) <$> t
-
-    -- Subtract scalar left
-    x .- t = (x-) <$> t
-
-    -- Multiplicate by scalar left
-    x .* t = (x*) <$> t
-
-    -- Add scalar right
-    t +. x = (+x) <$> t
-
-    -- Subtract scalar right
-    t -. x = (\p -> p - x) <$> t
-
-    -- Multiplicate by scalar right
-    t *. x = (*x) <$> t
-
-    -- Get tensor order [ (contravariant,covariant)-type ]
-    order (Scalar _) = (0,0)
-    order (FiniteTensor (Contravariant _ _) t) = (cnvr+1,covr)
-        where (cnvr,covr) = order $ Data.List.head (toList t)
-    order (FiniteTensor (Covariant _ _) t) = (cnvr,covr+1)
-        where (cnvr,covr) = order $ Data.List.head (toList t)
-    order (FiniteTensor (Indifferent _ _) t) = (cnvr,covr)
-        where (cnvr,covr) = order $ Data.List.head (toList t)
-    order (Err _) = (-1,-1)
-
-    -- Rename tensor index
-    rename (Scalar x) _ _ = Scalar x
-    rename (FiniteTensor i@(Contravariant count name) ts) before after
-        | name == before = FiniteTensor (Contravariant count after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (FiniteTensor i@(Covariant count name) ts) before after
-        | name == before = FiniteTensor (Covariant count after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (FiniteTensor i@(Indifferent count name) ts) before after
-        | name == before = FiniteTensor (Indifferent count after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (Err msg) _ _ = Err msg
-
-    -- Raise an index
-    Scalar x /\ _ = Scalar x
-    FiniteTensor index ts /\ n
-        | indexName index == n =
-            FiniteTensor (Contravariant (indexSize index) n) $ (/\ n) <$> ts
-        | otherwise =
-            FiniteTensor index $ (/\ n) <$> ts
-    Err msg /\ _ = Err msg
-
-    -- Lower an index
-    Scalar x \/ _ = Scalar x
-    FiniteTensor index ts \/ n
-        | indexName index == n =
-            FiniteTensor (Covariant (indexSize index) n) $ (\/ n) <$> ts
-        | otherwise =
-            FiniteTensor index $ (\/ n) <$> ts
-    Err msg \/ _ = Err msg
-
-    {-| Transpose a tensor (switch all indices types) -}
-    transpose (Scalar x) = Scalar x
-    transpose (FiniteTensor (Covariant count name) ts) =
-        FiniteTensor (Contravariant count name) (Multilinear.transpose <$> ts)
-    transpose (FiniteTensor (Contravariant count name) ts) =
-        FiniteTensor (Covariant count name) (Multilinear.transpose <$> ts)
-    transpose (FiniteTensor (Indifferent count name) ts) =
-        FiniteTensor (Indifferent count name) (Multilinear.transpose <$> ts)
-    transpose (Err msg) = Err msg
-
-    {-| Mapping with indices. -}
-    {-iMap f t = iMap' t zeroList
-        where
-        zeroList = 0:zeroList
-
-        iMap' (Scalar x) inds =
-            Scalar $ f inds x
-        iMap' (FiniteTensor index ts) inds =
-            Tensor index (\tind -> iMap' (fst tind) $ inds ++ [snd tind]) <$> zip ts [0..]
-        iMap' (Err msg) _  =
-            Err msg -}
-
-    {-| Concatenation of two tensor with given index or by creating a new one -}
-    {-augment t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) ind =
-        if indices t1 == indices t2
-        then
-            let t1' = t1 <<<| ind
-                t2' = t2 <<<| ind
-            in  Tensor (tensorIndex t1') $ tensorData t1' ++ tensorData t2'
-        else Err "Tensors are not equivalent!"
-    augment (Err msg) _ _ = Err msg
-    augment _ (Err msg) _ = Err msg
-    augment (Scalar _) _ _ = Err "Scalars cannot be augmented!"
-    augment _ (Scalar _) _ = Err "Cannot augment by scalar!"-}
-
-    {-| Shift tensor index right -}
-    {-| Moves given index one level deeper in recursion -}
-    Err msg |>> _  = Err msg
-    Scalar x |>> _ = Scalar x
-    t1@(FiniteTensor index1 ts1) |>> ind = t1
-        {-| Data.List.length (indicesNames t1) > 1 && indexName index1 /= ind =
-            FiniteTensor index1 $ (|>> ind) <$> ts1
-        | Data.List.length (indicesNames t1) > 1 && indexName index1 == ind =
-            let index2 = tensorIndex (Data.List.head ts1)
-            in Tensor index2 [Tensor index1 [tensorData (ts1 !! fromIntegral j) !! fromIntegral i
-                | j <- [0 .. indexSize index1 - 1]]
-                | i <- [0 .. indexSize index2 - 1]]
-        | otherwise = t1-}
-
-
+import qualified Data.Vector         as Boxed
+import qualified Data.Vector.Unboxed as Unboxed
+
+{-| Family of all recursive tensor types, parametrized by container type and elements type -}
+data family Tensor :: (* -> *) -> * -> *
+
+{-| List implementation of tensor must be done with ZipList -}
+{-| Common List Applicative instance is invalid -}
+type ListTensor = Tensor ZipList
+
+{-| ZipList must be a Monoid instance to work with it on tensors -}
+deriving instance Monoid (ZipList a)
+
+{-| List implementation of tensor must be done with ZipList -}
+{-| Common List Applicative instance is invalid -}
+type VectorTensor = Tensor ZipVector
+
+{-| List implementation of tensor must be done with ZipList -}
+{-| Common List Applicative instance is invalid -}
+type UnboxedVectorTensor = Tensor ZipUnboxedVector
+
+{-| Newtype wrapper for boxed Vector, providing proper Applicative instance -}
+newtype ZipVector a = 
+    ZipVector {
+        getZipVector :: Boxed.Vector a
+     } deriving (
+         Eq, Show, Read, Ord, 
+         Monad, MonadPlus, Alternative,
+         Functor, Foldable, 
+         Monoid, Generic)
+
+{-| ZipVector Applicative instance -}
+instance Applicative ZipVector where
+    pure = ZipVector . Boxed.singleton
+
+    ZipVector v1 <*> ZipVector v2 = 
+        let l1 = Boxed.length v1
+            l2 = Boxed.length v2
+            minl = if l1 < l2 then l1 else l2
+        in  ZipVector $ Boxed.generate minl ( \i -> (v1 Boxed.! i) (v2 Boxed.! i) )
+
+{-| Newtype wrapper for unboxed Vector, provising Applicative instance -}
+newtype ZipUnboxedVector a = 
+    ZipUnboxedVector {
+        getZipUnboxedVector :: Unboxed.Vector a
+     } deriving (
+         Eq, Show, Read, Ord,
+         Monoid, Generic)
