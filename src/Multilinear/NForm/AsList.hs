@@ -34,7 +34,7 @@ import           Data.Bits
 import qualified Data.Vector                as Vector
 import           Multilinear.Generic
 import           Multilinear.Generic.AsList
-import           Multilinear.Index.Finite
+import           Multilinear.Index
 import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
@@ -49,7 +49,7 @@ fromIndices :: (
 
 fromIndices [] [] f = Scalar $ f []
 fromIndices (d:ds) (s:size) f =
-    FiniteTensor (Covariant s [d]) $ ZipList [fromIndices ds size (\dss -> f (x:dss)) | x <- [0 .. s - 1] ]
+    FiniteTensor (Covariant (Just s) [d]) $ ZipList [fromIndices ds size (\dss -> f (x:dss)) | x <- [0 .. s - 1] ]
 fromIndices _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
 {-| Generate N-form with all components equal to @v@ -}
@@ -62,7 +62,7 @@ const :: (
 
 const [] [] v = Scalar v
 const (d:ds) (s:size) v =
-    FiniteTensor (Covariant s [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.NForm.AsList.const ds size v
+    FiniteTensor (Covariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.NForm.AsList.const ds size v
 const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
 {-| Generate n-vector with random real components with given probability distribution.
@@ -92,7 +92,7 @@ randomDouble [] [] d = do
 
 randomDouble (d:ds) (s:size) distr = do
   tensors <- sequence [randomDouble ds size distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
@@ -116,7 +116,7 @@ randomInt [] [] d = do
 
 randomInt (d:ds) (s:size) distr = do
   tensors <- sequence [randomInt ds size distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
@@ -149,7 +149,7 @@ randomDoubleSeed [] [] d seed = do
 
 randomDoubleSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed ds size distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
@@ -175,7 +175,7 @@ randomIntSeed [] [] d seed = do
 
 randomIntSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence [randomIntSeed ds size distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 

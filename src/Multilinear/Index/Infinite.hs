@@ -22,7 +22,7 @@ import           Data.Aeson
 import           Data.Hashable
 import           Data.Serialize
 import           GHC.Generics
-import           Multilinear.Index
+import qualified Multilinear.Index as TIndex
 
 {-| Index of infinite-dimensional tensor -}
 data Infinite =
@@ -44,7 +44,7 @@ instance Show Infinite where
     show (Indifferent n)   = "(" ++ n ++ ")"
 
 {-| Infinite index is a Multilinear.Index instance -}
-instance Index Infinite where
+instance TIndex.Index Infinite where
 
     {-| Index name -}
     indexName = indexName'
@@ -68,9 +68,9 @@ instance Index Infinite where
     equivI _ _                                 = False
 
     {-| Convert to TIndex -}
-    toTIndex (Covariant name)     = TCovariant Nothing name
-    toTIndex (Contravariant name) = TContravariant Nothing name
-    toTIndex (Indifferent name)   = TIndifferent Nothing name
+    toTIndex (Covariant name)     = TIndex.Covariant Nothing name
+    toTIndex (Contravariant name) = TIndex.Contravariant Nothing name
+    toTIndex (Indifferent name)   = TIndex.Indifferent Nothing name
 
 {-| Binary serialization and deserialization |-}
 instance Serialize Infinite
@@ -82,7 +82,7 @@ instance   ToJSON Infinite
 {-| Indices can be compared alphabetically by its name |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
 instance Ord Infinite where
-    ind1 <= ind2 = indexName ind1 <= indexName ind2
+    ind1 <= ind2 = TIndex.indexName ind1 <= TIndex.indexName ind2
 
 {-| Indices can be hashed by hash functions |-}
 {-| Used to allow to put tensors to typical unordered containers |-}

@@ -50,25 +50,25 @@ class Index i where
 
 {-| Generic index type with Maybe size field -}
 data TIndex =
-    TCovariant {
-        tIndexSize  :: Maybe Int,
+    Covariant {
+        indexSize  :: Maybe Int,
         tIndexName :: String
     } |
-    TContravariant {
-        tIndexSize  :: Maybe Int,
+    Contravariant {
+        indexSize  :: Maybe Int,
         tIndexName :: String
     } |
-    TIndifferent {
-        tIndexSize  :: Maybe Int,
+    Indifferent {
+        indexSize  :: Maybe Int,
         tIndexName :: String
     }
     deriving (Eq, Generic)
 
 {-| Show instance of Finitwe -}
 instance Show TIndex where
-    show (TCovariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
-    show (TContravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
-    show (TIndifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
+    show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
+    show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
+    show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
 
 {-| Finite index is a Multilinear.Index instance -}
 instance Index TIndex where
@@ -77,25 +77,25 @@ instance Index TIndex where
     indexName = tIndexName
 
     {-| Return true if index is covariant |-}
-    isCovariant (TCovariant _ _) = True
+    isCovariant (Covariant _ _) = True
     isCovariant _               = False
 
     {-| Return true if index is contravariant |-}
-    isContravariant (TContravariant _ _) = True
+    isContravariant (Contravariant _ _) = True
     isContravariant _                   = False
 
     {-| Return true if index is indifferent |-}
-    isIndifferent (TIndifferent _ _) = True
+    isIndifferent (Indifferent _ _) = True
     isIndifferent _                 = False
 
     {-| Returns true if two indices are quivalent, i.e. differs only by name, but share same type and size. -}
-    equivI (TCovariant count1 _) (TCovariant count2 _)
+    equivI (Covariant count1 _) (Covariant count2 _)
         | count1 == count2 = True
         | otherwise = False
-    equivI (TContravariant count1 _) (TContravariant count2 _)
+    equivI (Contravariant count1 _) (Contravariant count2 _)
         | count1 == count2 = True
         | otherwise = False
-    equivI (TIndifferent count1 _) (TIndifferent count2 _)
+    equivI (Indifferent count1 _) (Indifferent count2 _)
         | count1 == count2 = True
         | otherwise = False
     equivI _ _ = False
@@ -113,7 +113,7 @@ instance   ToJSON TIndex
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
 instance Ord TIndex where
-    ind1 <= ind2 = tIndexSize ind1 <= tIndexSize ind2
+    ind1 <= ind2 = indexSize ind1 <= indexSize ind2
 
 {-| Indices can be hashed by hash functions |-}
 {-| Used to allow to put tensors to typical unordered containers |-}

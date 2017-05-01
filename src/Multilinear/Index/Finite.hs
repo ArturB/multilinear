@@ -22,7 +22,7 @@ import           Data.Aeson
 import           Data.Hashable
 import           Data.Serialize
 import           GHC.Generics
-import           Multilinear.Index
+import qualified Multilinear.Index as TIndex
 
 {-| Index of finite-dimension tensor with specified size -}
 data Finite =
@@ -47,7 +47,7 @@ instance Show Finite where
     show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
 
 {-| Finite index is a Multilinear.Index instance -}
-instance Index Finite where
+instance TIndex.Index Finite where
 
     {-| Index name -}
     indexName = indexName'
@@ -77,9 +77,9 @@ instance Index Finite where
     equivI _ _ = False
 
     {-| Convert to TIndex type -}
-    toTIndex (Covariant size name)     = TCovariant (Just size) name
-    toTIndex (Contravariant size name) = TContravariant (Just size) name
-    toTIndex (Indifferent size name)   = TIndifferent (Just size) name
+    toTIndex (Covariant size name)     = TIndex.Covariant (Just size) name
+    toTIndex (Contravariant size name) = TIndex.Contravariant (Just size) name
+    toTIndex (Indifferent size name)   = TIndex.Indifferent (Just size) name
 
 {-| Binary serialization and deserialization |-}
 instance Serialize Finite

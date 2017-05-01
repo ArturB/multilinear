@@ -36,7 +36,7 @@ import qualified Data.Vector                as Vector
 import           Multilinear
 import           Multilinear.Generic
 import           Multilinear.Generic.AsList
-import           Multilinear.Index.Finite
+import           Multilinear.Index
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
@@ -49,7 +49,7 @@ fromIndices :: (
     -> ListTensor a      -- ^ Generated linear functional
 
 fromIndices [d] s f =
-    FiniteTensor (Covariant s [d]) $ ZipList [Scalar $ f x | x <- [0 .. s - 1] ]
+    FiniteTensor (Covariant (Just s) [d]) $ ZipList [Scalar $ f x | x <- [0 .. s - 1] ]
 fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with all components equal to some @v@ -}
@@ -61,7 +61,7 @@ const :: (
     -> ListTensor a     -- ^ Generated linear functional
 
 const [d] s v =
-    FiniteTensor (Covariant s [d]) $ ZipList $ replicate (fromIntegral s) (Scalar v)
+    FiniteTensor (Covariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random real components with given probability distribution.
@@ -86,7 +86,7 @@ randomDouble :: (
 
 randomDouble [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Covariant s [i]) $ ZipList $ Scalar <$> components
+  return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random integer components with given probability distribution.
@@ -105,7 +105,7 @@ randomInt :: (
 
 randomInt [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Covariant s [i]) $ ZipList $ Scalar <$> components
+  return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random real components with given probability distribution and given seed.
@@ -132,7 +132,7 @@ randomDoubleSeed :: (
 randomDoubleSeed [i] s d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genContVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Covariant s [i]) $ ZipList $ Scalar <$> components
+  return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random integer components with given probability distribution and given seed.
@@ -153,7 +153,7 @@ randomIntSeed :: (
 randomIntSeed [i] s d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Covariant s [i]) $ ZipList $ Scalar <$> components
+  return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Read linear functional components from CSV file. Reads only the first row of the file. -}
@@ -170,7 +170,7 @@ fromCSV [i] fileName separator = do
   let components = decode <$> firstLine
   let size = length $ rights components
   if size > 0
-  then return $ FiniteTensor (Covariant size [i]) $ ZipList (Scalar <$> rights components)
+  then return $ FiniteTensor (Covariant (Just size) [i]) $ ZipList (Scalar <$> rights components)
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
 fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 

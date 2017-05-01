@@ -30,7 +30,7 @@ import           Data.Bits
 import qualified Data.Vector                as Vector
 import           Multilinear.Generic
 import           Multilinear.Generic.AsList
-import           Multilinear.Index.Finite
+import           Multilinear.Index
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
@@ -44,9 +44,9 @@ fromIndices :: (
 
 fromIndices ([],[]) ([],[]) f = Scalar $ f [] []
 fromIndices (u:us,s:size) d f =
-    FiniteTensor (Contravariant s [u]) $ ZipList [fromIndices (us,size) d (\uss dss -> f (x:uss) dss) | x <- [0 .. s - 1] ]
+    FiniteTensor (Contravariant (Just s) [u]) $ ZipList [fromIndices (us,size) d (\uss dss -> f (x:uss) dss) | x <- [0 .. s - 1] ]
 fromIndices u (d:ds,s:size) f =
-    FiniteTensor (Covariant s [d]) $ ZipList [fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) | x <- [0 .. s - 1] ]
+    FiniteTensor (Covariant (Just s) [d]) $ ZipList [fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) | x <- [0 .. s - 1] ]
 fromIndices us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
 {-| Generate tensor with all components equal to @v@ -}
@@ -59,9 +59,9 @@ const :: (
 
 const ([],[]) ([],[]) v = Scalar v
 const (u:us,s:size) d v =
-    FiniteTensor (Contravariant s [u]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const (us,size) d v
+    FiniteTensor (Contravariant (Just s) [u]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const (us,size) d v
 const u (d:ds,s:size) v =
-    FiniteTensor (    Covariant s [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const u (ds,size) v
+    FiniteTensor (    Covariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const u (ds,size) v
 const us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
 {-| Generate tensor with random real components with given probability distribution.
@@ -91,11 +91,11 @@ randomDouble ([],[]) ([],[]) distr = do
 
 randomDouble (u:us,s:size) d distr = do
   tensors <- sequence [randomDouble (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
+  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomDouble u (d:ds,s:size) distr = do
   tensors <- sequence [randomDouble u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomDouble us ds _ = 
     return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
@@ -120,11 +120,11 @@ randomInt ([],[]) ([],[]) distr = do
 
 randomInt (u:us,s:size) d distr = do
   tensors <- sequence [randomInt (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
+  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomInt u (d:ds,s:size) distr = do
   tensors <- sequence [randomInt u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -157,11 +157,11 @@ randomDoubleSeed ([],[]) ([],[]) distr seed = do
 
 randomDoubleSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomDoubleSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
+  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomDoubleSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -187,10 +187,10 @@ randomIntSeed ([],[]) ([],[]) distr seed = do
 
 randomIntSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomIntSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipList tensors
+  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomIntSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomIntSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipList tensors
+  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"

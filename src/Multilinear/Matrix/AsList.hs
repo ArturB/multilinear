@@ -40,7 +40,6 @@ import           Multilinear
 import           Multilinear.Generic
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Multilinear.Index.Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
@@ -54,8 +53,8 @@ fromIndices :: (
     -> ListTensor a       -- ^ Generated matrix
 
 fromIndices [u,d] su sd f =
-    FiniteTensor (Contravariant su [u]) $
-      ZipList [FiniteTensor (Covariant sd [d]) $
+    FiniteTensor (Contravariant (Just su) [u]) $
+      ZipList [FiniteTensor (Covariant (Just sd) [d]) $
         ZipList [Scalar $ f x y
       | y <- [0 .. sd - 1] ]
     | x <- [0 .. su - 1] ]
@@ -71,9 +70,9 @@ const :: (
     -> ListTensor a  -- ^ Generated matrix
 
 const [u,d] su sd v =
-    FiniteTensor (Contravariant su [u]) $
+    FiniteTensor (Contravariant (Just su) [u]) $
       ZipList $ replicate (fromIntegral su) $
-        FiniteTensor (Covariant sd [d]) $
+        FiniteTensor (Covariant (Just sd) [d]) $
           ZipList $ replicate (fromIntegral sd) $ Scalar v
 const _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
 
@@ -107,8 +106,8 @@ randomDouble [u,d] su sd dist = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomDouble _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
@@ -136,8 +135,8 @@ randomInt [u,d] su sd dist = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomInt _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
@@ -173,8 +172,8 @@ randomDoubleSeed [u,d] su sd dist seed = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomDoubleSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
@@ -204,8 +203,8 @@ randomIntSeed [u,d] su sd dist seed = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomIntSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
@@ -224,8 +223,8 @@ fromCSV [u,d] fileName separator = do
   let columns = if rows > 0 then length $ rights (head components) else 0
   if rows > 0 && columns > 0
   then return $
-    FiniteTensor (Contravariant rows [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant columns [d]) $ ZipList $ Scalar <$> rights x
+    FiniteTensor (Contravariant (Just rows) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just columns) [d]) $ ZipList $ Scalar <$> rights x
     ) <$> components
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
 fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
