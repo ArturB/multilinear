@@ -24,6 +24,9 @@ module Multilinear.NForm.AsList (
   fromIndices, Multilinear.NForm.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  fromIndices', Multilinear.NForm.AsList.const',
+  randomDouble', randomDoubleSeed',
+  randomInt', randomIntSeed',
   dot, cross
 ) where
 
@@ -39,7 +42,9 @@ import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
-{-| Generate N-form as function of its indices -}
+-- * FINITE N-FORMS
+
+{-| Generate finite N-form as function of its indices -}
 fromIndices :: (
     Eq a, Show a, Num a, Bits a
   ) => String      -- ^ Indices names (one characted per index)
@@ -50,9 +55,9 @@ fromIndices :: (
 fromIndices [] [] f = Scalar $ f []
 fromIndices (d:ds) (s:size) f =
     FiniteTensor (Covariant (Just s) [d]) $ ZipList [fromIndices ds size (\dss -> f (x:dss)) | x <- [0 .. s - 1] ]
-fromIndices _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
+fromIndices _ _ _ = Err "Indices and its sizes incompatible with n-form structure!"
 
-{-| Generate N-form with all components equal to @v@ -}
+{-| Generate finite N-form with all components equal to @v@ -}
 const :: (
     Eq a, Show a, Num a, Bits a
   ) => String      -- ^ Indices names (one characted per index)
@@ -63,10 +68,10 @@ const :: (
 const [] [] v = Scalar v
 const (d:ds) (s:size) v =
     FiniteTensor (Covariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.NForm.AsList.const ds size v
-const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
+const _ _ _ = Err "Indices and its sizes incompatible with n-form structure!"
 
-{-| Generate n-vector with random real components with given probability distribution.
-The n-vector is wrapped in the IO monad. -}
+{-| Generate finite n-form with random real components with given probability distribution.
+The n-form is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
 {-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
@@ -94,10 +99,10 @@ randomDouble (d:ds) (s:size) distr = do
   tensors <- sequence [randomDouble ds size distr | _ <- [0 .. s - 1] ]
   return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
-randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
 
-{-| Generate n-vector with random integer components with given probability distribution.
-The n-vector is wrapped in the IO monad. -}
+{-| Generate finite n-form with random integer components with given probability distribution.
+The n-form is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
@@ -108,7 +113,7 @@ randomInt :: (
   ) => String                -- ^ Indices names (one character per index)
     -> [Int]                   -- ^ Indices sizes
     -> d                     -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> IO (ListTensor Int)     -- ^ Generated n-vector
+    -> IO (ListTensor Int)     -- ^ Generated n-form
 
 randomInt [] [] d = do
     component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen
@@ -118,9 +123,9 @@ randomInt (d:ds) (s:size) distr = do
   tensors <- sequence [randomInt ds size distr | _ <- [0 .. s - 1] ]
   return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
-randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
 
-{-| Generate n-vector with random real components with given probability distribution and given seed.
+{-| Generate finite n-form with random real components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -140,7 +145,7 @@ randomDoubleSeed :: (
     -> [Int]                 -- ^ Number of elements
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> i2                  -- ^ Randomness seed
-    -> m (ListTensor Double) -- ^ Generated n-vector
+    -> m (ListTensor Double) -- ^ Generated n-form
 
 randomDoubleSeed [] [] d seed = do
     gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
@@ -151,9 +156,9 @@ randomDoubleSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed ds size distr seed | _ <- [0 .. s - 1] ]
   return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
-randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
 
-{-| Generate n-vector with random integer components with given probability distribution and given seed.
+{-| Generate finite n-form with random integer components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -166,7 +171,7 @@ randomIntSeed :: (
     -> [Int]                 -- ^ Number of elements
     -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> i2                  -- ^ Randomness seed
-    -> m (ListTensor Int)    -- ^ Generated n-vector
+    -> m (ListTensor Int)    -- ^ Generated n-form
 
 randomIntSeed [] [] d seed = do
     gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
@@ -177,28 +182,153 @@ randomIntSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence [randomIntSeed ds size distr seed | _ <- [0 .. s - 1] ]
   return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
-randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-form!"
 
+-- * INFINITE N-FORMS
+
+{-| Generate infinite N-form as function of its indices -}
+fromIndices' :: (
+    Eq a, Show a, Num a, Bits a
+  ) => String        -- ^ Indices names (one characted per index)
+    -> ([Int] -> a)  -- ^ Generator function
+    -> ListTensor a  -- ^ Generated N-form
+
+fromIndices' [] f = Scalar $ f []
+fromIndices' (d:ds) f =
+    FiniteTensor (Covariant Nothing [d]) $ ZipList [fromIndices' ds (\dss -> f (x:dss)) | x <- [0 .. ] ]
+
+{-| Generate infinite N-form with all components equal to @v@ -}
+const' :: (
+    Eq a, Show a, Num a, Bits a
+  ) => String        -- ^ Indices names (one characted per index)
+    -> a             -- ^ N-form elements value
+    -> ListTensor a  -- ^ Generated N-form
+
+const' [] v = Scalar v
+const' (d:ds) v =
+    FiniteTensor (Covariant Nothing [d]) $ ZipList [Multilinear.NForm.AsList.const' ds v | _ <- [0..] ]
+
+{-| Generate infinite n-form with random real components with given probability distribution.
+The n-form is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDouble' :: (
+    ContGen d
+  ) => String                  -- ^ Indices names (one character per index)
+    -> d                       -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> IO (ListTensor Double)  -- ^ Generated linear functional
+
+randomDouble' [] d = do
+    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen
+    return $ Scalar component
+
+randomDouble' (d:ds) distr = do
+  tensors <- sequence [randomDouble' ds distr | _ <- [0 .. ] ]
+  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+
+{-| Generate infinite n-form with random integer components with given probability distribution.
+The n-form is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomInt' :: (
+    DiscreteGen d
+  ) => String                  -- ^ Indices names (one character per index)
+    -> d                       -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (ListTensor Int)     -- ^ Generated n-form
+
+randomInt' [] d = do
+    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen
+    return $ Scalar component
+
+randomInt' (d:ds) distr = do
+  tensors <- sequence [randomInt' ds distr | _ <- [0 .. ] ]
+  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+
+{-| Generate infinite n-form with random real components with given probability distribution and given seed.
+The form is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDoubleSeed' :: (
+    ContGen d, Integral i2, PrimMonad m
+  ) => String                -- ^ Index name (one character)
+    -> d                     -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> i2                    -- ^ Randomness seed
+    -> m (ListTensor Double) -- ^ Generated n-form
+
+randomDoubleSeed' [] d seed = do
+    gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+    component <- genContVar d gen
+    return $ Scalar component
+
+randomDoubleSeed' (d:ds) distr seed = do
+  tensors <- sequence [randomDoubleSeed' ds distr seed | _ <- [0 .. ] ]
+  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+
+{-| Generate infinite n-form with random integer components with given probability distribution and given seed.
+The form is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomIntSeed' :: (
+    DiscreteGen d, Integral i2, PrimMonad m
+  ) => String                -- ^ Index name (one character)
+    -> d                     -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> i2                    -- ^ Randomness seed
+    -> m (ListTensor Int)    -- ^ Generated n-form
+
+randomIntSeed' [] d seed = do
+    gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+    component <- genDiscreteVar d gen
+    return $ Scalar component
+
+randomIntSeed' (d:ds) distr seed = do
+  tensors <- sequence [randomIntSeed' ds distr seed | _ <- [0 .. ] ]
+  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+
+-- * COMMONLY USED N-FORMS
 
 {-| 2-form representing a dot product -}
 dot :: (
     Eq a, Show a, Num a, Bits a
   ) => String        -- ^ Indices names (one characted per index)
-    -> Int           -- ^ Size of tensor (dot product is a square tensor)
     -> ListTensor a  -- ^ Generated dot product
 
-dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
-dot _ _ = Err "Indices and its sizes incompatible with dot product!"
+dot [i1,i2] = fromIndices' [i1,i2] (\[i,j] -> if i == j then 1 else 0)
+dot _ = Err "Indices and its sizes incompatible with dot product!"
 
 {-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
 -- // TODO
 cross :: (
     Eq a, Show a, Num a, Bits a
   ) => String        -- ^ Indices names (one characted per index)
-    -> Int           -- ^ Size of tensor (dot product is a square tensor)
     -> ListTensor a  -- ^ Generated dot product
 
-cross [i,j,k] size =
-  Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
+cross [i,j,k] =
+  Tensor.fromIndices' [i] [j,k]
     (\[_] [_,_] -> 0)
-cross _ _ = Err "Indices and its sizes incompatible with cross product!"
+cross _ = Err "Indices and its sizes incompatible with cross product!"

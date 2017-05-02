@@ -21,6 +21,9 @@ module Multilinear.Form.AsList (
   fromIndices, Multilinear.Form.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  fromIndices', Multilinear.Form.AsList.const',
+  randomDouble', randomDoubleSeed',
+  randomInt', randomIntSeed',
   fromCSV, toCSV
 ) where
 
@@ -40,7 +43,9 @@ import           Multilinear.Index
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
-{-| Generate linear functional as function of indices -}
+-- * FINITE FUNCTIONAL
+
+{-| Generate finite linear functional as function of indices -}
 fromIndices :: (
     Eq a, Show a, Num a, Bits a
   ) => String             -- ^ Index name (one character)
@@ -52,7 +57,7 @@ fromIndices [d] s f =
     FiniteTensor (Covariant (Just s) [d]) $ ZipList [Scalar $ f x | x <- [0 .. s - 1] ]
 fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
-{-| Generate linear functional with all components equal to some @v@ -}
+{-| Generate finite linear functional with all components equal to some @v@ -}
 const :: (
     Eq a, Show a, Num a, Bits a
   ) => String           -- ^ Index name (one character)
@@ -64,7 +69,7 @@ const [d] s v =
     FiniteTensor (Covariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
-{-| Generate linear functional with random real components with given probability distribution.
+{-| Generate finite linear functional with random real components with given probability distribution.
 The functional is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -89,7 +94,7 @@ randomDouble [i] s d = do
   return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
-{-| Generate linear functional with random integer components with given probability distribution.
+{-| Generate finite linear functional with random integer components with given probability distribution.
 The functional is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -108,7 +113,7 @@ randomInt [i] s d = do
   return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
-{-| Generate linear functional with random real components with given probability distribution and given seed.
+{-| Generate finite linear functional with random real components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -135,7 +140,7 @@ randomDoubleSeed [i] s d seed = do
   return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
-{-| Generate linear functional with random integer components with given probability distribution and given seed.
+{-| Generate finite linear functional with random integer components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -155,6 +160,120 @@ randomIntSeed [i] s d seed = do
   components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
   return $ FiniteTensor (Covariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
+
+-- * INFINITE FUNCTIONAL
+
+{-| Generate infinite linear functional as function of indices -}
+fromIndices' :: (
+    Eq a, Show a, Num a, Bits a
+  ) => String             -- ^ Index name (one character)
+    -> (Int -> a)         -- ^ Generator function - returns a linear functional component at index @i@
+    -> ListTensor a       -- ^ Generated linear functional
+
+fromIndices' [d] f =
+    FiniteTensor (Covariant Nothing [d]) $ ZipList [Scalar $ f x | x <- [0 .. ] ]
+fromIndices' _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
+
+{-| Generate infinite linear functional with all components equal to some @v@ -}
+const' :: (
+    Eq a, Show a, Num a, Bits a
+  ) => String           -- ^ Index name (one character)
+    -> a                -- ^ Value of each element
+    -> ListTensor a     -- ^ Generated linear functional
+
+const' [d] v =
+    FiniteTensor (Covariant Nothing [d]) $ ZipList [ Scalar v | _ <- [0 .. ] ]
+const' _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
+
+{-| Generate infinite linear functional with random real components with given probability distribution.
+The functional is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDouble' :: (
+    ContGen d
+  ) => String                  -- ^ Index name (one character)
+    -> d                       -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> IO (ListTensor Double)  -- ^ Generated linear functional
+
+randomDouble' [i] d = do
+  components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..] ]
+  return $ FiniteTensor (Covariant Nothing [i]) $ ZipList $ Scalar <$> components
+randomDouble' _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
+
+{-| Generate infinite linear functional with random integer components with given probability distribution.
+The functional is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomInt' :: (
+    DiscreteGen d
+  ) => String                 -- ^ Index name (one character)
+    -> d                      -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (ListTensor Int)    -- ^ Generated linear functional
+
+randomInt' [i] d = do
+  components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..] ]
+  return $ FiniteTensor (Covariant Nothing [i]) $ ZipList $ Scalar <$> components
+randomInt' _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
+
+{-| Generate infinite linear functional with random real components with given probability distribution and given seed.
+The functional is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDoubleSeed' :: (
+    ContGen d, PrimMonad m
+  ) => String                     -- ^ Index name (one character)
+    -> d                          -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> Int                        -- ^ Randomness seed
+    -> m (ListTensor Double)      -- ^ Generated linear functional
+
+randomDoubleSeed' [i] d seed = do
+  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+  components <- sequence [ genContVar d gen | _ <- [1..] ]
+  return $ FiniteTensor (Covariant Nothing [i]) $ ZipList $ Scalar <$> components
+randomDoubleSeed' _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
+
+{-| Generate infinite linear functional with random integer components with given probability distribution and given seed.
+The functional is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomIntSeed' :: (
+    DiscreteGen d, PrimMonad m
+  ) => String                    -- ^ Index name (one character)
+    -> d                         -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> Int                       -- ^ Randomness seed
+    -> m (ListTensor Int)        -- ^ Generated linear functional
+
+randomIntSeed' [i] d seed = do
+  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+  components <- sequence [ genDiscreteVar d gen | _ <- [1..] ]
+  return $ FiniteTensor (Covariant Nothing [i]) $ ZipList $ Scalar <$> components
+randomIntSeed' _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
+
+-- * FROM FILES
 
 {-| Read linear functional components from CSV file. Reads only the first row of the file. -}
 fromCSV :: (
