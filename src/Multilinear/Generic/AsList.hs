@@ -50,7 +50,6 @@ import           GHC.Generics
 import           Multilinear
 import           Multilinear.Generic
 import           Multilinear.Index
-import           Multilinear.Index.Finite
 
 {-| ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -64,10 +63,17 @@ data instance Tensor ZipList a =
         {-| value of scalar -}
         scalarVal :: a
     } |
+    {-| Container of scalars -}
+    {-SimpleFinite {
+        {-| Finite index "Mutltilinear.Index.Finite" of tensor -}
+        tensorIndex :: Finite,
+        {-| Containter of tensors on deeper recursion level -}
+        simpleData :: ZipList a
+    } |-}
     {-| Container of other tensors -}
     FiniteTensor {
         {-| Finite index "Mutltilinear.Index.Finite" of tensor -}
-        tensorIndex :: Finite,
+        tensorIndex :: TIndex,
         {-| Containter of tensors on deeper recursion level -}
         tensorData  :: ZipList (Tensor ZipList a)
     } |
@@ -87,6 +93,7 @@ data instance Tensor ZipList a =
 
 (!) (Scalar _) _                    = Err "Scalar has no indices!"
 (!) (Err msg) _                     = Err msg
+--(!) (SimpleFinite _ (ZipList ts)) i = Scalar $ ts !! i
 (!) (FiniteTensor _ (ZipList ts)) i = ts !! i
 
 {-| Binary serialization and deserialization -}
@@ -223,6 +230,8 @@ instance (
 instance Functor ListTensor where
     -- Mapping scalars simply maps its value
     fmap f (Scalar v_) = Scalar (f v_)
+    -- Mapping vectors does mapping element by element
+    --fmap f (SimpleFinite indexT ts) = SimpleFinite indexT (f <$> ts)
     -- Mapping tensors does mapping element by element
     fmap f (FiniteTensor indexT ts) = FiniteTensor indexT v2
         where v2 = fmap (fmap f) ts
@@ -246,7 +255,10 @@ instance (
     Scalar _ <= _ = True
     _ <= Scalar _ = False
     -- Complex tensors are compared lexigographically
+    --SimpleFinite _ ts1 <= SimpleFinite _ ts2 = ts1 <= ts2
     FiniteTensor _ ts1 <= FiniteTensor _ ts2 = ts1 <= ts2
+    --SimpleFinite _ _ <= FiniteTensor _ _     = True
+    --FiniteTensor _ _ <= SimpleFinite _ _     = False
 
 -- You can compute a hash value from tensor
 -- Allows to put tensors to typical unordered containers
@@ -260,18 +272,19 @@ instance (
     Num a, Bits a
     ) => Monoid (ListTensor a) where
     -- Neutral element is a scalar as it has no indices and concatenation is by common inidces
-    mempty = FiniteTensor (Indifferent 0 "i") mempty
+    mempty = FiniteTensor (Indifferent (Just 0) "i") mempty
 
     -- Tensor concatenation by common index
     mappend t1@(FiniteTensor ti1 ts1) t2@(FiniteTensor _ ts2) =
         if indices t1 == indices t2
         then FiniteTensor ti1 $ ts1 <> ts2
         else Err "Tensors have different indices!"
+    --mappend (SimpleFinite _ _) (FiniteTensor _ _) = Err "Scalars and tensors cannot be concatenated!"
+    --mappend (FiniteTensor _ _) (SimpleFinite _ _) = Err "Scalars and tensors cannot be concatenated!"
     mappend (Err msg) _ = Err msg
     mappend _ (Err msg) = Err msg
     mappend (Scalar _) _ = Err "Scalars cannot be concatenated!"
     mappend _ (Scalar _) = Err "Cannot concatenate by scalar!"
-
 
 -- Tensors can be added, subtracted and multiplicated
 instance (
@@ -642,7 +655,7 @@ instance (
         | Data.List.length (indicesNames t1) > 1 && indexName index1 == ind =
             let index2 = tensorIndex (Data.List.head ts1)
             in FiniteTensor index2 $ ZipList [FiniteTensor index1 $ ZipList [getZipList (tensorData (ts1 !! fromIntegral j)) !! fromIntegral i
-                | j <- [0 .. indexSize index1 - 1]]
-                | i <- [0 .. indexSize index2 - 1]]
+                | j <- if isNothing (indexSize index1) then [0 ..] else [0 .. fromJust (indexSize index1) - 1] ]
+                | i <- if isNothing (indexSize index2) then [0 ..] else [0 .. fromJust (indexSize index2) - 1] ]
         | otherwise = t1
 

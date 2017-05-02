@@ -24,6 +24,9 @@ module Multilinear.Matrix.AsList (
   fromIndices, Multilinear.Matrix.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  fromIndices', Multilinear.Matrix.AsList.const',
+  randomDouble', randomDoubleSeed',
+  randomInt', randomIntSeed',
   fromCSV, toCSV
 ) where
 
@@ -40,11 +43,12 @@ import           Multilinear
 import           Multilinear.Generic
 import           Multilinear.Generic.AsList
 import           Multilinear.Index
-import           Multilinear.Index.Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
-{-| Generate matrix as function of its indices -}
+-- * FINITE MATRICES
+
+{-| Generate finite matrix as function of its indices -}
 fromIndices :: (
     Eq a, Show a, Integral a, Num a, Bits a
   ) => String             -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
@@ -54,14 +58,14 @@ fromIndices :: (
     -> ListTensor a       -- ^ Generated matrix
 
 fromIndices [u,d] su sd f =
-    FiniteTensor (Contravariant su [u]) $
-      ZipList [FiniteTensor (Covariant sd [d]) $
+    FiniteTensor (Contravariant (Just su) [u]) $
+      ZipList [FiniteTensor (Covariant (Just sd) [d]) $
         ZipList [Scalar $ f x y
       | y <- [0 .. sd - 1] ]
     | x <- [0 .. su - 1] ]
 fromIndices _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
 
-{-| Generate matrix with all components equal to @v@ -}
+{-| Generate finite matrix with all components equal to @v@ -}
 const :: (
     Eq a, Show a, Num a, Bits a
   ) => String        -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
@@ -71,13 +75,13 @@ const :: (
     -> ListTensor a  -- ^ Generated matrix
 
 const [u,d] su sd v =
-    FiniteTensor (Contravariant su [u]) $
+    FiniteTensor (Contravariant (Just su) [u]) $
       ZipList $ replicate (fromIntegral su) $
-        FiniteTensor (Covariant sd [d]) $
+        FiniteTensor (Covariant (Just sd) [d]) $
           ZipList $ replicate (fromIntegral sd) $ Scalar v
 const _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
 
-{-| Generate matrix with random real components with given probability distribution.
+{-| Generate finite matrix with random real components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -107,12 +111,12 @@ randomDouble [u,d] su sd dist = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomDouble _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
-{-| Generate matrix with random integer components with given probability distribution.
+{-| Generate finite matrix with random integer components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -136,12 +140,12 @@ randomInt [u,d] su sd dist = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomInt _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
-{-| Generate matrix with random real components with given probability distribution and given seed.
+{-| Generate finite matrix with random real components with given probability distribution and given seed.
 The matrix is wrapped in the a monad. -}
 {-| Available probability distributions: -}
 {-| - Beta : "Statistics.Distribution.BetaDistribution" -}
@@ -173,12 +177,12 @@ randomDoubleSeed [u,d] su sd dist seed = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomDoubleSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
-{-| Generate matrix with random integer components with given probability distribution. and given seed.
+{-| Generate finite matrix with random integer components with given probability distribution. and given seed.
 The matrix is wrapped in a monad. -}
 {-| Available probability distributions: -}
 {-| - Binomial : "Statistics.Distribution.Binomial" -}
@@ -204,10 +208,165 @@ randomIntSeed [u,d] su sd dist seed = do
     | _ <- [1..su] ]
 
   return $
-    FiniteTensor (Contravariant su [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ ZipList $ Scalar <$> x
+    FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
 randomIntSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+
+-- * INFINITE MATRICES
+
+{-| Generate infinite matrix as function of its indices -}
+fromIndices' :: (
+    Eq a, Show a, Integral a, Num a, Bits a
+  ) => String             -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> (Int -> Int -> a)  -- ^ Generator function - returns a matrix component at @i,j@
+    -> ListTensor a       -- ^ Generated matrix
+
+fromIndices' [u,d] f =
+    FiniteTensor (Contravariant Nothing [u]) $
+      ZipList [FiniteTensor (Covariant Nothing [d]) $
+        ZipList [Scalar $ f x y
+      | y <- [0 .. ] ]
+    | x <- [0 .. ] ]
+fromIndices' _ _ = Err "Indices and its sizes incompatible with matrix structure!"
+
+{-| Generate infinite matrix with all components equal to @v@ -}
+const' :: (
+    Eq a, Show a, Num a, Bits a
+  ) => String        -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> a             -- ^ Value of matrix components
+    -> ListTensor a  -- ^ Generated matrix
+
+const' [u,d] v =
+    FiniteTensor (Contravariant Nothing [u]) $
+      ZipList [FiniteTensor (Covariant Nothing [d]) $
+          ZipList [Scalar v | _ <- [0 .. ] ]
+      | _ <- [0 .. ] ]
+const' _ _ = Err "Indices and its sizes incompatible with matrix structure!"
+
+{-| Generate infinite matrix with random real components with given probability distribution.
+The matrix is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDouble' :: (
+    ContGen d
+  ) => String                  -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> d                       -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> IO (ListTensor Double)  -- ^ Generated matrix
+
+randomDouble' [u,d] dist = do
+  components <-
+    sequence [
+      sequence [
+        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
+      | _ <- [1..] ]
+    | _ <- [1..] ]
+
+  return $
+    FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
+    ) <$> components
+randomDouble' _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+
+{-| Generate infinite matrix with random integer components with given probability distribution.
+The matrix is wrapped in the IO monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomInt' :: (
+    DiscreteGen d
+  ) => String                  -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> d                       -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (ListTensor Double)  -- ^ Generated matrix
+
+randomInt' [u,d] dist = do
+  components <-
+    sequence [
+      sequence [
+        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
+      | _ <- [1..] ]
+    | _ <- [1..] ]
+
+  return $
+    FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
+    ) <$> components
+randomInt' _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+
+{-| Generate infinite matrix with random real components with given probability distribution and given seed.
+The matrix is wrapped in the a monad. -}
+{-| Available probability distributions: -}
+{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
+{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
+{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
+{-| - Exponential : "Statistics.Distribution.Exponential" -}
+{-| - Gamma : "Statistics.Distribution.Gamma" -}
+{-| - Normal : "Statistics.Distribution.Normal" -}
+{-| - StudentT : "Statistics.Distribution.StudentT" -}
+{-| - Uniform : "Statistics.Distribution.Uniform" -}
+{-| - F : "Statistics.Distribution.FDistribution" -}
+{-| - Laplace : "Statistics.Distribution.Laplace" -}
+randomDoubleSeed' :: (
+    ContGen d, PrimMonad m
+  ) => String                  -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> d                       -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> Int                     -- ^ Randomness seed
+    -> m (ListTensor Double)   -- ^ Generated matrix
+
+randomDoubleSeed' [u,d] dist seed = do
+  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+  components <-
+    sequence [
+      sequence [
+        genContVar dist gen
+      | _ <- [1..] ]
+    | _ <- [1..] ]
+
+  return $
+    FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
+    ) <$> components
+randomDoubleSeed' _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+
+{-| Generate infinite matrix with random integer components with given probability distribution. and given seed.
+The matrix is wrapped in a monad. -}
+{-| Available probability distributions: -}
+{-| - Binomial : "Statistics.Distribution.Binomial" -}
+{-| - Poisson : "Statistics.Distribution.Poisson" -}
+{-| - Geometric : "Statistics.Distribution.Geometric" -}
+{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+randomIntSeed' :: (
+    DiscreteGen d, PrimMonad m
+  ) => String                  -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> d                       -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> Int                      -- ^ Randomness seed
+    -> m (ListTensor Int)      -- ^ Generated matrix
+
+randomIntSeed' [u,d] dist seed = do
+  gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
+  components <-
+    sequence [
+      sequence [
+        genDiscreteVar dist gen
+      | _ <- [1..] ]
+    | _ <- [1..] ]
+
+  return $
+    FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
+    ) <$> components
+randomIntSeed' _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
 
 {-| Read matrix components from CSV file. -}
 fromCSV :: (
@@ -224,8 +383,8 @@ fromCSV [u,d] fileName separator = do
   let columns = if rows > 0 then length $ rights (head components) else 0
   if rows > 0 && columns > 0
   then return $
-    FiniteTensor (Contravariant rows [u]) $ ZipList $ (\x ->
-      FiniteTensor (Covariant columns [d]) $ ZipList $ Scalar <$> rights x
+    FiniteTensor (Contravariant (Just rows) [u]) $ ZipList $ (\x ->
+      FiniteTensor (Covariant (Just columns) [d]) $ ZipList $ Scalar <$> rights x
     ) <$> components
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
 fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"

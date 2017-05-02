@@ -49,7 +49,7 @@ import           Data.Vector.Serialize      ()
 import           GHC.Generics
 import           Multilinear
 import           Multilinear.Generic
-import           Multilinear.Index
+import qualified Multilinear.Index          as TIndex
 import           Multilinear.Index.Finite
 
 {-| ERROR MESSAGES -}
@@ -277,9 +277,9 @@ instance (
     t + Scalar x = (+x) <$> t
     t1@(FiniteTensor index1 v1) + t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ (+) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
+        | TIndex.indexName index1 `Data.List.elem` indicesNames t2 =
+            let t1' = t1 |>>> TIndex.indexName index1
+                t2' = t2 |>>> TIndex.indexName index1
             in  t1' + t2'
         | otherwise = FiniteTensor index1 $ (+t2) <$> v1
     Err msg + _ = Err msg
@@ -291,9 +291,9 @@ instance (
     t - Scalar x = (\e -> e - x) <$> t
     t1@(FiniteTensor index1 v1) - t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ (-) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
+        | TIndex.indexName index1 `Data.List.elem` indicesNames t2 =
+            let t1' = t1 |>>> TIndex.indexName index1
+                t2' = t2 |>>> TIndex.indexName index1
             in  t1' - t2'
         | otherwise = FiniteTensor index1 $ (\e -> e - t2) <$> v1
     Err msg - _ = Err msg
@@ -308,10 +308,10 @@ instance (
     t * Scalar x2 = (*x2) <$> t
     -- Two tensors may be contracted or multiplicated elem by elem
     t1@(FiniteTensor index1 ts1) * t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
+        | TIndex.indexName index1 == TIndex.indexName index2 = t1 `dot` t2
+        | TIndex.indexName index1 `Data.List.elem` indicesNames t2 =
+            let t1' = t1 |>>> TIndex.indexName index1
+                t2' = t2 |>>> TIndex.indexName index1
             in  t1' * t2'
         | otherwise = FiniteTensor index1 $ (* t2) <$> ts1
         where
@@ -352,9 +352,9 @@ instance (
     t .|. Scalar x = (.|. x) <$> t
     t1@(FiniteTensor index1 v1) .|. t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ (.|.) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
+        | TIndex.indexName index1 `Data.List.elem` indicesNames t2 =
+            let t1' = t1 |>>> TIndex.indexName index1
+                t2' = t2 |>>> TIndex.indexName index1
             in  t1' .|. t2'
         | otherwise = FiniteTensor index1 $ (.|. t2) <$> v1
     Err msg .|. _ = Err msg
@@ -369,10 +369,10 @@ instance (
     t .&. Scalar x2 = (.&. x2) <$> t
     -- Two tensors may be contracted or multiplicated elem by elem
     t1@(FiniteTensor index1 ts1) .&. t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
+        | TIndex.indexName index1 == TIndex.indexName index2 = t1 `dot` t2
+        | TIndex.indexName index1 `Data.List.elem` indicesNames t2 =
+            let t1' = t1 |>>> TIndex.indexName index1
+                t2' = t2 |>>> TIndex.indexName index1
             in  t1' .&. t2'
         | otherwise = FiniteTensor index1 $ (.&. t2) <$> ts1
         where
@@ -395,9 +395,9 @@ instance (
     t `xor` Scalar x = (`xor` x) <$> t
     t1@(FiniteTensor index1 v1) `xor` t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ xor <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
+        | TIndex.indexName index1 `Data.List.elem` indicesNames t2 =
+            let t1' = t1 |>>> TIndex.indexName index1
+                t2' = t2 |>>> TIndex.indexName index1
             in  t1' `xor` t2'
         | otherwise = FiniteTensor index1 $ (`xor` t2) <$> v1
     Err msg `xor` _ = Err msg
@@ -553,7 +553,7 @@ instance (
 
     -- List of all tensor indices
     indices (Scalar _)          = []
-    indices (FiniteTensor i ts) = toTIndex i : indices (head $ toList ts)
+    indices (FiniteTensor i ts) = TIndex.toTIndex i : indices (head $ toList ts)
     indices (Err _)             = []
 
     -- Get tensor order [ (contravariant,covariant)-type ]
@@ -582,7 +582,7 @@ instance (
     -- Raise an index
     Scalar x /\ _ = Scalar x
     FiniteTensor index ts /\ n
-        | indexName index == n =
+        | TIndex.indexName index == n =
             FiniteTensor (Contravariant (indexSize index) n) $ (/\ n) <$> ts
         | otherwise =
             FiniteTensor index $ (/\ n) <$> ts
@@ -591,7 +591,7 @@ instance (
     -- Lower an index
     Scalar x \/ _ = Scalar x
     FiniteTensor index ts \/ n
-        | indexName index == n =
+        | TIndex.indexName index == n =
             FiniteTensor (Covariant (indexSize index) n) $ (\/ n) <$> ts
         | otherwise =
             FiniteTensor index $ (\/ n) <$> ts
@@ -630,9 +630,9 @@ instance (
     Err msg |>> _  = Err msg
     Scalar x |>> _ = Scalar x
     t1@(FiniteTensor index1 (ZipVector ts1)) |>> ind
-        | Data.List.length (indicesNames t1) > 1 && indexName index1 /= ind =
+        | Data.List.length (indicesNames t1) > 1 && TIndex.indexName index1 /= ind =
             FiniteTensor index1 $ ZipVector $ (|>> ind) <$> ts1
-        | Data.List.length (indicesNames t1) > 1 && indexName index1 == ind =
+        | Data.List.length (indicesNames t1) > 1 && TIndex.indexName index1 == ind =
             let index2 = tensorIndex (Boxed.head ts1)
             in FiniteTensor index2 $ ZipVector $
                 Boxed.generate (indexSize index2)
