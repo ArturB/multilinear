@@ -15,10 +15,10 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Tensor.AsArray (
+  -- * Generators
   fromIndices, Multilinear.Tensor.AsArray.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed

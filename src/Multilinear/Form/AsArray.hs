@@ -18,9 +18,11 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Form.AsArray (
+  -- * Generators
   fromIndices, Multilinear.Form.AsArray.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * From files
   fromCSV, toCSV
 ) where
 

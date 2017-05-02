@@ -15,13 +15,14 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
 {-# LANGUAGE Strict #-}
 
 module Multilinear.Tensor.AsList (
+  -- * Finite tensors
   fromIndices, Multilinear.Tensor.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Infinite tensors
   fromIndices', Multilinear.Tensor.AsList.const',
   randomDouble', randomDoubleSeed',
   randomInt', randomIntSeed'

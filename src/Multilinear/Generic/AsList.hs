@@ -63,13 +63,6 @@ data instance Tensor ZipList a =
         {-| value of scalar -}
         scalarVal :: a
     } |
-    {-| Container of scalars -}
-    {-SimpleFinite {
-        {-| Finite index "Mutltilinear.Index.Finite" of tensor -}
-        tensorIndex :: Finite,
-        {-| Containter of tensors on deeper recursion level -}
-        simpleData :: ZipList a
-    } |-}
     {-| Container of other tensors -}
     FiniteTensor {
         {-| Finite index "Mutltilinear.Index.Finite" of tensor -}

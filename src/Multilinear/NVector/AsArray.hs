@@ -15,15 +15,13 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
 {-# LANGUAGE Strict #-}
-{-# OPTIONS_GHC #-}
 
 module Multilinear.NVector.AsArray (
+  -- * Generators
   fromIndices, Multilinear.NVector.AsArray.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
-  dot, cross
 ) where
 
 
@@ -33,7 +31,6 @@ import qualified Data.Vector                 as Boxed
 import           Multilinear.Generic
 import           Multilinear.Generic.AsArray
 import           Multilinear.Index.Finite
-import qualified Multilinear.Tensor.AsArray  as Tensor
 import           Statistics.Distribution
 import qualified System.Random.MWC           as MWC
 
@@ -177,26 +174,3 @@ randomIntSeed (d:ds) (s:size) distr seed = do
 
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
-
-{-| 2-form representing a dot product -}
-dot :: (
-    Eq a, Show a, Num a, Bits a
-  ) => String        -- ^ Indices names (one characted per index)
-    -> Int           -- ^ Size of tensor (dot product is a square tensor)
-    -> VectorTensor a  -- ^ Generated dot product
-
-dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
-dot _ _ = Err "Indices and its sizes incompatible with dot product!"
-
-{-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
--- // TODO
-cross :: (
-    Eq a, Show a, Num a, Bits a
-  ) => String        -- ^ Indices names (one characted per index)
-    -> Int           -- ^ Size of tensor (dot product is a square tensor)
-    -> VectorTensor a  -- ^ Generated dot product
-
-cross [i,j,k] size =
-  Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
-    (\[_] [_,_] -> 0)
-cross _ _ = Err "Indices and its sizes incompatible with cross product!"

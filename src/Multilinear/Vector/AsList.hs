@@ -15,16 +15,16 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
-{-# LANGUAGE Strict #-}
-
 module Multilinear.Vector.AsList (
+  -- * Finite vectors
   fromIndices, Multilinear.Vector.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Infinite vectors
   fromIndices', Multilinear.Vector.AsList.const',
   randomDouble', randomDoubleSeed',
   randomInt', randomIntSeed',
+  -- * From files
   fromCSV, toCSV
 ) where
 

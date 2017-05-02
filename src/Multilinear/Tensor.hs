@@ -15,5 +15,5 @@ module Multilinear.Tensor (
   module X
 ) where
 
-{-| Default implementation is list -}
+{- Default implementation is list -}
 import Multilinear.Tensor.AsList as X
