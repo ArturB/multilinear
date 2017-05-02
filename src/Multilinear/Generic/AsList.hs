@@ -491,52 +491,65 @@ instance (
     Floating a, Bits a
     ) => Floating (ListTensor a) where
 
+    {-| PI number -}
     pi = Scalar pi
 
+    {-| Exponential function. (exp t)[i] = exp( t[i] ) -}
     exp (Scalar x)              = Scalar $ exp x
     exp (FiniteTensor index ts) = FiniteTensor index (exp <$> ts)
     exp (Err msg)               = Err msg
 
+    {-| Natural logarithm. (log t)[i] = log( t[i] ) -}
     log (Scalar x)              = Scalar $ log x
     log (FiniteTensor index ts) = FiniteTensor index (log <$> ts)
     log (Err msg)               = Err msg
 
+    {-| Sinus. (sin t)[i] = sin( t[i] ) -}
     sin (Scalar x)              = Scalar $ sin x
     sin (FiniteTensor index ts) = FiniteTensor index (sin <$> ts)
     sin (Err msg)               = Err msg
 
+    {-| Cosinus. (cos t)[i] = cos( t[i] ) -}
     cos (Scalar x)              = Scalar $ cos x
     cos (FiniteTensor index ts) = FiniteTensor index (cos <$> ts)
     cos (Err msg)               = Err msg
 
+    {-| Inverse sinus. (asin t)[i] = asin( t[i] ) -}
     asin (Scalar x)              = Scalar $ asin x
     asin (FiniteTensor index ts) = FiniteTensor index (asin <$> ts)
     asin (Err msg)               = Err msg
 
+    {-| Inverse cosinus. (acos t)[i] = acos( t[i] ) -}
     acos (Scalar x)              = Scalar $ acos x
     acos (FiniteTensor index ts) = FiniteTensor index (acos <$> ts)
     acos (Err msg)               = Err msg
 
+    {-| Inverse tangent. (atan t)[i] = atan( t[i] ) -}
     atan (Scalar x)              = Scalar $ atan x
     atan (FiniteTensor index ts) = FiniteTensor index (atan <$> ts)
     atan (Err msg)               = Err msg
 
+    {-| Hyperbolic sinus. (sinh t)[i] = sinh( t[i] ) -}
     sinh (Scalar x)              = Scalar $ sinh x
     sinh (FiniteTensor index ts) = FiniteTensor index (sinh <$> ts)
     sinh (Err msg)               = Err msg
 
+    {-| Hyperbolic cosinus. (cosh t)[i] = cosh( t[i] ) -}
     cosh (Scalar x)              = Scalar $ cosh x
     cosh (FiniteTensor index ts) = FiniteTensor index (cosh <$> ts)
     cosh (Err msg)               = Err msg
 
+    {-| Inverse hyperbolic sinus. (asinh t)[i] = asinh( t[i] ) -}
     asinh (Scalar x)              = Scalar $ asinh x
     asinh (FiniteTensor index ts) = FiniteTensor index (asinh <$> ts)
     asinh (Err msg)               = Err msg
 
+    {-| Inverse hyperbolic cosinus. (acosh t)[i] = acosh (t[i] ) -}
     acosh (Scalar x)              = Scalar $ acosh x
     acosh (FiniteTensor index ts) = FiniteTensor index (acosh <$> ts)
     acosh (Err msg)               = Err msg
 
+    {-| Inverse hyperbolic tangent. (atanh t)[i] = atanh( t[i] ) -}
     atanh (Scalar x)              = Scalar $ atanh x
     atanh (FiniteTensor index ts) = FiniteTensor index (atanh <$> ts)
     atanh (Err msg)               = Err msg
