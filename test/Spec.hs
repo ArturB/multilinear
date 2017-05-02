@@ -13,27 +13,30 @@ module Main (
     main
 ) where
 
-import qualified Multilinear.Form.AsArray   as Form
+import           Multilinear
 import           Multilinear.Generic
-import qualified Multilinear.Matrix.AsArray as Matrix
-import qualified Multilinear.Vector.AsArray as Vector
+import qualified Multilinear.Matrix.AsArray as Matrix.AsArray
+import qualified Multilinear.Matrix.AsList  as Matrix.AsList
+import qualified Multilinear.Vector.AsArray as Vector.AsArray
+import qualified Multilinear.Vector.AsList  as Vector.AsList
 
-m1 :: VectorTensor Int
-m1 = Matrix.fromIndices "ij" 5 5 $ \i k -> i + k
+ml1 :: ListTensor Int
+ml1 = Matrix.AsList.fromIndices "ij" 500 500 $ \i j -> i + j
 
-m2 :: VectorTensor Int
-m2 = Matrix.fromIndices "jk" 5 5 $ \j k -> j + k
+ml2 :: ListTensor Int
+ml2 = Matrix.AsList.fromIndices "jk" 500 500 $ \j k -> j + k
 
-v :: VectorTensor Int
-v = Vector.fromIndices "k" 5 id
+vl :: ListTensor Int
+vl = Vector.AsList.fromIndices "k" 500 id
 
-v2 :: VectorTensor Int
-v2 = Form.const "l" 5 10
+vl2 :: ListTensor Int
+vl2 = Vector.AsList.fromIndices "j" 500 id
 
 main :: IO ()
 main = do
     putStrLn "Start..."
-    print $ m1 * m2
+    let res = ml1 * ml2 * vl
+    print $ (res \/ "i") * res
     putStr "End..."
 
 

@@ -33,7 +33,7 @@ vl = Vector.AsList.fromIndices "k" 500 id
 
 vl2 :: ListTensor Int
 vl2 = Vector.AsList.fromIndices "j" 500 id
-
+{-
 ma1 :: VectorTensor Int
 ma1 = Matrix.AsArray.fromIndices "ij" 500 500 $ \i j -> i + j
 
@@ -45,16 +45,16 @@ va = Vector.AsArray.fromIndices "k" 500 id
 
 va2 :: VectorTensor Int
 va2 = Vector.AsArray.fromIndices "j" 500 id
-
+-}
 main :: IO ()
 main = do
     mmList  <- Meas.measure ( nfIO $ print (ml1 * ml2 * vl) ) 1
     mvList  <- Meas.measure ( nfIO $ print (ml1 * vl2     ) ) 1
-    mmArray <- Meas.measure ( nfIO $ print (ma1 * ma2 * va) ) 1
-    mvArray <- Meas.measure ( nfIO $ print (ma1 * va2     ) ) 1
-    putStrLn $ "\nMultiply list matrix by list matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
-    putStrLn $ "\nMultiply list matrix by list vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
-    putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
-    putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"
+    --mmArray <- Meas.measure ( nfIO $ print (ma1 * ma2 * va) ) 1
+    --mvArray <- Meas.measure ( nfIO $ print (ma1 * va2     ) ) 1
+    putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
+    putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
+    --putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
+    --putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"
     return ()
 
