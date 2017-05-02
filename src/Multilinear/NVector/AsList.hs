@@ -15,14 +15,12 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
-{-# LANGUAGE Strict #-}
-{-# OPTIONS_GHC #-}
-
 module Multilinear.NVector.AsList (
+  -- * Finite N-vectors
   fromIndices, Multilinear.NVector.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Infinite N-vectors
   fromIndices', Multilinear.NVector.AsList.const',
   randomDouble', randomDoubleSeed',
   randomInt', randomIntSeed'

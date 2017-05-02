@@ -15,5 +15,5 @@ module Multilinear.Vector (
   module X
 ) where
 
-{-| Default implementation is list -}
+{- Default implementation is list -}
 import Multilinear.Vector.AsList as X

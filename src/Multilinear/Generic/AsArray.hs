@@ -25,7 +25,8 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE UndecidableInstances  #-}
 
 module Multilinear.Generic.AsArray (
-    Tensor(..), (!),
+    Tensor(..), 
+    (!),
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
     Multilinear.Generic.AsArray.toJSON, toJSONFile,

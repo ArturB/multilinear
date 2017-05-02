@@ -15,18 +15,16 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs               #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE Strict              #-}
-{-# OPTIONS_GHC #-}
-
 module Multilinear.Matrix.AsList (
+  -- * Finite matrices
   fromIndices, Multilinear.Matrix.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Infinite matrices
   fromIndices', Multilinear.Matrix.AsList.const',
   randomDouble', randomDoubleSeed',
   randomInt', randomIntSeed',
+  -- * From files
   fromCSV, toCSV
 ) where
 

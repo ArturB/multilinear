@@ -15,5 +15,5 @@ module Multilinear.NForm (
   module X
 ) where
 
-{-| Default implementation is list -}
+{- Default implementation is list -}
 import Multilinear.NForm.AsList as X

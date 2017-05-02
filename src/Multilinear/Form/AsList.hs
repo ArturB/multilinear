@@ -15,15 +15,16 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE Strict #-}
-
 module Multilinear.Form.AsList (
+  -- * Finite linear funtionals
   fromIndices, Multilinear.Form.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Infinite linear functionals
   fromIndices', Multilinear.Form.AsList.const',
   randomDouble', randomDoubleSeed',
   randomInt', randomIntSeed',
+  -- * From files
   fromCSV, toCSV
 ) where
 

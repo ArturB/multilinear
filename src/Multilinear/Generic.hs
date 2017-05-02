@@ -24,10 +24,13 @@ Type family for all tensor-like types.
 {-# LANGUAGE UndecidableInstances       #-}
 
 module Multilinear.Generic (
+    -- * Datatype family
     Tensor,
+    -- * Type aliases
     ListTensor,
     VectorTensor,
     UnboxedVectorTensor,
+    -- * "Control.Applicative"" instances
     ZipVector(..),
     ZipUnboxedVector(..)
 ) where

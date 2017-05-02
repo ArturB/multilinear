@@ -16,14 +16,14 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
 {-# LANGUAGE Strict #-}
-{-# OPTIONS_GHC #-}
 
 module Multilinear.NForm.AsArray (
+    -- * Generators
   fromIndices, Multilinear.NForm.AsArray.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Common cases
   dot, cross
 ) where
 

@@ -16,17 +16,16 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE GADTs  #-}
-{-# LANGUAGE Strict #-}
-{-# OPTIONS_GHC #-}
-
 module Multilinear.NForm.AsList (
+    -- * Finite N-forms
   fromIndices, Multilinear.NForm.AsList.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Infinite N-forms
   fromIndices', Multilinear.NForm.AsList.const',
   randomDouble', randomDoubleSeed',
   randomInt', randomIntSeed',
+  -- * Common cases
   dot, cross
 ) where
 

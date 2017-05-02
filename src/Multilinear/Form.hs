@@ -15,5 +15,5 @@ module Multilinear.Form (
   module X
 ) where
 
-{-| Default implementation is list -}
+{- Default implementation is list -}
 import Multilinear.Form.AsList as X
