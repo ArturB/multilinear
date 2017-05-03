@@ -13,10 +13,14 @@ module Main (
     main
 ) where
 
+import           Control.Applicative
 import           Criterion.Main
 import           Criterion.Measurement      as Meas
 import           Criterion.Types
+import qualified Data.Vector                as Boxed
+import           Multilinear
 import           Multilinear.Generic
+import           Multilinear.Generic.AsList
 import qualified Multilinear.Matrix.AsArray as Matrix.AsArray
 import qualified Multilinear.Matrix.AsList  as Matrix.AsList
 import qualified Multilinear.Vector.AsArray as Vector.AsArray
@@ -48,12 +52,15 @@ va2 = Vector.AsArray.fromIndices "j" 500 id
 -}
 main :: IO ()
 main = do
-    mmList  <- Meas.measure ( nfIO $ print (ml1 * ml2 * vl) ) 1
-    mvList  <- Meas.measure ( nfIO $ print (ml1 * vl2     ) ) 1
+    let m1 = mergeScalars $ ml1 |>>> "j" :: ListTensor Int
+    let m2 = mergeScalars $ ml2 |>>> "j" :: ListTensor Int
+    --Scalar $ sum ((+) <$> ZipList [1 .. 10000] <*> ZipList [1 .. 10000])
+    mmList  <- Meas.measure ( nfIO $ print $ m1 * m2 * vl ) 1
+    --mvList  <- Meas.measure ( nfIO $ print (ml1 * vl2     ) ) 1
     --mmArray <- Meas.measure ( nfIO $ print (ma1 * ma2 * va) ) 1
     --mvArray <- Meas.measure ( nfIO $ print (ma1 * va2     ) ) 1
     putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
-    putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
+    --putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
     --putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
     --putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"
     return ()

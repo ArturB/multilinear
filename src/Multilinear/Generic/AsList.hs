@@ -29,7 +29,8 @@ module Multilinear.Generic.AsList (
     toBinary, toBinaryFile,
     fromBinary, fromBinaryFile,
     Multilinear.Generic.AsList.toJSON, toJSONFile,
-    Multilinear.Generic.AsList.fromJSON, fromJSONFile
+    Multilinear.Generic.AsList.fromJSON, fromJSONFile,
+    mergeScalars
 ) where
 
 import           Codec.Compression.GZip
@@ -46,6 +47,7 @@ import           Data.List
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Serialize
+--import qualified Data.Set                   as Set
 import           GHC.Generics
 import           Multilinear
 import           Multilinear.Generic
@@ -62,6 +64,11 @@ data instance Tensor ZipList a =
     Scalar {
         {-| value of scalar -}
         scalarVal :: a
+    } |
+    {-| Simple Finite -}
+    SimpleFinite {
+        tensorIndex :: TIndex,
+        tensorScalars :: ZipList a
     } |
     {-| Container of other tensors -}
     FiniteTensor {
@@ -180,13 +187,19 @@ instance (
         show' (Scalar x) = show x
         -- Covariant components are shown horizontally
         show' (FiniteTensor index@(Covariant _ _) ts) =
-            show index ++ " " ++ _showHorizontal ts
+            show index ++ " T: " ++ _showHorizontal ts
+        show' (SimpleFinite index@(Covariant _ _) ts) =
+            show index ++ " S: " ++ _showHorizontal ts
         -- Contravariant components are shown vertically
         show' (FiniteTensor index@(Contravariant _ _) ts)=
-            show index ++ " " ++ _showVertical ts
+            show index ++ " T: " ++ _showVertical ts
+        show' (SimpleFinite index@(Contravariant _ _) ts)=
+            show index ++ " S: " ++ _showVertical ts
         -- Sequences are shown horizontally
         show' (FiniteTensor index@(Indifferent _ _) ts) =
-            show index ++ " " ++ _showHorizontal ts
+            show index ++ " T: " ++ _showHorizontal ts
+        show' (SimpleFinite index@(Indifferent _ _) ts) =
+            show index ++ " S: " ++ _showHorizontal ts
         -- Error prints it error message
         show' (Err msg) = show msg
 
@@ -199,8 +212,8 @@ instance (
             let err = Data.List.find _isErrTensor (_mergeErr <$> ts)
             -- and return this error if found, whole tensor otherwise
             in fromMaybe t1 err
-        -- in scalars cannot be any error
-        _mergeErr (Scalar x) = Scalar x
+        -- in other types of tensor cannot be any error
+        _mergeErr t1 = t1
 
         -- return True if tensor is an error
         --_isErrTensor :: Tensor c a -> Bool
@@ -224,7 +237,7 @@ instance Functor ListTensor where
     -- Mapping scalars simply maps its value
     fmap f (Scalar v_) = Scalar (f v_)
     -- Mapping vectors does mapping element by element
-    --fmap f (SimpleFinite indexT ts) = SimpleFinite indexT (f <$> ts)
+    fmap f (SimpleFinite indexT ts) = SimpleFinite indexT (f <$> ts)
     -- Mapping tensors does mapping element by element
     fmap f (FiniteTensor indexT (ZipList ts)) = case head ts of
         Scalar _         -> FiniteTensor indexT $ ZipList [Scalar (f x) | Scalar x <- ts]
@@ -282,6 +295,12 @@ instance (
     mappend (Scalar _) _ = Err "Scalars cannot be concatenated!"
     mappend _ (Scalar _) = Err "Cannot concatenate by scalar!"
 
+mergeScalars :: ListTensor a -> ListTensor a
+mergeScalars (FiniteTensor index1 (ZipList ts1)) = case head ts1 of
+    Scalar _ -> SimpleFinite index1 $ ZipList (scalarVal <$> ts1)
+    _        -> FiniteTensor index1 $ ZipList $ mergeScalars <$> ts1
+mergeScalars t = t
+
 -- Tensors can be added, subtracted and multiplicated
 instance (
     Num a, Bits a
@@ -294,10 +313,23 @@ instance (
     t1@(FiniteTensor index1 v1) + t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ (+) <$> v1 <*> v2
         | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' + t2'
-        | otherwise = FiniteTensor index1 $ (+t2) <$> v1
+            FiniteTensor index2 $ (t1+) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
+    t1@(SimpleFinite index1 v1) + t2@(SimpleFinite index2 v2)
+        | index1 == index2 = SimpleFinite index1 $ (+) <$> v1 <*> v2
+        | indexName index1 `Data.List.elem` indicesNames t2 =
+            FiniteTensor index2 $ (t1+) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
+    t1@(SimpleFinite index1 v1) + t2@(FiniteTensor index2 v2)
+        | index1 == index2 = FiniteTensor index1 $ (.+) <$> v1 <*> v2
+        | indexName index1 `Data.List.elem` indicesNames t2 =
+            FiniteTensor index2 $ (t1+) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
+    t1@(FiniteTensor index1 v1) + t2@(SimpleFinite index2 v2)
+        | index1 == index2 = FiniteTensor index1 $ (+.) <$> v1 <*> v2
+        | indexName index1 `Data.List.elem` indicesNames t2 =
+            FiniteTensor index2 $ (t1+) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
     Err msg + _ = Err msg
     _ + Err msg = Err msg
 
@@ -308,10 +340,8 @@ instance (
     t1@(FiniteTensor index1 v1) - t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ (-) <$> v1 <*> v2
         | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' - t2'
-        | otherwise = FiniteTensor index1 $ (\e -> e - t2) <$> v1
+            FiniteTensor index2 $ (t1-) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (\x -> x - t2) <$> tensorData t1
     Err msg - _ = Err msg
     _ - Err msg = Err msg
 
@@ -323,17 +353,60 @@ instance (
     Scalar x1 * t = (x1*) <$> t
     t * Scalar x2 = (*x2) <$> t
     -- Two tensors may be contracted or multiplicated elem by elem
-    t1@(FiniteTensor index1 ts1) * t2@(FiniteTensor index2 _)
+    t1@(FiniteTensor index1 _) * t2@(FiniteTensor index2 _)
         | indexName index1 == indexName index2 = t1 `dot` t2
         | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' * t2'
-        | otherwise = FiniteTensor index1 $ (* t2) <$> ts1
+            FiniteTensor index2 $ (t1 *) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
         where
         -- Contraction of covariant and contravariant index
         FiniteTensor i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
             | count1 == count2 = sum $ (*) <$> ts1' <*> ts2'
+            | otherwise = contractionErr i1 i2
+        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
+        contractionErr i1' i2' = Err $
+                "Tensor product: " ++ incompatibleTypes ++
+                " - index1 is " ++ show i1' ++
+                " and index2 is " ++ show i2'
+    t1@(SimpleFinite index1 ts1) * t2@(SimpleFinite index2 ts2)
+        | indexName index1 == indexName index2 = Scalar $ sum $ (*) <$> ts1 <*> ts2
+        | indexName index1 `Data.List.elem` indicesNames t2 =
+            FiniteTensor index2 $ (t1 *) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
+        where
+        -- Contraction of covariant and contravariant index
+        SimpleFinite i1@(Covariant count1 _) ts1' `dot` SimpleFinite i2@(Contravariant count2 _) ts2'
+            | count1 == count2 = Scalar $ sum $ (*) <$> ts1' <*> ts2'
+            | otherwise = contractionErr i1 i2
+        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
+        contractionErr i1' i2' = Err $
+                "Tensor product: " ++ incompatibleTypes ++
+                " - index1 is " ++ show i1' ++
+                " and index2 is " ++ show i2'
+    t1@(SimpleFinite index1 _) * t2@(FiniteTensor index2 _)
+        | indexName index1 == indexName index2 = t1 `dot` t2
+        | indexName index1 `Data.List.elem` indicesNames t2 =
+            FiniteTensor index2 $ (t1 *) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
+        where
+        -- Contraction of covariant and contravariant index
+        SimpleFinite i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
+            | count1 == count2 = sum $ (.*) <$> ts1' <*> ts2'
+            | otherwise = contractionErr i1 i2
+        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
+        contractionErr i1' i2' = Err $
+                "Tensor product: " ++ incompatibleTypes ++
+                " - index1 is " ++ show i1' ++
+                " and index2 is " ++ show i2'
+    t1@(FiniteTensor index1 _) * t2@(SimpleFinite index2 _)
+        | indexName index1 == indexName index2 = t1 `dot` t2
+        | indexName index1 `Data.List.elem` indicesNames t2 =
+            FiniteTensor index2 $ (t1 *) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
+        where
+        -- Contraction of covariant and contravariant index
+        FiniteTensor i1@(Covariant count1 _) ts1' `dot` SimpleFinite i2@(Contravariant count2 _) ts2'
+            | count1 == count2 = sum $ (*.) <$> ts1' <*> ts2'
             | otherwise = contractionErr i1 i2
         t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
         contractionErr i1' i2' = Err $
@@ -369,10 +442,8 @@ instance (
     t1@(FiniteTensor index1 v1) .|. t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ (.|.) <$> v1 <*> v2
         | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' .|. t2'
-        | otherwise = FiniteTensor index1 $ (.|. t2) <$> v1
+            FiniteTensor index2 $ (t1 .|.) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (.|. t2) <$> tensorData t1
     Err msg .|. _ = Err msg
     _ .|. Err msg = Err msg
 
@@ -384,13 +455,11 @@ instance (
     Scalar x1 .&. t = (x1 .&.) <$> t
     t .&. Scalar x2 = (.&. x2) <$> t
     -- Two tensors may be contracted or multiplicated elem by elem
-    t1@(FiniteTensor index1 ts1) .&. t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
+    t1@(FiniteTensor index1 _) .&. t2@(FiniteTensor index2 _)
+        | index1 == index2 = t1 `dot` t2
         | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' .&. t2'
-        | otherwise = FiniteTensor index1 $ (.&. t2) <$> ts1
+            FiniteTensor index2 $ (t1 .&.) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (.&. t2) <$> tensorData t1
         where
         -- Contraction of covariant and contravariant index
         FiniteTensor i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
@@ -412,10 +481,8 @@ instance (
     t1@(FiniteTensor index1 v1) `xor` t2@(FiniteTensor index2 v2)
         | index1 == index2 = FiniteTensor index1 $ xor <$> v1 <*> v2
         | indexName index1 `Data.List.elem` indicesNames t2 =
-            let t1' = t1 |>>> indexName index1
-                t2' = t2 |>>> indexName index1
-            in  t1' `xor` t2'
-        | otherwise = FiniteTensor index1 $ (`xor` t2) <$> v1
+            FiniteTensor index2 $ (t1 `xor`) <$> tensorData t2
+        | otherwise = FiniteTensor index1 $ (`xor` t2) <$> tensorData t1
     Err msg `xor` _ = Err msg
     _ `xor` Err msg = Err msg
 
@@ -583,6 +650,7 @@ instance (
     -- List of all tensor indices
     indices (Scalar _)          = []
     indices (FiniteTensor i ts) = toTIndex i : indices (head $ toList ts)
+    indices (SimpleFinite i _)  = [i]
     indices (Err _)             = []
 
     -- Get tensor order [ (contravariant,covariant)-type ]
@@ -663,8 +731,10 @@ instance (
             FiniteTensor index1 $ ZipList $ (|>> ind) <$> ts1
         | Data.List.length (indicesNames t1) > 1 && indexName index1 == ind =
             let index2 = tensorIndex (Data.List.head ts1)
-            in FiniteTensor index2 $ ZipList [FiniteTensor index1 $ ZipList [getZipList (tensorData (ts1 !! fromIntegral j)) !! fromIntegral i
-                | j <- if isNothing (indexSize index1) then [0 ..] else [0 .. fromJust (indexSize index1) - 1] ]
-                | i <- if isNothing (indexSize index2) then [0 ..] else [0 .. fromJust (indexSize index2) - 1] ]
+                dane = (getZipList . tensorData) <$> ts1
+                transposed = ZipList <$> Data.List.transpose dane
+            in  FiniteTensor index2 $ ZipList $ FiniteTensor index1 <$> transposed
+            --(FiniteTensor index1 $ ZipList (head <$> ts1) :  | j <- if isNothing (indexSize index1) then [0 ..] else [0 .. fromJust (indexSize index1) - 1] ]
+                --[ts1 !! j |  ]
         | otherwise = t1
 

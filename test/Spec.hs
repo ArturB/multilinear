@@ -35,7 +35,8 @@ vl2 = Vector.AsList.fromIndices "j" 500 id
 main :: IO ()
 main = do
     putStrLn "Start..."
-    let res = ml1 * ml2 * vl
+    let m2 = ml2 |>>> "j"
+    let res = ml1 * m2 * vl
     print $ (res \/ "i") * res
     putStr "End..."
 
