@@ -12,7 +12,7 @@ Infinite-dimensional tensor index.
 -}
 
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE Strict        #-}
+--{-# LANGUAGE Strict        #-}
 
 module Multilinear.Index.Infinite (
     Infinite(..)

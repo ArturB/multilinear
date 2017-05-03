@@ -230,6 +230,7 @@ instance Functor ListTensor where
         Scalar _         -> FiniteTensor indexT $ ZipList [Scalar (f x) | Scalar x <- ts]
         FiniteTensor _ _ -> FiniteTensor indexT $ ZipList $ fmap (fmap f) ts
         Err msg          -> Err msg
+    --fmap f (FiniteTensor indexT (ZipList ts)) = FiniteTensor indexT $ ZipList $ fmap (fmap f) ts
     -- Mapping errors changes nothing
     fmap _ (Err msg) = Err msg
 
@@ -291,9 +292,7 @@ instance (
     Scalar x + t = (x+) <$> t
     t + Scalar x = (+x) <$> t
     t1@(FiniteTensor index1 v1) + t2@(FiniteTensor index2 v2)
-        | index1 == index2 = case (head $ getZipList v1,head $ getZipList v2) of
-            (Scalar _, Scalar _) -> FiniteTensor index1 $ ZipList $ Scalar <$> zipWith (+) (scalarVal <$> getZipList v1) (scalarVal <$> getZipList v2)
-            (_, _)               -> FiniteTensor index1 $ (+) <$> v1 <*> v2
+        | index1 == index2 = FiniteTensor index1 $ (+) <$> v1 <*> v2
         | indexName index1 `Data.List.elem` indicesNames t2 =
             let t1' = t1 |>>> indexName index1
                 t2' = t2 |>>> indexName index1

@@ -142,7 +142,7 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 -}
 
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE Strict #-}
+--{-# LANGUAGE Strict #-}
 
 module Multilinear (
     Multilinear(..),

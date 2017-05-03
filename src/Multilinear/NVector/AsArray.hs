@@ -15,7 +15,7 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE Strict #-}
+--{-# LANGUAGE Strict #-}
 
 module Multilinear.NVector.AsArray (
   -- * Generators
