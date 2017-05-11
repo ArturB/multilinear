@@ -51,7 +51,7 @@ fromIndices :: (
     -> (Int -> Int -> a)    -- ^ Generator function - returns a matrix component at @i,j@
     -> VectorTensor a       -- ^ Generated matrix
 
-fromIndices [u,d] su sd f =
+fromIndices [u,d] su sd f = mergeScalars $ 
     FiniteTensor (Contravariant su [u]) $
       ZipVector $ Boxed.generate su (\i -> FiniteTensor (Covariant sd [d]) $
         ZipVector $ Boxed.generate sd (Scalar . f i)
@@ -67,7 +67,7 @@ const :: (
     -> a               -- ^ Value of matrix components
     -> VectorTensor a  -- ^ Generated matrix
 
-const [u,d] su sd v =
+const [u,d] su sd v = mergeScalars $ 
     FiniteTensor (Contravariant su [u]) $
       ZipVector $ Boxed.replicate (fromIntegral su) $
         FiniteTensor (Covariant sd [d]) $
@@ -103,7 +103,7 @@ randomDouble [u,d] su sd dist = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant su [u]) $ ZipVector $ (\x ->
       FiniteTensor (Covariant sd [d]) $ ZipVector $ Scalar <$> Boxed.fromList x
     ) <$> Boxed.fromList components
@@ -132,7 +132,7 @@ randomInt [u,d] su sd dist = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant su [u]) $ ZipVector $ (\x ->
       FiniteTensor (Covariant sd [d]) $ ZipVector $ Scalar <$> Boxed.fromList x
     ) <$> Boxed.fromList components
@@ -169,7 +169,7 @@ randomDoubleSeed [u,d] su sd dist seed = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant su [u]) $ ZipVector $ (\x ->
       FiniteTensor (Covariant sd [d]) $ ZipVector $ Scalar <$> Boxed.fromList x
     ) <$> Boxed.fromList components
@@ -200,7 +200,7 @@ randomIntSeed [u,d] su sd dist seed = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant su [u]) $ ZipVector $ (\x ->
       FiniteTensor (Covariant sd [d]) $ ZipVector $ Scalar <$> Boxed.fromList x
     ) <$> Boxed.fromList components
@@ -220,7 +220,7 @@ fromCSV [u,d] fileName separator = do
   let rows = length components
   let columns = if rows > 0 then length $ rights (head components) else 0
   if rows > 0 && columns > 0
-  then return $
+  then return $ mergeScalars $ 
     FiniteTensor (Contravariant rows [u]) $ ZipVector $ (\x ->
       FiniteTensor (Covariant columns [d]) $ ZipVector $ Scalar <$> Boxed.fromList (rights x)
     ) <$> Boxed.fromList components

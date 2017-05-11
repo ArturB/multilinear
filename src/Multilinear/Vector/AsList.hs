@@ -54,7 +54,7 @@ fromIndices :: (
     -> (Int -> a)         -- ^ Generator function - returns a vector component at index @i@
     -> ListTensor a      -- ^ Generated vector
 
-fromIndices [d] s f =
+fromIndices [d] s f = mergeScalars $ 
     FiniteTensor (Contravariant (Just s) [d]) $ ZipList [Scalar $ f x | x <- [0 .. s - 1] ]
 fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
@@ -66,7 +66,7 @@ const :: (
     -> a                -- ^ Value of each element
     -> ListTensor a     -- ^ Generated vector
 
-const [d] s v =
+const [d] s v = mergeScalars $ 
     FiniteTensor (Contravariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
@@ -92,7 +92,7 @@ randomDouble :: (
 
 randomDouble [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate finite vector with random integer components with given probability distribution.
@@ -111,7 +111,7 @@ randomInt :: (
 
 randomInt [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate finite vector with random real components with given probability distribution and given seed.
@@ -138,7 +138,7 @@ randomDoubleSeed :: (
 randomDoubleSeed [i] s d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genContVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate finite vector with random integer components with given probability distribution and given seed.
@@ -159,7 +159,7 @@ randomIntSeed :: (
 randomIntSeed [i] s d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [i]) $ ZipList $ Scalar <$> components
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 -- * INFINITE VECTORS
@@ -171,7 +171,7 @@ fromIndices' :: (
     -> (Int -> a)         -- ^ Generator function - returns a vector component at index @i@
     -> ListTensor a       -- ^ Generated vector
 
-fromIndices' [d] f =
+fromIndices' [d] f = mergeScalars $ 
     FiniteTensor (Contravariant Nothing [d]) $ ZipList [Scalar $ f x | x <- [0 .. ] ]
 fromIndices' _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
@@ -182,7 +182,7 @@ const' :: (
     -> a                -- ^ Value of each element
     -> ListTensor a     -- ^ Generated vector
 
-const' [d] v =
+const' [d] v = mergeScalars $ 
     FiniteTensor (Contravariant Nothing [d]) $ ZipList [ Scalar v | _ <- [0 .. ] ]
 const' _ _ = Err "Indices and its sizes not compatible with structure of vector!"
 
@@ -207,7 +207,7 @@ randomDouble' :: (
 
 randomDouble' [i] d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..] ]
-  return $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
 randomDouble' _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate infinite vector with random integer components with given probability distribution.
@@ -225,7 +225,7 @@ randomInt' :: (
 
 randomInt' [i] d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..] ]
-  return $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
 randomInt' _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate infinite vector with random real components with given probability distribution and given seed.
@@ -251,7 +251,7 @@ randomDoubleSeed' :: (
 randomDoubleSeed' [i] d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genContVar d gen | _ <- [1..] ]
-  return $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
 randomDoubleSeed' _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate infinite vector with random integer components with given probability distribution and given seed.
@@ -271,7 +271,7 @@ randomIntSeed' :: (
 randomIntSeed' [i] d seed = do
   gen <- MWC.initialize (Vector.singleton $ fromIntegral seed)
   components <- sequence [ genDiscreteVar d gen | _ <- [1..] ]
-  return $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [i]) $ ZipList $ Scalar <$> components
 randomIntSeed' _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 
 
@@ -291,7 +291,7 @@ fromCSV [i] fileName separator = do
   let components = decode <$> firstLine
   let size = length $ rights components
   if size > 0
-  then return $ FiniteTensor (Contravariant (Just size) [i]) $ ZipList (Scalar <$> rights components)
+  then return $  mergeScalars $ FiniteTensor (Contravariant (Just size) [i]) $ ZipList (Scalar <$> rights components)
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
 fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of vector!"
 

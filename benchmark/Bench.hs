@@ -27,41 +27,43 @@ import qualified Multilinear.Vector.AsArray as Vector.AsArray
 import qualified Multilinear.Vector.AsList  as Vector.AsList
 
 ml1 :: ListTensor Int
-ml1 = Matrix.AsList.fromIndices "ij" 500 500 $ \i j -> i + j
+ml1 = Matrix.AsList.fromIndices "ij" 200 200 $ \i j -> i + j
 
 ml2 :: ListTensor Int
-ml2 = Matrix.AsList.fromIndices "jk" 500 500 $ \j k -> j + k
+ml2 = Matrix.AsList.fromIndices "jk" 200 200 $ \j k -> j + k
 
 vl :: ListTensor Int
-vl = Vector.AsList.fromIndices "k" 500 id
+vl = Vector.AsList.fromIndices "k" 200 id
 
 vl2 :: ListTensor Int
-vl2 = Vector.AsList.fromIndices "j" 500 id
-{-
+vl2 = Vector.AsList.fromIndices "j" 200 id
+
 ma1 :: VectorTensor Int
-ma1 = Matrix.AsArray.fromIndices "ij" 500 500 $ \i j -> i + j
+ma1 = Matrix.AsArray.fromIndices "ij" 200 200 $ \i j -> i + j
 
 ma2 :: VectorTensor Int
-ma2 = Matrix.AsArray.fromIndices "jk" 500 500 $ \j k -> j + k
+ma2 = Matrix.AsArray.fromIndices "jk" 200 200 $ \j k -> j + k
 
 va :: VectorTensor Int
-va = Vector.AsArray.fromIndices "k" 500 id
+va = Vector.AsArray.fromIndices "k" 200 id
 
 va2 :: VectorTensor Int
-va2 = Vector.AsArray.fromIndices "j" 500 id
--}
+va2 = Vector.AsArray.fromIndices "j" 200 id
+
 main :: IO ()
 main = do
-    let m1 = mergeScalars $ ml1 |>>> "j" :: ListTensor Int
-    let m2 = mergeScalars $ ml2 |>>> "j" :: ListTensor Int
-    --Scalar $ sum ((+) <$> ZipList [1 .. 10000] <*> ZipList [1 .. 10000])
-    mmList  <- Meas.measure ( nfIO $ print $ m1 * m2 * vl ) 1
-    --mvList  <- Meas.measure ( nfIO $ print (ml1 * vl2     ) ) 1
-    --mmArray <- Meas.measure ( nfIO $ print (ma1 * ma2 * va) ) 1
-    --mvArray <- Meas.measure ( nfIO $ print (ma1 * va2     ) ) 1
+    let m1l = ml1 |>>> "j" :: ListTensor Int
+    let m2l = ml2 |>>> "j" :: ListTensor Int
+    let m1a = ma1 |>>> "j" :: VectorTensor Int
+    let m2a = ma2 |>>> "j" :: VectorTensor Int
+    --let zl = ZipList [1..125000000] :: ZipList Int
+    mmList  <- Meas.measure ( nfIO $ print $ m1l * m2l * vl ) 1
+    mvList  <- Meas.measure ( nfIO $ print $ m1l * vl2      ) 1
+    mmArray <- Meas.measure ( nfIO $ print $ m1a * m2a * va ) 1
+    mvArray <- Meas.measure ( nfIO $ print $ m1a * va2      ) 1
     putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
-    --putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
-    --putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
-    --putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"
+    putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
+    putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
+    putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"
     return ()
 

@@ -49,9 +49,9 @@ fromIndices :: (
       -> ListTensor a          -- ^ Generated tensor
 
 fromIndices ([],[]) ([],[]) f = Scalar $ f [] []
-fromIndices (u:us,s:size) d f =
+fromIndices (u:us,s:size) d f = mergeScalars $ 
     FiniteTensor (Contravariant (Just s) [u]) $ ZipList [fromIndices (us,size) d (\uss dss -> f (x:uss) dss) | x <- [0 .. s - 1] ]
-fromIndices u (d:ds,s:size) f =
+fromIndices u (d:ds,s:size) f = mergeScalars $ 
     FiniteTensor (Covariant (Just s) [d]) $ ZipList [fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) | x <- [0 .. s - 1] ]
 fromIndices us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -64,9 +64,9 @@ const :: (
       -> ListTensor a     -- ^ Generated tensor
 
 const ([],[]) ([],[]) v = Scalar v
-const (u:us,s:size) d v =
+const (u:us,s:size) d v = mergeScalars $ 
     FiniteTensor (Contravariant (Just s) [u]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const (us,size) d v
-const u (d:ds,s:size) v =
+const u (d:ds,s:size) v = mergeScalars $ 
     FiniteTensor (    Covariant (Just s) [d]) $ ZipList $ replicate (fromIntegral s) $ Multilinear.Tensor.AsList.const u (ds,size) v
 const us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -97,11 +97,11 @@ randomDouble ([],[]) ([],[]) distr = do
 
 randomDouble (u:us,s:size) d distr = do
   tensors <- sequence [randomDouble (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomDouble u (d:ds,s:size) distr = do
   tensors <- sequence [randomDouble u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomDouble us ds _ = 
     return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
@@ -126,11 +126,11 @@ randomInt ([],[]) ([],[]) distr = do
 
 randomInt (u:us,s:size) d distr = do
   tensors <- sequence [randomInt (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomInt u (d:ds,s:size) distr = do
   tensors <- sequence [randomInt u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomInt us ds _ = return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -163,11 +163,11 @@ randomDoubleSeed ([],[]) ([],[]) distr seed = do
 
 randomDoubleSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomDoubleSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomDoubleSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomDoubleSeed us ds _ _ = return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -193,11 +193,11 @@ randomIntSeed ([],[]) ([],[]) distr seed = do
 
 randomIntSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomIntSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant (Just s) [u]) $ ZipList tensors
 
 randomIntSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomIntSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant (Just s) [d]) $ ZipList tensors
 
 randomIntSeed us ds _ _ = return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -212,9 +212,9 @@ fromIndices' :: (
       -> ListTensor a            -- ^ Generated tensor
 
 fromIndices' [] [] f = Scalar $ f [] []
-fromIndices' (u:us) d f =
+fromIndices' (u:us) d f = mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $ ZipList [fromIndices' us d (\uss dss -> f (x:uss) dss) | x <- [0 .. ] ]
-fromIndices' u (d:ds) f =
+fromIndices' u (d:ds) f = mergeScalars $ 
     FiniteTensor (Covariant Nothing [d]) $ ZipList [fromIndices' u ds (\uss dss -> f uss (x:dss)) | x <- [0 .. ] ]
 
 {-| Generate infinite tensor with all components equal to @v@ -}
@@ -226,9 +226,9 @@ const' :: (
       -> ListTensor a     -- ^ Generated tensor
 
 const' [] [] v = Scalar v
-const' (u:us) d v =
+const' (u:us) d v = mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $ ZipList [Multilinear.Tensor.AsList.const' us d v | _ <- [0 .. ] ]
-const' u (d:ds) v =
+const' u (d:ds) v = mergeScalars $ 
     FiniteTensor (    Covariant Nothing [d]) $ ZipList [Multilinear.Tensor.AsList.const' u ds v | _ <- [0 .. ] ]
 
 {-| Generate infinite tensor with random real components with given probability distribution.
@@ -258,11 +258,11 @@ randomDouble' [] [] distr = do
 
 randomDouble' (u:us) d distr = do
   tensors <- sequence [randomDouble' us d distr | _ <- [0 .. ] ]
-  return $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
 
 randomDouble' u (d:ds) distr = do
   tensors <- sequence [randomDouble' u ds distr | _ <- [0 .. ] ]
-  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
 
 {-| Generate infinite tensor with random integer components with given probability distribution.
 The tensor is wrapped in the IO monad. -}
@@ -284,11 +284,11 @@ randomInt' [] [] distr = do
 
 randomInt' (u:us) d distr = do
   tensors <- sequence [randomInt' us d distr | _ <- [0 .. ] ]
-  return $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
 
 randomInt' u (d:ds) distr = do
   tensors <- sequence [randomInt' u ds distr | _ <- [0 .. ] ]
-  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
 
 {-| Generate infinite tensor with random real components with given probability distribution and given seed.
 The tensor is wrapped in a monad. -}
@@ -319,11 +319,11 @@ randomDoubleSeed' [] [] distr seed = do
 
 randomDoubleSeed' (u:us) d distr seed = do
   tensors <- sequence [randomDoubleSeed' us d distr seed | _ <- [0 .. ] ]
-  return $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
 
 randomDoubleSeed' u (d:ds) distr seed = do
   tensors <- sequence [randomDoubleSeed' u ds distr seed | _ <- [0 .. ] ]
-  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
 
 {-| Generate infinite tensor with random integer components with given probability distribution and given seed.
 The tensor is wrapped in a monad. -}
@@ -347,9 +347,9 @@ randomIntSeed' [] [] distr seed = do
 
 randomIntSeed' (u:us) d distr seed = do
   tensors <- sequence [randomIntSeed' us d distr seed | _ <- [0 .. ] ]
-  return $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant Nothing [u]) $ ZipList tensors
 
 randomIntSeed' u (d:ds) distr seed = do
   tensors <- sequence [randomIntSeed' u ds distr seed | _ <- [0 .. ] ]
-  return $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant Nothing [d]) $ ZipList tensors
 

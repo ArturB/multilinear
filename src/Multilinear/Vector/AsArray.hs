@@ -50,7 +50,7 @@ fromIndices :: (
     -> (Int -> a)         -- ^ Generator function - returns a linear functional component at index @i@
     -> VectorTensor a      -- ^ Generated linear functional
 
-fromIndices [d] s f =
+fromIndices [d] s f = mergeScalars $ 
     FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.generate s (Scalar . f)
 fromIndices _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
@@ -62,7 +62,7 @@ const :: (
     -> a                -- ^ Value of each element
     -> VectorTensor a     -- ^ Generated linear functional
 
-const [d] s v =
+const [d] s v = mergeScalars $ 
     FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.replicate (fromIntegral s) (Scalar v)
 const _ _ _ = Err "Indices and its sizes not compatible with structure of linear functional!"
 
@@ -88,7 +88,7 @@ randomDouble :: (
 
 randomDouble [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
+  return $  mergeScalars $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random integer components with given probability distribution.
@@ -107,7 +107,7 @@ randomInt :: (
 
 randomInt [i] s d = do
   components <- sequence [ MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
+  return $  mergeScalars $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random real components with given probability distribution and given seed.
@@ -134,7 +134,7 @@ randomDoubleSeed :: (
 randomDoubleSeed [i] s d seed = do
   gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
   components <- sequence [ genContVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
+  return $  mergeScalars $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Generate linear functional with random integer components with given probability distribution and given seed.
@@ -155,7 +155,7 @@ randomIntSeed :: (
 randomIntSeed [i] s d seed = do
   gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
   components <- sequence [ genDiscreteVar d gen | _ <- [1..s] ]
-  return $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
+  return $  mergeScalars $ FiniteTensor (Contravariant s [i]) $ ZipVector $ Scalar <$> Boxed.fromList components
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 
 {-| Read linear functional components from CSV file. Reads only the first row of the file. -}
@@ -172,7 +172,7 @@ fromCSV [i] fileName separator = do
   let components = decode <$> firstLine
   let size = length $ rights components
   if size > 0
-  then return $ FiniteTensor (Contravariant size [i]) $ ZipVector (Scalar <$> Boxed.fromList (rights components))
+  then return $  mergeScalars $ FiniteTensor (Contravariant size [i]) $ ZipVector (Scalar <$> Boxed.fromList (rights components))
   else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
 fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of linear functional!"
 

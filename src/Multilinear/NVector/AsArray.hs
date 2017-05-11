@@ -43,7 +43,7 @@ fromIndices :: (
     -> VectorTensor a  -- ^ Generated N-form
 
 fromIndices [] [] f = Scalar $ f []
-fromIndices (d:ds) (s:size) f =
+fromIndices (d:ds) (s:size) f = mergeScalars $ 
     FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.generate s (\x -> fromIndices ds size (\dss -> f (x:dss)) )
 fromIndices _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
@@ -56,7 +56,7 @@ const :: (
     -> VectorTensor a  -- ^ Generated N-form
 
 const [] [] v = Scalar v
-const (d:ds) (s:size) v =
+const (d:ds) (s:size) v = mergeScalars $ 
     FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.replicate (fromIntegral s) $ Multilinear.NVector.AsArray.const ds size v
 const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
@@ -87,7 +87,7 @@ randomDouble [] [] d = do
 
 randomDouble (d:ds) (s:size) distr = do
   tensors <- sequence [randomDouble ds size distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
@@ -111,7 +111,7 @@ randomInt [] [] d = do
 
 randomInt (d:ds) (s:size) distr = do
   tensors <- sequence [randomInt ds size distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
@@ -144,7 +144,7 @@ randomDoubleSeed [] [] d seed = do
 
 randomDoubleSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed ds size distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 
@@ -170,7 +170,7 @@ randomIntSeed [] [] d seed = do
 
 randomIntSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence [randomIntSeed ds size distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
 

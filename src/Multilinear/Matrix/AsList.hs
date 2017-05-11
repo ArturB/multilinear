@@ -55,7 +55,7 @@ fromIndices :: (
     -> (Int -> Int -> a)  -- ^ Generator function - returns a matrix component at @i,j@
     -> ListTensor a       -- ^ Generated matrix
 
-fromIndices [u,d] su sd f =
+fromIndices [u,d] su sd f = mergeScalars $ 
     FiniteTensor (Contravariant (Just su) [u]) $
       ZipList [FiniteTensor (Covariant (Just sd) [d]) $
         ZipList [Scalar $ f x y
@@ -72,7 +72,7 @@ const :: (
     -> a             -- ^ Value of matrix components
     -> ListTensor a  -- ^ Generated matrix
 
-const [u,d] su sd v =
+const [u,d] su sd v = mergeScalars $ 
     FiniteTensor (Contravariant (Just su) [u]) $
       ZipList $ replicate (fromIntegral su) $
         FiniteTensor (Covariant (Just sd) [d]) $
@@ -108,7 +108,7 @@ randomDouble [u,d] su sd dist = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -137,7 +137,7 @@ randomInt [u,d] su sd dist = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -174,7 +174,7 @@ randomDoubleSeed [u,d] su sd dist seed = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -205,7 +205,7 @@ randomIntSeed [u,d] su sd dist seed = do
       | _ <- [1..sd] ]
     | _ <- [1..su] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant (Just su) [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant (Just sd) [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -220,7 +220,7 @@ fromIndices' :: (
     -> (Int -> Int -> a)  -- ^ Generator function - returns a matrix component at @i,j@
     -> ListTensor a       -- ^ Generated matrix
 
-fromIndices' [u,d] f =
+fromIndices' [u,d] f = mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $
       ZipList [FiniteTensor (Covariant Nothing [d]) $
         ZipList [Scalar $ f x y
@@ -235,7 +235,7 @@ const' :: (
     -> a             -- ^ Value of matrix components
     -> ListTensor a  -- ^ Generated matrix
 
-const' [u,d] v =
+const' [u,d] v = mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $
       ZipList [FiniteTensor (Covariant Nothing [d]) $
           ZipList [Scalar v | _ <- [0 .. ] ]
@@ -269,7 +269,7 @@ randomDouble' [u,d] dist = do
       | _ <- [1..] ]
     | _ <- [1..] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -296,7 +296,7 @@ randomInt' [u,d] dist = do
       | _ <- [1..] ]
     | _ <- [1..] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -331,7 +331,7 @@ randomDoubleSeed' [u,d] dist seed = do
       | _ <- [1..] ]
     | _ <- [1..] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -360,7 +360,7 @@ randomIntSeed' [u,d] dist seed = do
       | _ <- [1..] ]
     | _ <- [1..] ]
 
-  return $
+  return $ mergeScalars $ 
     FiniteTensor (Contravariant Nothing [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant Nothing [d]) $ ZipList $ Scalar <$> x
     ) <$> components
@@ -380,7 +380,7 @@ fromCSV [u,d] fileName separator = do
   let rows = length components
   let columns = if rows > 0 then length $ rights (head components) else 0
   if rows > 0 && columns > 0
-  then return $
+  then return $ mergeScalars $ 
     FiniteTensor (Contravariant (Just rows) [u]) $ ZipList $ (\x ->
       FiniteTensor (Covariant (Just columns) [d]) $ ZipList $ Scalar <$> rights x
     ) <$> components
