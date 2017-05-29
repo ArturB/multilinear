@@ -84,6 +84,16 @@ data instance Tensor ZipList a =
         errMessage :: String
     } deriving (Eq, Generic)
 
+
+instance StandardTensor Tensor ZipList a where
+
+    type TensorIndex Tensor ZipList a = TIndex
+
+    scalar = Scalar
+    simple = SimpleFinite
+    tensor = FiniteTensor
+
+
 {-| Return true if tensor is a scalar -}
 isScalar :: ListTensor a -> Bool
 isScalar (Scalar _) = True

@@ -18,6 +18,7 @@ import           Criterion.Main
 import           Criterion.Measurement      as Meas
 import           Criterion.Types
 import qualified Data.Vector                as Boxed
+import qualified Data.Vector.Unboxed        as Unboxed
 import           Multilinear
 import           Multilinear.Generic
 import           Multilinear.Generic.AsList
@@ -52,18 +53,19 @@ va2 = Vector.AsArray.fromIndices "j" 200 id
 
 main :: IO ()
 main = do
-    let m1l = ml1 |>>> "j" :: ListTensor Int
+    {-let m1l = ml1 |>>> "j" :: ListTensor Int
     let m2l = ml2 |>>> "j" :: ListTensor Int
     let m1a = ma1 |>>> "j" :: VectorTensor Int
-    let m2a = ma2 |>>> "j" :: VectorTensor Int
-    --let zl = ZipList [1..125000000] :: ZipList Int
-    mmList  <- Meas.measure ( nfIO $ print $ m1l * m2l * vl ) 1
-    mvList  <- Meas.measure ( nfIO $ print $ m1l * vl2      ) 1
+    let m2a = ma2 |>>> "j" :: VectorTensor Int-}
+    let zl = Unboxed.generate 10000000 id
+    --mmList  <- Meas.measure ( nfIO $ print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl  ) 1
+    print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl
+    {-mvList  <- Meas.measure ( nfIO $ print $ m1l * vl2      ) 1
     mmArray <- Meas.measure ( nfIO $ print $ m1a * m2a * va ) 1
-    mvArray <- Meas.measure ( nfIO $ print $ m1a * va2      ) 1
-    putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
-    putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
+    mvArray <- Meas.measure ( nfIO $ print $ m1a * va2      ) 1-}
+    --putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
+    {-putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
     putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
-    putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"
+    putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"-}
     return ()
 
