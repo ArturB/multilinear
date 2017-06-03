@@ -43,8 +43,8 @@ library
                     ,  either
                     ,  deepseq
   default-language:    Haskell2010
-  ghc-options:         -Wall -O2 -Wno-type-defaults -Wno-orphans -Werror
-  default-extensions:  Strict
+  ghc-options:         -Wall -Werror -O2 
+  default-extensions:  
 
 test-suite Multilinear-test
   type:                exitcode-stdio-1.0
@@ -53,9 +53,9 @@ test-suite Multilinear-test
   build-depends:       base
                      , Multilinear
                      , transformers
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wno-orphans -Werror
+  ghc-options:         -Wall -Werror -O2 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
-  default-extensions:  Strict
+  default-extensions:  
 
 benchmark Multilinear-bench
   type:                exitcode-stdio-1.0
@@ -65,9 +65,10 @@ benchmark Multilinear-bench
                      , Multilinear
                      , criterion
                      , vector
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -prof -fprof-auto -Wno-orphans -Werror
+                     , deepseq
+  ghc-options:         -Wall -Werror -O2 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
-  default-extensions:  Strict
+  default-extensions:  
 
 source-repository head
   type:     git

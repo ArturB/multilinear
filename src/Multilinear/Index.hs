@@ -17,6 +17,7 @@ module Multilinear.Index (
     TIndex(..)
 ) where
 
+import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Hashable
 import           Data.Serialize
@@ -109,6 +110,9 @@ instance Serialize TIndex
 {-| Serialization to and from JSON |-}
 instance FromJSON TIndex
 instance   ToJSON TIndex
+
+{-| NFData instance -}
+instance NFData TIndex
 
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}

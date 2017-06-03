@@ -29,6 +29,7 @@ module Multilinear.Generic (
 ) where
 
 import           Codec.Compression.GZip
+import           Control.DeepSeq
 import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Maybe
@@ -160,6 +161,9 @@ instance Serialize a => Serialize (Tensor a)
 instance ToJSON a => ToJSON (Tensor a)
 -- JSON deserialization instance
 instance FromJSON a => FromJSON (Tensor a)
+
+-- NFData instance
+instance NFData a => NFData (Tensor a)
 
 -- Print tensor
 instance (
@@ -451,43 +455,14 @@ dot :: (
       -> Tensor a                             -- ^ Second dot product argument
       -> Tensor a                             -- ^ Resulting dot product
 
--- Two finite tensors product
-dot f _ _ _ add _ (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Data.Foldable.foldl' add 0 $ Boxed.zipWith f ts1' ts2'
-    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
-
 -- Two simple tensors product
-dot _ _ _ f _ add (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Scalar $ Data.Foldable.foldl' add 0 $ Boxed.zipWith f ts1' ts2'
+dot _ _ _ _ _ _ (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = 
+        let dotProduct v1 v2 = Boxed.sum $ Boxed.zipWith (*) v1 v2
+        in  Scalar $ dotProduct ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
--- Simple tensor and finite tensor product
-dot _ _ f _ add _ (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Data.Foldable.foldl' add 0 $ Boxed.zipWith f ts1' ts2'
-    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
-
--- Finite tensor and simple tensor product
-dot _ f _ _ add _ (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Data.Foldable.foldl' add 0 $ Boxed.zipWith f ts1' ts2'
-    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
-
--- Simple tensor and infinite tensor product
-dot _ _ f _ add _ (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
-    Data.Foldable.foldl' add 0 $ Boxed.zipWith f ts1' (Boxed.fromList $ take count1 ts2')
-
--- Infinite tensor and simple tensor product
-dot _ f _ _ add _ (InfiniteTensor (Infinite.Covariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') = 
-    Data.Foldable.foldl' add 0 $ Boxed.zipWith f (Boxed.fromList $ take count2 ts1') ts2'
-
--- Finite tensor and infinite tensor product
-dot f _ _ _ add _ (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
-    Data.Foldable.foldl' add 0 $ Boxed.zipWith f ts1' (Boxed.fromList $ take count1 ts2')
-
--- Infinite tensor and finite tensor product
-dot f _ _ _ add _ (InfiniteTensor (Infinite.Covariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') = 
-    Data.Foldable.foldl' add 0 $ Boxed.zipWith f (Boxed.fromList $ take count2 ts1') ts2'
-
--- In other cases, especially for inconsistent upper and lower indices, dot product cannot be calculated
+-- In other cases cannot happen!
 dot _ _ _ _ _ _ t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
 
 -- contraction error

@@ -12,12 +12,12 @@ Finite-dimensional tensor index.
 -}
 
 {-# LANGUAGE DeriveGeneric #-}
---{-# LANGUAGE Strict        #-}
 
 module Multilinear.Index.Finite (
     Index(..),
 ) where
 
+import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Hashable
 import           Data.Serialize
@@ -87,6 +87,9 @@ instance Serialize Index
 {-| Serialization to and from JSON |-}
 instance FromJSON Index
 instance   ToJSON Index
+
+{-| NFData instance -}
+instance NFData Index
 
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}

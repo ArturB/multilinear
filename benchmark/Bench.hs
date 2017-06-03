@@ -13,36 +13,35 @@ module Main (
     main
 ) where
 
-import           Control.Applicative
 import           Criterion.Main
 import           Criterion.Measurement as Meas
 import           Criterion.Types
-import qualified Data.Vector           as Boxed
-import qualified Data.Vector.Unboxed   as Unboxed
 import           Multilinear
 import           Multilinear.Generic
 import qualified Multilinear.Matrix    as Matrix
 import qualified Multilinear.Vector    as Vector
 
-m1 :: ListTensor Int
-m1 = Matrix.fromIndices "ij" 500 500 $ \i j -> i + j
+m1 :: Tensor Int
+m1 = Matrix.fromIndices "ij" 100 100 $ \i j -> i + j
 
-m2 :: ListTensor Int
-m2 = Matrix.fromIndices "jk" 500 500 $ \j k -> j + k
+m2 :: Tensor Int
+m2 = Matrix.fromIndices "jk" 100 100 $ \j k -> j + k
 
-v :: ListTensor Int
-v = Vector.fromIndices "k" 500 id
+v :: Tensor Int
+v = Vector.fromIndices "k" 100 id
 
-v2 :: ListTensor Int
-v2 = Vector.fromIndices "j" 500 id
+v2 :: Tensor Int
+v2 = Vector.fromIndices "j" 100 id
 
 
 main :: IO ()
 main = do
-    let m1l = ml |>>> "j" :: Tensor Int
-    let m2l = ml |>>> "j" :: Tensor Int
-    mmList  <- Meas.measure ( m1l * m2l * v `deepseq` print "Matrix by matrix multiplying..." ) 1
-    mvList  <- Meas.measure ( m1l * v2 `deepseq` print "Matrix by vector multiplying..."      ) 1
+    let m1l = m1 |>>> "j" :: Tensor Int
+    let m2l = m2 |>>> "j" :: Tensor Int
+    putStrLn "Matrix by matrix multiplying..."
+    mmList  <- Meas.measure ( nfIO $ print $ m1l * m2l * v ) 1
+    putStrLn "Matrix by vector multiplying..."
+    mvList  <- Meas.measure ( nfIO $ print $ m1l * v2      ) 1
     putStrLn $ "\nMultiply matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
     putStrLn $ "\nMultiply matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
     return ()
