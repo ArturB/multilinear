@@ -15,7 +15,7 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 
 -}
 
-{-# LANGUAGE Strict #-}
+--{-# LANGUAGE Strict #-}
 
 module Multilinear.Tensor.AsArray (
   -- * Generators
@@ -42,9 +42,9 @@ fromIndices :: (
       -> VectorTensor a          -- ^ Generated tensor
 
 fromIndices ([],[]) ([],[]) f = Scalar $ f [] []
-fromIndices (u:us,s:size) d f =
+fromIndices (u:us,s:size) d f = mergeScalars $ 
     FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.generate s (\x -> fromIndices (us,size) d (\uss dss -> f (x:uss) dss) )
-fromIndices u (d:ds,s:size) f =
+fromIndices u (d:ds,s:size) f = mergeScalars $ 
     FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.generate s (\x -> fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) )
 fromIndices us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -57,9 +57,9 @@ const :: (
       -> VectorTensor a     -- ^ Generated tensor
 
 const ([],[]) ([],[]) v = Scalar v
-const (u:us,s:size) d v =
+const (u:us,s:size) d v = mergeScalars $ 
     FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.AsArray.const (us,size) d v
-const u (d:ds,s:size) v =
+const u (d:ds,s:size) v = mergeScalars $ 
     FiniteTensor (    Covariant s [d]) $ ZipVector $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.AsArray.const u (ds,size) v
 const us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
@@ -90,11 +90,11 @@ randomDouble ([],[]) ([],[]) distr = do
 
 randomDouble (u:us,s:size) d distr = do
   tensors <- sequence [randomDouble (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
 
 randomDouble u (d:ds,s:size) distr = do
   tensors <- sequence [randomDouble u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomDouble us ds _ = 
     return $ Err $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
@@ -119,11 +119,11 @@ randomInt ([],[]) ([],[]) distr = do
 
 randomInt (u:us,s:size) d distr = do
   tensors <- sequence [randomInt (us,size) d distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
 
 randomInt u (d:ds,s:size) distr = do
   tensors <- sequence [randomInt u (ds,size) distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -156,11 +156,11 @@ randomDoubleSeed ([],[]) ([],[]) distr seed = do
 
 randomDoubleSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomDoubleSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
 
 randomDoubleSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomDoubleSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"
 
@@ -186,10 +186,10 @@ randomIntSeed ([],[]) ([],[]) distr seed = do
 
 randomIntSeed (u:us,s:size) d distr seed = do
   tensors <- sequence [randomIntSeed (us,size) d distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Contravariant s [u]) $ ZipVector $ Boxed.fromList tensors
 
 randomIntSeed u (d:ds,s:size) distr seed = do
   tensors <- sequence [randomIntSeed u (ds,size) distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
+  return $  mergeScalars $ FiniteTensor (Covariant s [d]) $ ZipVector $ Boxed.fromList tensors
 
 randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of 1-form!"

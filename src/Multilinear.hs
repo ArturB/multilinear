@@ -142,17 +142,23 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 -}
 
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE Strict #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE TypeFamilies          #-}
 
 module Multilinear (
     Multilinear(..),
-    Accessible(..)
+    Accessible(..), StandardTensor(..)
 ) where
 
 import Data.Maybe
 import Data.Set
 import Multilinear.Index
 import Data.Bits
+import           Data.Serialize
+import Data.Aeson
+import qualified Data.ByteString.Lazy       as ByteString
+import           Control.Monad.Trans.Either
+import           Control.Monad.Trans.Maybe
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
@@ -299,6 +305,58 @@ class (
     map :: (a -> b) -> t a -> t b
     map = fmap
 
+    {-| Serialize to binary string -}
+    toBinary :: (
+        Serialize a
+        ) => t a                     -- ^ Tensor to serialize
+          -> ByteString.ByteString   -- ^ Tensor serialized to binary string
+
+    {-| Write to binary file. Uses compression with gzip -}
+    toBinaryFile :: (
+        Serialize a
+        ) => String         -- ^ File name
+          -> t a            -- ^ Tensor to serialize
+          -> IO ()
+
+    {-| Deserialize from binary string -}
+    fromBinary :: (
+        Serialize a
+        ) => ByteString.ByteString          -- ^ Binary string to deserialize
+          -> Either String (t a)            -- ^ Deserialized tensor or deserialization error message
+
+    {-| Read from binary file -}
+    fromBinaryFile :: (
+        Serialize a
+        ) => String                             -- ^ File name
+          -> EitherT String IO (t a)            -- ^ Deserialized tensor or deserialization error message - either way, wrapped in the IO monad
+
+
+    {-| Serialize to JSON string -}
+    toJSON :: (
+        ToJSON a
+        ) => t a                     -- ^ Tensor to serialize
+          -> ByteString.ByteString   -- ^ Binary string with JSON-encoded tensor
+
+    {-| Write to JSON file -}
+    toJSONFile :: (
+        ToJSON a
+        ) => String          -- ^ File name
+          -> t a             -- ^ Tensor to serialize
+          -> IO ()
+
+    {-| Deserialize from JSON string -}
+    fromJSON :: (
+        FromJSON a
+        ) => ByteString.ByteString    -- ^ Binary string with JSON-encoded tensor
+          -> Maybe (t a)              -- ^ Deserialized tensor or an error
+
+    {-| Read from JSON file -}
+    fromJSONFile :: (
+        FromJSON a
+        ) => String                      -- ^ File name
+          -> MaybeT IO (t a)             -- ^ Deserialized tensor or an error, either way wrapped in the IO monad
+
+
 {-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
 class Multilinear t a => Accessible t a where
 
@@ -313,3 +371,12 @@ class Multilinear t a => Accessible t a where
     {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
     iMap :: ([Int] -> a -> b) -> t a -> t b
     -- // TODO
+
+class StandardTensor t c a where
+    type TensorIndex t c a
+
+    scalar :: a -> t c a
+
+    simple :: TensorIndex t c a -> c a -> t c a
+
+    tensor :: TensorIndex t c a -> c (t c a) -> t c a

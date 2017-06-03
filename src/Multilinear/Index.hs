@@ -10,7 +10,7 @@ Portability : Windows/POSIX
 -}
 
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE Strict        #-}
+--{-# LANGUAGE Strict        #-}
 
 module Multilinear.Index (
     Index(..),

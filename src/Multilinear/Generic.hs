@@ -19,7 +19,7 @@ Type family for all tensor-like types.
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE Strict                     #-}
+--{-# LANGUAGE Strict                     #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
 
@@ -37,9 +37,9 @@ module Multilinear.Generic (
 
 import           Control.Applicative
 import           Control.Monad
-import           GHC.Generics
 import qualified Data.Vector         as Boxed
 import qualified Data.Vector.Unboxed as Unboxed
+import           GHC.Generics
 
 {-| Family of all recursive tensor types, parametrized by container type and elements type -}
 data family Tensor :: (* -> *) -> * -> *
@@ -60,27 +60,23 @@ type VectorTensor = Tensor ZipVector
 type UnboxedVectorTensor = Tensor ZipUnboxedVector
 
 {-| Newtype wrapper for boxed Vector, providing proper Applicative instance -}
-newtype ZipVector a = 
+newtype ZipVector a =
     ZipVector {
         getZipVector :: Boxed.Vector a
      } deriving (
-         Eq, Show, Read, Ord, 
+         Eq, Show, Read, Ord,
          Monad, MonadPlus, Alternative,
-         Functor, Foldable, 
+         Functor, Foldable,
          Monoid, Generic)
 
 {-| ZipVector Applicative instance -}
 instance Applicative ZipVector where
     pure = ZipVector . Boxed.singleton
 
-    ZipVector v1 <*> ZipVector v2 = 
-        let l1 = Boxed.length v1
-            l2 = Boxed.length v2
-            minl = if l1 < l2 then l1 else l2
-        in  ZipVector $ Boxed.generate minl ( \i -> (v1 Boxed.! i) (v2 Boxed.! i) )
+    ZipVector v1 <*> ZipVector v2 = ZipVector $ (\(f,p) -> f p) <$> Boxed.zip v1 v2
 
 {-| Newtype wrapper for unboxed Vector, provising Applicative instance -}
-newtype ZipUnboxedVector a = 
+newtype ZipUnboxedVector a =
     ZipUnboxedVector {
         getZipUnboxedVector :: Unboxed.Vector a
      } deriving (

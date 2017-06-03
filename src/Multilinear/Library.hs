@@ -12,7 +12,7 @@ Defines main tyclasses to deal with multilinear algebra and re-exports content o
 -}
 
 {-# LANGUAGE GADTs  #-}
-{-# LANGUAGE Strict #-}
+--{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC -O2 #-}
 
 module Multilinear.Library (
