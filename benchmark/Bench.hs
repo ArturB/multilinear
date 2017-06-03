@@ -22,16 +22,16 @@ import qualified Multilinear.Matrix    as Matrix
 import qualified Multilinear.Vector    as Vector
 
 m1 :: Tensor Int
-m1 = Matrix.fromIndices "ij" 100 100 $ \i j -> i + j
+m1 = Matrix.fromIndices "ij" 1000 1000 $ \i j -> i + j
 
 m2 :: Tensor Int
-m2 = Matrix.fromIndices "jk" 100 100 $ \j k -> j + k
+m2 = Matrix.fromIndices "jk" 1000 1000 $ \j k -> j + k
 
 v :: Tensor Int
-v = Vector.fromIndices "k" 100 id
+v = Vector.fromIndices "k" 1000 id
 
 v2 :: Tensor Int
-v2 = Vector.fromIndices "j" 100 id
+v2 = Vector.fromIndices "j" 1000 id
 
 
 main :: IO ()
