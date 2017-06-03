@@ -12,8 +12,6 @@ Portability : Windows/POSIX
 
 -}
 
---{-# LANGUAGE Strict #-}
-
 module Multilinear.Vector (
   -- * Generators
   fromIndices, Multilinear.Vector.const,

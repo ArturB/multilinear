@@ -12,8 +12,6 @@ Portability : Windows/POSIX
 
 -}
 
---{-# LANGUAGE Strict #-}
-
 module Multilinear.NVector (
   -- * Generators
   fromIndices, Multilinear.NVector.const,
@@ -53,7 +51,7 @@ const :: (
 
 const [] [] v = Scalar v
 const (d:ds) (s:size) v = mergeScalars $ 
-    FiniteTensor (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NVector.AsArray.const ds size v
+    FiniteTensor (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NVector.const ds size v
 const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
 {-| Generate n-vector with random real components with given probability distribution.

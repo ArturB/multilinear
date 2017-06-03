@@ -54,7 +54,7 @@ const :: (
 
 const [] [] v = Scalar v
 const (d:ds) (s:size) v = mergeScalars $
-    FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NForm.AsArray.const ds size v
+    FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NForm.const ds size v
 const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
 
 {-| Generate n-vector with random real components with given probability distribution.

@@ -52,9 +52,9 @@ const :: (
 
 const ([],[]) ([],[]) v = Scalar v
 const (u:us,s:size) d v = mergeScalars $ 
-    FiniteTensor (Contravariant s [u]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.AsArray.const (us,size) d v
+    FiniteTensor (Contravariant s [u]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.const (us,size) d v
 const u (d:ds,s:size) v = mergeScalars $ 
-    FiniteTensor (    Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.AsArray.const u (ds,size) v
+    FiniteTensor (    Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.const u (ds,size) v
 const us ds _ = error $ "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
 {-| Generate tensor with random real components with given probability distribution.

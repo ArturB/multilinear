@@ -15,57 +15,35 @@ module Main (
 
 import           Control.Applicative
 import           Criterion.Main
-import           Criterion.Measurement      as Meas
+import           Criterion.Measurement as Meas
 import           Criterion.Types
-import qualified Data.Vector                as Boxed
-import qualified Data.Vector.Unboxed        as Unboxed
+import qualified Data.Vector           as Boxed
+import qualified Data.Vector.Unboxed   as Unboxed
 import           Multilinear
 import           Multilinear.Generic
-import           Multilinear.Generic.AsList
-import qualified Multilinear.Matrix.AsArray as Matrix.AsArray
-import qualified Multilinear.Matrix.AsList  as Matrix.AsList
-import qualified Multilinear.Vector.AsArray as Vector.AsArray
-import qualified Multilinear.Vector.AsList  as Vector.AsList
+import qualified Multilinear.Matrix    as Matrix
+import qualified Multilinear.Vector    as Vector
 
-ml1 :: ListTensor Int
-ml1 = Matrix.AsList.fromIndices "ij" 200 200 $ \i j -> i + j
+m1 :: ListTensor Int
+m1 = Matrix.fromIndices "ij" 500 500 $ \i j -> i + j
 
-ml2 :: ListTensor Int
-ml2 = Matrix.AsList.fromIndices "jk" 200 200 $ \j k -> j + k
+m2 :: ListTensor Int
+m2 = Matrix.fromIndices "jk" 500 500 $ \j k -> j + k
 
-vl :: ListTensor Int
-vl = Vector.AsList.fromIndices "k" 200 id
+v :: ListTensor Int
+v = Vector.fromIndices "k" 500 id
 
-vl2 :: ListTensor Int
-vl2 = Vector.AsList.fromIndices "j" 200 id
+v2 :: ListTensor Int
+v2 = Vector.fromIndices "j" 500 id
 
-ma1 :: Tensor Int
-ma1 = Matrix.AsArray.fromIndices "ij" 200 200 $ \i j -> i + j
-
-ma2 :: Tensor Int
-ma2 = Matrix.AsArray.fromIndices "jk" 200 200 $ \j k -> j + k
-
-va :: Tensor Int
-va = Vector.AsArray.fromIndices "k" 200 id
-
-va2 :: Tensor Int
-va2 = Vector.AsArray.fromIndices "j" 200 id
 
 main :: IO ()
 main = do
-    {-let m1l = ml1 |>>> "j" :: ListTensor Int
-    let m2l = ml2 |>>> "j" :: ListTensor Int
-    let m1a = ma1 |>>> "j" :: Tensor Int
-    let m2a = ma2 |>>> "j" :: Tensor Int-}
-    let zl = Unboxed.generate 10000000 id
-    --mmList  <- Meas.measure ( nfIO $ print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl  ) 1
-    print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl
-    {-mvList  <- Meas.measure ( nfIO $ print $ m1l * vl2      ) 1
-    mmArray <- Meas.measure ( nfIO $ print $ m1a * m2a * va ) 1
-    mvArray <- Meas.measure ( nfIO $ print $ m1a * va2      ) 1-}
-    --putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
-    {-putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
-    putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
-    putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"-}
+    let m1l = ml |>>> "j" :: Tensor Int
+    let m2l = ml |>>> "j" :: Tensor Int
+    mmList  <- Meas.measure ( m1l * m2l * v `deepseq` print "Matrix by matrix multiplying..." ) 1
+    mvList  <- Meas.measure ( m1l * v2 `deepseq` print "Matrix by vector multiplying..."      ) 1
+    putStrLn $ "\nMultiply matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
+    putStrLn $ "\nMultiply matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
     return ()
 
