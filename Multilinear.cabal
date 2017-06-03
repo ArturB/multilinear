@@ -17,29 +17,15 @@ library
   hs-source-dirs:      src
   exposed-modules:     Multilinear
                     ,  Multilinear.Form
-                    ,  Multilinear.Form.AsList
-                    ,  Multilinear.Form.AsArray
                     ,  Multilinear.Generic
-                    ,  Multilinear.Generic.AsList
-                    ,  Multilinear.Generic.AsArray
                     ,  Multilinear.Index
                     ,  Multilinear.Index.Finite
                     ,  Multilinear.Index.Infinite
                     ,  Multilinear.Matrix
-                    ,  Multilinear.Matrix.AsList
-                    ,  Multilinear.Matrix.AsArray
                     ,  Multilinear.NForm
-                    ,  Multilinear.NForm.AsList
-                    ,  Multilinear.NForm.AsArray
                     ,  Multilinear.NVector
-                    ,  Multilinear.NVector.AsList
-                    ,  Multilinear.NVector.AsArray
                     ,  Multilinear.Tensor
-                    ,  Multilinear.Tensor.AsList
-                    ,  Multilinear.Tensor.AsArray
                     ,  Multilinear.Vector
-                    ,  Multilinear.Vector.AsList
-                    ,  Multilinear.Vector.AsArray
   build-depends:       base >= 4.7 && < 5
                     ,  cereal
                     ,  containers

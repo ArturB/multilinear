@@ -203,6 +203,9 @@ class (
     {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
     order :: t a -> (Int,Int)
 
+    {-| Return size of index with given name of Nothing if index is infinite-dimensional -}
+    size :: t a -> Either String Int
+
     {-| Check if tensors are equivalent (have same indices but in different order) -}
     equiv :: t a -> t a -> Bool
     equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)

@@ -39,24 +39,24 @@ vl = Vector.AsList.fromIndices "k" 200 id
 vl2 :: ListTensor Int
 vl2 = Vector.AsList.fromIndices "j" 200 id
 
-ma1 :: VectorTensor Int
+ma1 :: Tensor Int
 ma1 = Matrix.AsArray.fromIndices "ij" 200 200 $ \i j -> i + j
 
-ma2 :: VectorTensor Int
+ma2 :: Tensor Int
 ma2 = Matrix.AsArray.fromIndices "jk" 200 200 $ \j k -> j + k
 
-va :: VectorTensor Int
+va :: Tensor Int
 va = Vector.AsArray.fromIndices "k" 200 id
 
-va2 :: VectorTensor Int
+va2 :: Tensor Int
 va2 = Vector.AsArray.fromIndices "j" 200 id
 
 main :: IO ()
 main = do
     {-let m1l = ml1 |>>> "j" :: ListTensor Int
     let m2l = ml2 |>>> "j" :: ListTensor Int
-    let m1a = ma1 |>>> "j" :: VectorTensor Int
-    let m2a = ma2 |>>> "j" :: VectorTensor Int-}
+    let m1a = ma1 |>>> "j" :: Tensor Int
+    let m2a = ma2 |>>> "j" :: Tensor Int-}
     let zl = Unboxed.generate 10000000 id
     --mmList  <- Meas.measure ( nfIO $ print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl  ) 1
     print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl

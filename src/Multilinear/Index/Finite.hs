@@ -15,7 +15,7 @@ Finite-dimensional tensor index.
 --{-# LANGUAGE Strict        #-}
 
 module Multilinear.Index.Finite (
-    Finite(..),
+    Index(..),
 ) where
 
 import           Data.Aeson
@@ -25,7 +25,7 @@ import           GHC.Generics
 import qualified Multilinear.Index as TIndex
 
 {-| Index of finite-dimension tensor with specified size -}
-data Finite =
+data Index =
     Covariant {
         indexSize  :: Int,
         indexName' :: String
@@ -41,13 +41,13 @@ data Finite =
     deriving (Eq, Generic)
 
 {-| Show instance of Finitwe -}
-instance Show Finite where
+instance Show Index where
     show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
     show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
 
 {-| Finite index is a Multilinear.Index instance -}
-instance TIndex.Index Finite where
+instance TIndex.Index Index where
 
     {-| Index name -}
     indexName = indexName'
@@ -82,18 +82,18 @@ instance TIndex.Index Finite where
     toTIndex (Indifferent size name)   = TIndex.Indifferent (Just size) name
 
 {-| Binary serialization and deserialization |-}
-instance Serialize Finite
+instance Serialize Index
 
 {-| Serialization to and from JSON |-}
-instance FromJSON Finite
-instance   ToJSON Finite
+instance FromJSON Index
+instance   ToJSON Index
 
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
-instance Ord Finite where
+instance Ord Index where
     ind1 <= ind2 = indexSize ind1 <= indexSize ind2
 
 {-| Indices can be hashed by hash functions |-}
 {-| Used to allow to put tensors to typical unordered containers |-}
-instance Hashable Finite
+instance Hashable Index
 
