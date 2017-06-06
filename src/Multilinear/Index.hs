@@ -10,13 +10,13 @@ Portability : Windows/POSIX
 -}
 
 {-# LANGUAGE DeriveGeneric #-}
---{-# LANGUAGE Strict        #-}
 
 module Multilinear.Index (
     Index(..),
     TIndex(..)
 ) where
 
+--import           Control.Lens
 import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Hashable

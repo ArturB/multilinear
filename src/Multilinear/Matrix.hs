@@ -14,7 +14,7 @@ Portability : Windows/POSIX
 
 module Multilinear.Matrix (
   -- * Generators
-fromIndices, Multilinear.Matrix.const,
+  fromIndices, Multilinear.Matrix.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
   -- * From files
@@ -24,7 +24,6 @@ fromIndices, Multilinear.Matrix.const,
 import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
-import           Data.Bits
 import           Data.CSV.Enumerator
 import           Data.Either
 import           Data.Serialize
@@ -36,37 +35,47 @@ import           Multilinear.Index.Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
 
+invalidIndices :: String
+invalidIndices = "Indices and its sizes not compatible with structure of matrix!"
+
+deserializationError :: String
+deserializationError = "Components deserialization error!"
+
 {-| Generate matrix as function of its indices -}
+{-# INLINE fromIndices #-}
 fromIndices :: (
-    Eq a, Show a, Integral a, Num a, Bits a
+    Num a
   ) => String               -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
     -> Int                  -- ^ Number of matrix rows
     -> Int                  -- ^ Number of matrix columns
     -> (Int -> Int -> a)    -- ^ Generator function - returns a matrix component at @i,j@
-    -> Tensor a       -- ^ Generated matrix
+    -> Tensor a             -- ^ Generated matrix
 
-fromIndices [u,d] su sd f = mergeScalars $
-    FiniteTensor (Contravariant su [u]) $
-      Boxed.generate su (\i -> FiniteTensor (Covariant sd [d]) $
-        Boxed.generate sd (Scalar . f i)
-     )
-fromIndices _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
+fromIndices x = case x of
+    [u,d] -> \su sd f -> 
+      FiniteTensor (Contravariant su [u]) $
+        Boxed.generate su (
+          SimpleFinite (Covariant sd [d]) . Boxed.generate sd . f
+      )
+    _ -> \_ _ _ -> Err invalidIndices
 
 {-| Generate matrix with all components equal to @v@ -}
+{-# INLINE Multilinear.Matrix.const #-}
 const :: (
-    Eq a, Show a, Num a, Bits a
-  ) => String          -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> Int             -- ^ Number of matrix rows
-    -> Int             -- ^ Number of matrix columns
-    -> a               -- ^ Value of matrix components
+    Num a
+  ) => String    -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> Int       -- ^ Number of matrix rows
+    -> Int       -- ^ Number of matrix columns
+    -> a         -- ^ Value of matrix components
     -> Tensor a  -- ^ Generated matrix
 
-const [u,d] su sd v = mergeScalars $
-    FiniteTensor (Contravariant su [u]) $
-      Boxed.replicate (fromIntegral su) $
-        FiniteTensor (Covariant sd [d]) $
-          Boxed.replicate (fromIntegral sd) $ Scalar v
-const _ _ _ _ = Err "Indices and its sizes incompatible with matrix structure!"
+const x = case x of
+  [u,d] -> \su sd v -> 
+      FiniteTensor (Contravariant su [u]) $
+        Boxed.replicate (fromIntegral su) $
+          SimpleFinite (Covariant sd [d]) $
+            Boxed.replicate (fromIntegral sd) v
+  _ -> \_ _ _ -> Err invalidIndices
 
 {-| Generate matrix with random real components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
@@ -81,27 +90,30 @@ The matrix is wrapped in the IO monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
+{-# INLINE randomDouble #-}
 randomDouble :: (
     ContGen d
-  ) => String                    -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> Int                       -- ^ Number of matrix rows
-    -> Int                       -- ^ Number of matrix columns
-    -> d                         -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+  ) => String              -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> Int                 -- ^ Number of matrix rows
+    -> Int                 -- ^ Number of matrix columns
+    -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated matrix
 
-randomDouble [u,d] su sd dist = do
-  components <-
-    sequence [
+randomDouble x = case x of
+  [u,d] -> \su sd dist -> do
+    components <-
       sequence [
-        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
-      | _ <- [1..sd] ]
-    | _ <- [1..su] ]
+        sequence [
+          MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
+        | _ <- [1..sd] ]
+      | _ <- [1..su] ]
 
-  return $ mergeScalars $
-    FiniteTensor (Contravariant su [u]) $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ Scalar <$> Boxed.fromList x
-    ) <$> Boxed.fromList components
-randomDouble _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+    return $ 
+      FiniteTensor (Contravariant su [u]) $ (
+        SimpleFinite (Covariant sd [d]) . Boxed.fromList
+      ) <$> Boxed.fromList components
+
+  _ -> \_ _ _ -> return $ Err invalidIndices
 
 {-| Generate matrix with random integer components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
@@ -110,27 +122,30 @@ The matrix is wrapped in the IO monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+{-# INLINE randomInt #-}
 randomInt :: (
     DiscreteGen d
-  ) => String                    -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> Int                       -- ^ Number of matrix rows
-    -> Int                       -- ^ Number of matrix columns
-    -> d                         -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor Double)  -- ^ Generated matrix
+  ) => String           -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> Int              -- ^ Number of matrix rows
+    -> Int              -- ^ Number of matrix columns
+    -> d                -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> IO (Tensor Int)  -- ^ Generated matrix
 
-randomInt [u,d] su sd dist = do
-  components <-
-    sequence [
+randomInt x = case x of
+  [u,d] -> \su sd dist -> do
+    components <-
       sequence [
-        MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar dist gen
-      | _ <- [1..sd] ]
-    | _ <- [1..su] ]
+        sequence [
+          MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar dist gen
+        | _ <- [1..sd] ]
+      | _ <- [1..su] ]
 
-  return $ mergeScalars $
-    FiniteTensor (Contravariant su [u]) $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ Scalar <$> Boxed.fromList x
-    ) <$> Boxed.fromList components
-randomInt _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+    return $ 
+      FiniteTensor (Contravariant su [u]) $ (
+        SimpleFinite (Covariant sd [d]) . Boxed.fromList
+      ) <$> Boxed.fromList components
+
+  _ -> \_ _ _ -> return $ Err invalidIndices
 
 {-| Generate matrix with random real components with given probability distribution and given seed.
 The matrix is wrapped in the a monad. -}
@@ -145,29 +160,32 @@ The matrix is wrapped in the a monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
+{-# INLINE randomDoubleSeed #-}
 randomDoubleSeed :: (
     ContGen d, PrimMonad m
-  ) => String                    -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> Int                       -- ^ Number of matrix rows
-    -> Int                       -- ^ Number of matrix columns
-    -> d                         -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> Int                       -- ^ Randomness seed
+  ) => String              -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> Int                 -- ^ Number of matrix rows
+    -> Int                 -- ^ Number of matrix columns
+    -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
+    -> Int                 -- ^ Randomness seed
     -> m (Tensor Double)   -- ^ Generated matrix
 
-randomDoubleSeed [u,d] su sd dist seed = do
-  gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-  components <-
-    sequence [
+randomDoubleSeed x = case x of
+  [u,d] -> \su sd dist seed -> do
+    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
+    components <-
       sequence [
-        genContVar dist gen
-      | _ <- [1..sd] ]
-    | _ <- [1..su] ]
+        sequence [
+          genContVar dist gen
+        | _ <- [1..sd] ]
+      | _ <- [1..su] ]
 
-  return $ mergeScalars $
-    FiniteTensor (Contravariant su [u]) $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ Scalar <$> Boxed.fromList x
-    ) <$> Boxed.fromList components
-randomDoubleSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+    return $ 
+      FiniteTensor (Contravariant su [u]) $ (
+        SimpleFinite (Covariant sd [d]) . Boxed.fromList
+      ) <$> Boxed.fromList components
+
+  _ -> \_ _ _ _ -> return $ Err invalidIndices
 
 {-| Generate matrix with random integer components with given probability distribution. and given seed.
 The matrix is wrapped in a monad. -}
@@ -176,64 +194,73 @@ The matrix is wrapped in a monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
+{-# INLINE randomIntSeed #-}
 randomIntSeed :: (
     DiscreteGen d, PrimMonad m
-  ) => String                    -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> Int                       -- ^ Number of matrix rows
-    -> Int                       -- ^ Number of matrix columns
-    -> d                         -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> Int                       -- ^ Randomness seed
+  ) => String              -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> Int                 -- ^ Number of matrix rows
+    -> Int                 -- ^ Number of matrix columns
+    -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
+    -> Int                 -- ^ Randomness seed
     -> m (Tensor Int)      -- ^ Generated matrix
 
-randomIntSeed [u,d] su sd dist seed = do
-  gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-  components <-
-    sequence [
+randomIntSeed x = case x of
+  [u,d] -> \su sd dist seed -> do
+    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
+    components <-
       sequence [
-        genDiscreteVar dist gen
-      | _ <- [1..sd] ]
-    | _ <- [1..su] ]
+        sequence [
+          genDiscreteVar dist gen
+        | _ <- [1..sd] ]
+      | _ <- [1..su] ]
 
-  return $ mergeScalars $
-    FiniteTensor (Contravariant su [u]) $ (\x ->
-      FiniteTensor (Covariant sd [d]) $ Scalar <$> Boxed.fromList x
-    ) <$> Boxed.fromList components
-randomIntSeed _ _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+    return $ 
+      FiniteTensor (Contravariant su [u]) $ (
+        SimpleFinite (Covariant sd [d]) . Boxed.fromList
+      ) <$> Boxed.fromList components
+
+  _ -> \_ _ _ _ -> return $ Err invalidIndices
 
 {-| Read matrix components from CSV file. -}
+{-# INLINE fromCSV #-}
 fromCSV :: (
-    Eq a, Show a, Num a, Bits a, Serialize a
-  ) => String                                        -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> String                                        -- ^ CSV file name
-    -> Char                                          -- ^ Separator expected to be used in this CSV file
+    Num a, Serialize a
+  ) => String                                  -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
+    -> String                                  -- ^ CSV file name
+    -> Char                                    -- ^ Separator expected to be used in this CSV file
     -> EitherT SomeException IO (Tensor a)     -- ^ Generated matrix or error message
 
-fromCSV [u,d] fileName separator = do
-  csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
-  let components = (decode <$> ) <$> csv
-  let rows = length components
-  let columns = if rows > 0 then length $ rights (head components) else 0
-  if rows > 0 && columns > 0
-  then return $ mergeScalars $
-    FiniteTensor (Contravariant rows [u]) $ (\x ->
-      FiniteTensor (Covariant columns [d]) $ Scalar <$> Boxed.fromList (rights x)
-    ) <$> Boxed.fromList components
-  else EitherT $ return $ Left $ SomeException $ TypeError "Components deserialization error!"
-fromCSV _ _ _ = return $ Err "Indices and its sizes not compatible with structure of matrix!"
+fromCSV x = case x of
+  [u,d] -> \fileName separator -> do
+    csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
+    let components = (decode <$> ) <$> csv
+    let rows = length components
+    let columns = if rows > 0 then length $ rights (head components) else 0
+    if rows > 0 && columns > 0
+    then return $ 
+      FiniteTensor (Contravariant rows [u]) $ (
+        SimpleFinite (Covariant columns [d]) . Boxed.fromList . rights
+      ) <$> Boxed.fromList components
+    else EitherT $ return $ Left $ SomeException $ TypeError deserializationError
+
+  _ -> \_ _ -> return $ Err invalidIndices
 
 {-| Write matrix to CSV file. -}
+{-# INLINE toCSV                    #-}
 toCSV :: (
-    Eq a, Show a, Num a, Bits a, Serialize a
+    Num a, Serialize a
   ) => Tensor a  -- ^ Matrix to serialize
-    -> String          -- ^ CSV file name
-    -> Char            -- ^ Separator expected to be used in this CSV file
-    -> IO Int          -- ^ Number of rows written
+    -> String    -- ^ CSV file name
+    -> Char      -- ^ Separator expected to be used in this CSV file
+    -> IO Int    -- ^ Number of rows written
 
-toCSV t@(FiniteTensor (Contravariant _ _) rows) fileName separator =
-  let elems = Boxed.toList $ Boxed.toList . tensorsFinite <$> rows
-      encodedElems = (encode . scalarVal <$>) <$> elems
-  in
-    if length (indices t) == 2 && TIndex.isCovariant (indices t !! 1)
-    then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
-    else return 0
-toCSV _ _ _ = return 0
+toCSV t = case t of
+  (FiniteTensor (Contravariant _ _) rows) -> \fileName separator ->
+    let elems = Boxed.toList $ Boxed.toList . tensorsFinite <$> rows
+        encodedElems = (encode . scalarVal <$>) <$> elems
+    in
+      if length (indices t) == 2 && TIndex.isCovariant (indices t !! 1)
+      then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
+      else return 0
+
+  _ -> \_ _ -> return 0

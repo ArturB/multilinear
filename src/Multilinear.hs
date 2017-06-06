@@ -1,34 +1,34 @@
 {-|
 Module      : Multilinear
-Description : A (multi)linear algbra library. 
+Description : A (multi)linear algbra library.
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-Multilinear library provides efficient and terse way to deal with linear algebra in Haskell. It is based on concept of tensor - a multidimensional indexed array of numbers. Vectors, matrices and linear functionals are examples of low-order tensors. 
+Multilinear library provides efficient and terse way to deal with linear algebra in Haskell. It is based on concept of tensor - a multidimensional indexed array of numbers. Vectors, matrices and linear functionals are examples of low-order tensors.
 
 = Quick tutorial
 
-Tensors are indexed, each having one or several indices numbering its components. A scalar has no indices, as being simply a value. A vector has one index, because it is a one-dimensional list of numbers. A matrix has two indices, being a bidimensional table of numbers. Tensors are arbitrarily - dimensional, so you can have a vector of matrices (third-order tensor) and so on. Such tensors are especially useful when dealing with more complex task, such as programming neural networks e.g. for deep learning. 
+Tensors are indexed, each having one or several indices numbering its components. A scalar has no indices, as being simply a value. A vector has one index, because it is a one-dimensional list of numbers. A matrix has two indices, being a bidimensional table of numbers. Tensors are arbitrarily - dimensional, so you can have a vector of matrices (third-order tensor) and so on. Such tensors are especially useful when dealing with more complex task, such as programming neural networks e.g. for deep learning.
 
-Index may be either __lower (contravariant)__ or __upper (covariant)__, depending on its function. 
+Index may be either __lower (contravariant)__ or __upper (covariant)__, depending on its function.
 
-A vector has one __upper__ or __contravariant__ index, because it represents a value, point in a space. A linear functional (called in this library as a __form__) is represented as a list of numbers, similar to vector, but it does not indicate a value, but rather a coefficients of __linear map__  or __transformation__ that takes a vector and returns a number, simply by calculating a linear combination of vector components with weights being a linear functional coefficients. So elements of linear functional are indexed by __lower__ or __covariant__ index. 
+A vector has one __upper__ or __contravariant__ index, because it represents a value, point in a space. A linear functional (called in this library as a __form__) is represented as a list of numbers, similar to vector, but it does not indicate a value, but rather a coefficients of __linear map__  or __transformation__ that takes a vector and returns a number, simply by calculating a linear combination of vector components with weights being a linear functional coefficients. So elements of linear functional are indexed by __lower__ or __covariant__ index.
 
 A matrix also represents a linear transformation, similar to linear functional, but it take a vector and return a vector, not a scalar. So matrix is simply a bunch of linear functionals - each one is a matrix row and returns a one element of resulting vector. These linear functionals are also indexed - of course by an contravariant index, as vector, which is returned by a matrix. So matrix is a tensor with two indices - one uppper (contravariant) and one lower (covariant).
 
-A dot product is - what a surprise! - a linear transformation. But it is different from matrix - it takes two vectors to multiplicate and returns one number. So it needs two lower (covariant) indices. In fact, a dot product is represented as a bidimensional table of numbers - as matrix - but with two lower indices, instead of one upper and one lower. Tensors with several lower indices are called n-forms. Actually, many linear maps that takes two vectors and returns a number are represented in such notation. A dot product is a table filled with zeros but having a 1-s in diagonal of the table - it look visually identical like unit matrix, but it isn't a matrix - it's actually a 2-form. In this library dot product is called (as in abstract maths) a __Kronecker delta__ (in "Multilinear.NForm""). 
+A dot product is - what a surprise! - a linear transformation. But it is different from matrix - it takes two vectors to multiplicate and returns one number. So it needs two lower (covariant) indices. In fact, a dot product is represented as a bidimensional table of numbers - as matrix - but with two lower indices, instead of one upper and one lower. Tensors with several lower indices are called n-forms. Actually, many linear maps that takes two vectors and returns a number are represented in such notation. A dot product is a table filled with zeros but having a 1-s in diagonal of the table - it look visually identical like unit matrix, but it isn't a matrix - it's actually a 2-form. In this library dot product is called (as in abstract maths) a __Kronecker delta__ (in "Multilinear.NForm"").
 
-A cross product takes two vectors and returns a vector of numbers. So, as you can guess, it has three indices - two covariant (lower) and one upper (contravariant). A tensor that corresponds to cross product is called Levi-Civita symbol and is implemented under "Multilinear.Tensor". 
+A cross product takes two vectors and returns a vector of numbers. So, as you can guess, it has three indices - two covariant (lower) and one upper (contravariant). A tensor that corresponds to cross product is called Levi-Civita symbol and is implemented under "Multilinear.Tensor".
 
-As you see, multidimensional indexed arrays - tensors - provide a unified way to deal with linear algebra - such with data (vectors) and functions operating on them (matrices, n-forms). Using tensors instead of limited number of pre-defined functions, you gain a power of universal formalism, where you can express any linear function you want to deal with. 
+As you see, multidimensional indexed arrays - tensors - provide a unified way to deal with linear algebra - such with data (vectors) and functions operating on them (matrices, n-forms). Using tensors instead of limited number of pre-defined functions, you gain a power of universal formalism, where you can express any linear function you want to deal with.
 
 When you apply a linear functional to a vector, you compute a linear combination - or a weighted sum - of its components. It is so common operation in linear algebra,
 that it requires a convenient way to note. Einstein (1905) introduced a summation rule:
 
-If you multiply a tensor with lower index __/i/__ by a tensor with upper index with same name __/i__ then the linear combination of its components is automatically computed. The only condition is that an index of vector and index of corresponding linear transformation must have the same name. 
+If you multiply a tensor with lower index __/i/__ by a tensor with upper index with same name __/i__ then the linear combination of its components is automatically computed. The only condition is that an index of vector and index of corresponding linear transformation must have the same name.
 
 == Examples
 
@@ -77,9 +77,9 @@ If you want to apply a vector to matrix, you must simply multiply them. The only
    | 60
    | 70
 @
-Note, that result vector is indexed with "i" - the same index as uppper index of our matrix. 
+Note, that result vector is indexed with "i" - the same index as uppper index of our matrix.
 
-If you want to do a matrix multiplication, a lower index of first matrix must have the same name as upper index of second matrix. 
+If you want to do a matrix multiplication, a lower index of first matrix must have the same name as upper index of second matrix.
 
 @
 
@@ -104,7 +104,7 @@ If you want to do a matrix multiplication, a lower index of first matrix must ha
    | [k:4] [50,60,70,80]
 @
 
-Note, that rule that first matrix lower index must be the same as the second matrix upper index corresponeds to the fact, that to multiply two matrices, the widht of first matrix must be the same as width of the second matrix. The rule of matrix multiplication guarantees, that this operation is equivalent to linear functions composition. 
+Note, that rule that first matrix lower index must be the same as the second matrix upper index corresponeds to the fact, that to multiply two matrices, the widht of first matrix must be the same as width of the second matrix. The rule of matrix multiplication guarantees, that this operation is equivalent to linear functions composition.
 
 The dot product of vectors may be done by simply making one of vectors with lower index, or - more correctly - by applying two vectors to Kronecker delta:
 
@@ -133,7 +133,7 @@ The dot product of vectors may be done by simply making one of vectors with lowe
 
 @
 
-If you want to know more about linear algebra and Einstein convention, read Wikipedia: 
+If you want to know more about linear algebra and Einstein convention, read Wikipedia:
 
 - <https://en.wikipedia.org/wiki/Matrix_(mathematics)>
 - <https://en.wikipedia.org/wiki/Covariance_and_contravariance_of_vectors>
@@ -141,8 +141,8 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 
 -}
 
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies          #-}
 
 module Multilinear (
@@ -150,47 +150,57 @@ module Multilinear (
     Accessible(..), StandardTensor(..)
 ) where
 
-import Data.Maybe
-import Data.Set
-import Multilinear.Index
-import Data.Bits
-import           Data.Serialize
-import Data.Aeson
-import qualified Data.ByteString.Lazy       as ByteString
 import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Maybe
+import           Data.Aeson
+import qualified Data.ByteString.Lazy       as ByteString
+import           Data.Maybe
+import           Data.Serialize
+import           Data.Set
+import           Multilinear.Index
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
   Num (t a),     -- Tensors may be added, subtracted and multiplicated
-  Bits (t a),    -- Also bit operations can be performed on tensors
-  Monoid (t a),  -- Tensors are a monoid with concatenation as monoid operation
+  Monoid (t a),  -- Tensors are monoids with concatenation as monoid operation
   Functor t      -- Tensor should be a Functor for convenience
   ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
     infixl 7 .+
-    (.+) :: a -> t a -> t a
+    (+.) :: a -> t a -> t a
 
     {-| Subtract each element of tensor @t@ from scalar scalar left -}
     infixl 7 .-
-    (.-) :: a -> t a -> t a
+    (-.) :: a -> t a -> t a
 
     {-| Multiply scalar @a@ by each element of tensor @t@ -}
     infixl 8 .*
-    (.*) :: a -> t a -> t a
+    (*.) :: a -> t a -> t a
 
     {-| Add each element of tensor @t@ to scalar @a@ -}
     infixl 7 +.
-    (+.) :: t a -> a -> t a
+    (.+) :: t a -> a -> t a
 
-    {-| Subtract scalar @a@ to each element of tensor @t@ -}
+    {-| Subtract scalar @a@ from each element of tensor @t@ -}
     infixl 7 -.
-    (-.) :: t a -> a -> t a
+    (.-) :: t a -> a -> t a
 
     {-| Multiply each element of tensor @t@ by scalar @a@ -}
     infixl 8 *.
-    (*.) :: t a -> a -> t a
+    (.*) :: t a -> a -> t a
+
+    {-| Tensor adding - functionally equal to Num (+) but more efficient -}
+    infixl 7 .+.
+    (.+.) :: t a -> t a -> t a
+
+    {-| Tensor subtracting - functionally equal to Num (-) but more efficient -}
+    infixl 7 .-.
+    (.-.) :: t a -> t a -> t a
+
+    {-| Tensor multiplication - functionally equal to Num (*) but more efficient -}
+    infixl 7 .*.
+    (.*.) :: t a -> t a -> t a
 
     {-| List of all tensor indices -}
     indices :: t a -> [TIndex]
@@ -198,13 +208,13 @@ class (
     {-| List of tensor indices names -}
     indicesNames :: t a -> [String]
     indicesNames t = indexName <$> indices t
-    
+
     {-| Tensor order - number of covariant and contravariant indices -}
     {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
     order :: t a -> (Int,Int)
 
     {-| Return size of index with given name of Nothing if index is infinite-dimensional -}
-    size :: t a -> Either String Int
+    size :: t a -> String -> Either String Int
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
     equiv :: t a -> t a -> Bool
@@ -240,7 +250,7 @@ class (
     transpose :: t a -> t a
 
     {-| Shift tensor index right -}
-    {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion. 
+    {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion.
         Elements of tensor as indexed with indices names becomes unchanged. -}
     shiftRight :: t a -> String -> t a
     -- ^ Right shift of an index is equivalent to left shift of its successor in recursion @s@, if only @s@ exists, so:
@@ -259,7 +269,7 @@ class (
     t |>> n = shiftRight t n
 
     {-| Shift tensor index rightmost -}
-    {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion. 
+    {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion.
         Elements of tensor as indexed with indices names becomes unchanged.  -}
     shiftRightmost :: t a -> String -> t a
     shiftRightmost t n = until (\x -> n == last (indicesNames x)) (|>> n) t
@@ -364,9 +374,9 @@ class (
 class Multilinear t a => Accessible t a where
 
     {-| Accessing tensor elements -}
-    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5. 
+    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5.
         Values of other indices are insignificant -}
-    {-| If given index value is out of range, then modulo operation is performed: 
+    {-| If given index value is out of range, then modulo operation is performed:
         el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
     el :: [String] -> t a -> [Int] -> t a
 

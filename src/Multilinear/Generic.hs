@@ -21,11 +21,11 @@ so it may operate in smaller memory (e.g. linear instead of quadratic when multi
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE UndecidableInstances  #-}
 
 module Multilinear.Generic (
     Tensor(..), (!), mergeScalars,
-    isScalar, isSimple, isFiniteTensor, isInfiniteTensor
+    isScalar, isSimple, isFiniteTensor, isInfiniteTensor,
+    dot, _elemByElem, contractionErr, tensorIndex
 ) where
 
 import           Codec.Compression.GZip
@@ -63,7 +63,10 @@ infiniteIndex :: String
 infiniteIndex = "Index is infinitely-dimensional!"
 
 infiniteTensor :: String
-infiniteTensor = "This tensor is infinitely-dimensional and cannto be printed!"
+infiniteTensor = "This tensor is infinitely-dimensional and cannot be printed!"
+
+indexNotFound :: String
+indexNotFound = "This tensor has not such index!"
 
 {-| Tensor defined recursively as scalar or list of other tensors -}
 {-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
@@ -99,61 +102,90 @@ data Tensor a =
     } deriving (Eq, Generic)
 
 {-| Return true if tensor is a scalar -}
+{-# INLINE isScalar #-}
 isScalar :: Tensor a -> Bool
-isScalar (Scalar _) = True
-isScalar _          = False
+isScalar x = case x of
+    Scalar _ -> True
+    _        -> False
 
 {-| Return true if tensor is a simple tensor -}
+{-# INLINE isSimple #-}
 isSimple :: Tensor a -> Bool
-isSimple (SimpleFinite _ _) = True
-isSimple _                  = False
+isSimple x = case x of
+    SimpleFinite _ _ -> True
+    _                -> False
 
 {-| Return True if tensor is a complex tensor -}
+{-# INLINE isFiniteTensor #-}
 isFiniteTensor :: Tensor a -> Bool
-isFiniteTensor (FiniteTensor _ _) = True
-isFiniteTensor _                  = False
+isFiniteTensor x = case x of
+    FiniteTensor _ _ -> True
+    _                -> False
 
 {-| Return True if tensor is a infinite tensor -}
+{-# INLINE isInfiniteTensor #-}
 isInfiniteTensor :: Tensor a -> Bool
-isInfiniteTensor (InfiniteTensor _ _) = True
-isInfiniteTensor _                    = False
+isInfiniteTensor x = case x of
+    InfiniteTensor _ _ -> True
+    _                  -> False
+
+{- Return True if tensor is a error tensor -}
+{-# INLINE isErrTensor #-}
+isErrTensor :: Tensor a -> Bool
+isErrTensor x = case x of
+    Err _ -> True
+    _     -> False
 
 {-| Return generic tensor index -}
+{-# INLINE tensorIndex #-}
 tensorIndex :: Tensor a -> Index.TIndex
-tensorIndex (Scalar _)           = error scalarIndices
-tensorIndex (SimpleFinite i _)   = Index.toTIndex i
-tensorIndex (FiniteTensor i _)   = Index.toTIndex i
-tensorIndex (InfiniteTensor i _) = Index.toTIndex i
-tensorIndex (Err msg)            = error msg
+tensorIndex x = case x of
+    Scalar _           -> error scalarIndices
+    SimpleFinite i _   -> Index.toTIndex i
+    FiniteTensor i _   -> Index.toTIndex i
+    InfiniteTensor i _ -> Index.toTIndex i
+    Err msg            -> error msg
 
 {-| Return True if tensor has no elements -}
+{-# INLINE isEmptyTensor #-}
 isEmptyTensor :: Tensor a -> Bool
-isEmptyTensor (Scalar _)            = False
-isEmptyTensor (SimpleFinite _ ts)   = Boxed.null ts
-isEmptyTensor (FiniteTensor _ ts)   = Boxed.null ts
-isEmptyTensor (InfiniteTensor _ ts) = null ts
-isEmptyTensor (Err _)               = True
+isEmptyTensor x = case x of
+    Scalar _            -> False
+    SimpleFinite _ ts   -> Boxed.null ts
+    FiniteTensor _ ts   -> Boxed.null ts
+    InfiniteTensor _ ts -> null ts
+    Err _               -> False
 
 {-| Returns sample element of the tensor. Used to determine some features common for all elements, like bit-qualities. -}
+{-# INLINE firstElem #-}
 firstElem :: Tensor a -> a
-firstElem (Scalar x)            = x
-firstElem (SimpleFinite _ ts)   = Boxed.head ts
-firstElem (FiniteTensor _ ts)   = firstElem $ Boxed.head ts
-firstElem (InfiniteTensor _ ts) = firstElem $ head ts
-firstElem (Err msg)             = error msg
+firstElem x = case x of
+    Scalar val          -> val
+    SimpleFinite _ ts   -> Boxed.head ts
+    FiniteTensor _ ts   -> firstElem $ Boxed.head ts
+    InfiniteTensor _ ts -> firstElem $ head ts
+    Err msg             -> error msg
+
+{-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
+{-# INLINE firstTensor #-}
+firstTensor :: Tensor a -> Tensor a
+firstTensor x = case x of
+    FiniteTensor _ ts   -> Boxed.head ts
+    InfiniteTensor _ ts -> Data.List.head ts
+    _                   -> x
 
 {-| Recursive indexing on list tensor
-    @t ! i = t[i]@
--}
+    @t ! i = t[i]@ -}
+{-# INLINE (!) #-}
 (!) :: Tensor a      -- ^ tensor @t@
     -> Int           -- ^ index @i@
     -> Tensor a      -- ^ tensor @t[i]@
-
-(!) (Scalar _) _            = Err scalarIndices
-(!) (Err msg) _             = Err msg
-(!) (SimpleFinite _  ts) i  = Scalar $ ts Boxed.! i
-(!) (FiniteTensor _  ts) i  = ts Boxed.! i
-(!) (InfiniteTensor _ ts) i = ts !! i
+t ! i = case t of
+    Scalar _            -> Err scalarIndices
+    Err msg             -> Err msg
+    SimpleFinite _  ts  -> Scalar $ ts Boxed.! i
+    FiniteTensor _  ts  -> ts Boxed.! i
+    InfiniteTensor _ ts -> ts !! i
 
 -- Binary serialization instance
 instance Serialize a => Serialize (Tensor a)
@@ -173,44 +205,38 @@ instance (
     -- merge errors first and then print whole tensor
     show t = show' $ _mergeErr t
         where
-        -- Scalar is showed simply as its value
-        show' (Scalar x) = show x
-        -- Covariant components are shown horizontally
-        show' (FiniteTensor index@(Finite.Covariant _ _) ts) =
-            show index ++ " T: " ++ _showHorizontal ts
-        show' (SimpleFinite index@(Finite.Covariant _ _) ts) =
-            show index ++ " S: " ++ _showHorizontal ts
-        -- Contravariant components are shown vertically
-        show' (FiniteTensor index@(Finite.Contravariant _ _) ts)=
-            show index ++ " T: " ++ _showVertical ts
-        show' (SimpleFinite index@(Finite.Contravariant _ _) ts)=
-            show index ++ " S: " ++ _showVertical ts
-        -- Sequences are shown horizontally
-        show' (FiniteTensor index@(Finite.Indifferent _ _) ts) =
-            show index ++ " T: " ++ _showHorizontal ts
-        show' (SimpleFinite index@(Finite.Indifferent _ _) ts) =
-            show index ++ " S: " ++ _showHorizontal ts
-        -- Error prints it error message
-        show' (Err msg) = show msg
-        -- Infinite tensors are printed with special message
-        show' (InfiniteTensor _ _) = show infiniteTensor
-
+        show' x = case x of
+            -- Scalar is showed simply as its value
+            Scalar v -> show v
+            -- SimpleFinite is shown dependent on its index...
+            SimpleFinite index ts -> show index ++ " S:" ++ case index of
+                -- If index is contravariant, show tensor components vertically
+                Finite.Contravariant _ _ -> _showVertical ts
+                -- If index is covariant or indifferent, show tensor compoments horizontally
+                _                        -> _showHorizontal ts
+            -- FiniteTensor is shown dependent on its index...
+            FiniteTensor index ts -> show index ++ " T:" ++ case index of
+                -- If index is contravariant, show tensor components vertically
+                Finite.Contravariant _ _ -> _showVertical ts
+                -- If index is covariant or indifferent, show tensor compoments horizontally
+                _                        -> _showHorizontal ts
+            -- Infinite tensor print erorr message as it cannot be fully shown
+            InfiniteTensor _ _ -> show infiniteTensor
+            -- Error prints its error message
+            Err msg -> show msg
+            
         -- Merge many errors in tensor to the first one
-        -- Error tensor is passed further
-        _mergeErr (Err msg) = Err msg
-        -- Tensor is merged to first error on deeper recursion level
-        _mergeErr t1@(FiniteTensor _ ts) =
-            -- find first error if present
-            let err = Data.List.find _isErrTensor (_mergeErr <$> ts)
-            -- and return this error if found, whole tensor otherwise
-            in fromMaybe t1 err
-        -- in other types of tensor cannot be any error
-        _mergeErr t1 = t1
-
-        -- return True if tensor is an error
-        --_isErrTensor :: Tensor c a -> Bool
-        _isErrTensor (Err _) = True
-        _isErrTensor _       = False
+        _mergeErr x = case x of
+            -- Error tensor is passed further
+            Err msg -> Err msg
+            -- FiniteTensor is merged to first error on deeper recursion level
+            FiniteTensor _ ts ->
+                -- find first error if present
+                let err = Data.List.find isErrTensor (_mergeErr <$> ts)
+                -- and return this error if found, whole tensor otherwise
+                in fromMaybe x err
+            -- in other types of tensor cannot be any error
+            _ -> x
 
         -- print container elements vertically
         -- used to show contravariant components of tensor, which by convention are written vertically
@@ -219,22 +245,24 @@ instance (
             "\n" ++ tail (foldl' (\string e -> string ++ "\n  |" ++ show e) "" container)
 
         -- print container elements horizontally
-        -- used to show contravariant components of tensor, which by convention are written vertically
+        -- used to show covariant (or indifferent) components of tensor, which by convention are written horizontally
         _showHorizontal :: (Show a, Foldable c) => c a -> String
         _showHorizontal container =
             "[" ++ tail (foldl' (\string e -> string ++ "," ++ show e) "" container) ++ "]"
 
 -- Tensor is a functor
 instance Functor Tensor where
-    -- Mapping scalars simply maps its value
-    fmap f (Scalar v_)                = Scalar (f v_)
-    -- Mapping vectors does mapping element by element
-    fmap f (SimpleFinite indexT ts)   = SimpleFinite indexT (f <$> ts)
-    -- Mapping tensors does mapping element by element
-    fmap f (FiniteTensor indexT ts)   = FiniteTensor indexT $ fmap (fmap f) ts
-    fmap f (InfiniteTensor indexT ts) = InfiniteTensor indexT $ fmap (fmap f) ts
-    -- Mapping errors changes nothing
-    fmap _ (Err msg)                  = Err msg
+
+    {-# INLINE fmap #-}
+    fmap f x = case x of
+        -- Mapping scalar simply maps its value
+        Scalar v                -> Scalar $ f v
+        -- Mapping complex tensor does mapping element by element
+        SimpleFinite index ts   -> SimpleFinite index (f <$> ts)
+        FiniteTensor index ts   -> FiniteTensor index $ fmap (fmap f) ts
+        InfiniteTensor index ts -> InfiniteTensor index $ fmap (fmap f) ts
+        -- Mapping errors changes nothing
+        Err msg                 -> Err msg
 
 -- Tensors can be compared lexigographically
 -- Allowes to put tensors in typical ordered containers
@@ -242,6 +270,7 @@ instance (
     Ord a
     ) => Ord (Tensor a) where
 
+    {-# INLINE (<=) #-}
     -- Error is smaller by other tensors, so when printing ordered containers, all erorrs will be printed first
     -- Two errors are compared by they messages lexigographically
     Err msg1 <= Err msg2 = msg1 <= msg2
@@ -255,65 +284,60 @@ instance (
     -- Complex tensors are compared lexigographically
     SimpleFinite _ ts1 <= SimpleFinite _ ts2     = ts1 <= ts2
     FiniteTensor _ ts1 <= FiniteTensor _ ts2     = ts1 <= ts2
-    SimpleFinite _ _ <= FiniteTensor _ _         = True
+    InfiniteTensor _ ts1 <= InfiniteTensor _ ts2 = ts1 <= ts2
     FiniteTensor _ _ <= SimpleFinite _ _         = False
+    SimpleFinite _ _ <= FiniteTensor _ _         = True
     InfiniteTensor _ _ <= FiniteTensor _ _       = False
     FiniteTensor _ _ <= InfiniteTensor _ _       = True
-    InfiniteTensor _ ts1 <= InfiniteTensor _ ts2 = ts1 <= ts2
     InfiniteTensor _ _ <= SimpleFinite _ _       = False
     SimpleFinite _ _ <= InfiniteTensor _ _       = True
 
 -- Tensors concatenation makes them a monoid
 instance (
-    Num a, Bits a
+    Num a
     ) => Monoid (Tensor a) where
-    -- Neutral element is a scalar as it has no indices and concatenation is by common inidces
-    mempty = {-FiniteTensor (Finite.Indifferent (Just 0) "i") mempty-} Scalar 0
 
-    -- Tensor concatenation by common index
-    mappend t1@(FiniteTensor ti1 ts1) t2@(FiniteTensor _ ts2) =
-        if indices t1 == indices t2
-        then FiniteTensor ti1 $ ts1 <> ts2
+    {-| Neutral element is a scalar as it has no indices and concatenation is by common inidces -}
+    {-# INLINE mempty #-}
+    mempty = Scalar 0
+
+    {-| Tensor concatenation -}
+    {-# INLINE mappend #-}
+    mappend t1 t2 = 
+        -- To preserve tensor structure, indices must be the same
+        if indices t1 == indices t2 
+        then case (t1,t2) of
+            -- Concatenation with scalar does nothing - Scalar is a neutral element
+            (Scalar _, _) -> t2
+            (_, Scalar _) -> t1
+            -- Concatenation of two SimpleFiniteTensors
+            (SimpleFinite i1 ts1, SimpleFinite _ ts2) -> 
+                SimpleFinite i1 $ ts1 <> ts2
+            -- Concatenation of two FiniteTensors
+            (FiniteTensor i1 ts1, FiniteTensor _ ts2) ->
+                FiniteTensor i1 $ ts1 <> ts2
+            -- Concatenation of other tensors (especially infinite ones) is impossible
+            _ -> Err differentIndices
+        -- If tensor indices are different, concatenation is impossible
         else Err differentIndices
-    mappend t1@(InfiniteTensor ti1 ts1) t2@(InfiniteTensor _ ts2) =
-        if indices t1 == indices t2
-        then InfiniteTensor ti1 $ ts1 <> ts2
-        else Err differentIndices
-    mappend t1@(InfiniteTensor ti1 ts1) t2@(FiniteTensor _ ts2) =
-        if indices t1 == indices t2
-        then InfiniteTensor ti1 $ ts1 <> Boxed.toList ts2
-        else Err differentIndices
-    mappend t1@(FiniteTensor _ ts1) t2@(InfiniteTensor ti2 ts2) =
-        if indices t1 == indices t2
-        then InfiniteTensor ti2 $ Boxed.toList ts1 <> ts2
-        else Err differentIndices
-    mappend t1@(SimpleFinite ti1 ts1) t2@(SimpleFinite _ ts2) =
-        if indices t1 == indices t2
-        then SimpleFinite ti1 $ ts1 <> ts2
-        else Err differentIndices
-    mappend (SimpleFinite _ _) t2@(FiniteTensor _ _) = t2
-    mappend t1@(FiniteTensor _ _) (SimpleFinite _ _) = t1
-    mappend (SimpleFinite _ _) t2@(InfiniteTensor _ _) = t2
-    mappend t1@(InfiniteTensor _ _) (SimpleFinite _ _) = t1
-    mappend (Err msg) _ = Err msg
-    mappend _ (Err msg) = Err msg
-    mappend (Scalar _) t = t
-    mappend t (Scalar _) = t
 
 {-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
+{-# INLINE mergeScalars #-}
 mergeScalars :: Tensor a -> Tensor a
-mergeScalars (FiniteTensor index1 ts1) = case ts1 Boxed.! 0 of
-    Scalar _ -> SimpleFinite index1 (scalarVal <$> ts1)
-    _        -> FiniteTensor index1 $ mergeScalars <$> ts1
-mergeScalars t = t
+mergeScalars x = case x of
+    (FiniteTensor index1 ts1) -> case ts1 Boxed.! 0 of
+        Scalar _ -> SimpleFinite index1 (scalarVal <$> ts1)
+        _        -> FiniteTensor index1 $ mergeScalars <$> ts1
+    _ -> x
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
-_elemByElem' :: (Num a, Bits a) =>
-               Tensor a                            -- ^ First argument of operator
-            -> Tensor a                            -- ^ Second argument of operator
-            -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
-            -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
-            -> Tensor a                            -- ^ Result tensor
+{-# INLINE _elemByElem' #-}
+_elemByElem' :: Num a 
+             => Tensor a                            -- ^ First argument of operator
+             -> Tensor a                            -- ^ Second argument of operator
+             -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
+             -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
+             -> Tensor a                            -- ^ Result tensor
 
 -- @Scalar x + Scalar y = Scalar x + y@
 _elemByElem' (Scalar x1) (Scalar x2) f _ = Scalar $ f x1 x2
@@ -380,24 +404,29 @@ _elemByElem' (Err msg) _ _ _ = Err msg
 _elemByElem' _ (Err msg) _ _ = Err msg
 
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
-_elemByElem :: (Num a, Bits a) =>
-               Tensor a                             -- ^ First argument of operator
+{-# INLINE _elemByElem #-}
+_elemByElem :: Num a 
+            => Tensor a                             -- ^ First argument of operator
             -> Tensor a                             -- ^ Second argument of operator
             -> (a -> a -> a)                        -- ^ Operator on tensor elements if indices are different
             -> (Tensor a -> Tensor a -> Tensor a)   -- ^ Tensor operator called if indices are the same
             -> Tensor a                             -- ^ Result tensor
 _elemByElem t1 t2 f op = mergeScalars $ _elemByElem' t1 t2 f op
 
--- Zipping two tensors with a function, assuming they have the same indices
-zipT :: (
-    Num a, Bits a
-    ) => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
+-- Zipping two tensors with a combinator, assuming they have the same indices
+{-# INLINE zipT #-}
+zipT :: Num a
+      => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
       -> (Tensor a -> a -> Tensor a)          -- ^ Tensor and scalar combinator
       -> (a -> Tensor a -> Tensor a)          -- ^ Scalar and tensor combinator
       -> (a -> a -> a)                        -- ^ Two scalars combinator
       -> Tensor a                             -- ^ First tensor to zip
       -> Tensor a                             -- ^ Second tensor to zip
       -> Tensor a                             -- ^ Result tensor
+
+-- Two simple tensors case
+zipT _ _ _ f (SimpleFinite index v1) (SimpleFinite _ v2)     = 
+    SimpleFinite index $ Boxed.zipWith f v1 v2
 
 --Two finite tensors case
 zipT f _ _ _ (FiniteTensor index v1) (FiniteTensor _ v2)     = 
@@ -406,10 +435,6 @@ zipT f _ _ _ (FiniteTensor index v1) (FiniteTensor _ v2)     =
 -- Two infinte tensors case
 zipT f _ _ _ (InfiniteTensor index v1) (InfiniteTensor _ v2) = 
     InfiniteTensor index $ Data.List.zipWith f v1 v2
-
--- Two simple tensors case
-zipT _ _ _ f (SimpleFinite index v1) (SimpleFinite _ v2)     = 
-    SimpleFinite index $ Boxed.zipWith f v1 v2
 
 -- Infinite and finite tensor case
 zipT f _ _ _ (InfiniteTensor _ v1) (FiniteTensor index v2)   = 
@@ -443,29 +468,103 @@ zipT _ _ _ _ _ (Err msg) = Err msg
 zipT _ _ _ _ _ _ = Err scalarIndices
 
 -- dot product of two tensors
-dot :: (
+{-# INLINE dot #-}
+dot :: Num a
+      => Tensor a  -- ^ First dot product argument
+      -> Tensor a  -- ^ Second dot product argument
+      -> Tensor a  -- ^ Resulting dot product
+
+-- Two simple tensors product
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = 
+        Scalar $ Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Two finite tensors product
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Simple tensor and finite tensor product
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*.) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Finite tensor and simple tensor product
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (.*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Simple tensor and infinite tensor product
+dot (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*.) ts1' (Boxed.fromList $ take count1 ts2')
+
+-- Infinite tensor and simple tensor product
+dot (InfiniteTensor (Infinite.Covariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (.*) (Boxed.fromList $ take count2 ts1') ts2'
+
+-- Finite tensor and infinite tensor product
+dot (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*) ts1' (Boxed.fromList $ take count1 ts2')
+
+-- Infinite tensor and finite tensor product
+dot (InfiniteTensor (Infinite.Covariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*) (Boxed.fromList $ take count2 ts1') ts2'
+
+-- In other cases cannot happen!
+dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
+
+-- bit dot product of two tensors
+{-# INLINE bitDot #-}
+bitDot :: (
     Num a, Bits a
-    ) => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors multiplication function
-      -> (Tensor a -> a -> Tensor a)          -- ^ Tensor and scalar multiplication function
-      -> (a -> Tensor a -> Tensor a)          -- ^ Scalar and tensor multiplication function
-      -> (a -> a -> a)                        -- ^ Two scalars multiplication function
-      -> (Tensor a -> Tensor a -> Tensor a)   -- ^ Tensor summation function
-      -> (a -> a -> a)                        -- ^ Scalars summation function
-      -> Tensor a                             -- ^ First dot product argument
+    ) => Tensor a                             -- ^ First dot product argument
       -> Tensor a                             -- ^ Second dot product argument
       -> Tensor a                             -- ^ Resulting dot product
 
+-- Two finite tensors product
+bitDot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Data.Foldable.foldl' (.|.) 0 $ Boxed.zipWith (.&.) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
 -- Two simple tensors product
-dot _ _ _ _ _ _ (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+bitDot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = 
-        let dotProduct v1 v2 = Boxed.sum $ Boxed.zipWith (*) v1 v2
+        let dotProduct v1 v2 =  Data.Foldable.foldl' (.|.) 0 $ Boxed.zipWith (.&.) v1 v2
         in  Scalar $ dotProduct ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
+-- Simple tensor and finite tensor product
+bitDot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 =  Data.Foldable.foldl' (.|.) 0 $ Boxed.zipWith (\e t -> (e .&.) <$> t) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Finite tensor and simple tensor product
+bitDot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Data.Foldable.foldl' (.|.) 0 $ Boxed.zipWith (\t e -> (.&. e) <$> t) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Simple tensor and infinite tensor product
+bitDot (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
+    Data.Foldable.foldl' (.|.) 0 $ Boxed.zipWith (\e t -> (e .&.) <$> t) ts1' (Boxed.fromList $ take count1 ts2')
+
+-- Infinite tensor and simple tensor product
+bitDot (InfiniteTensor (Infinite.Covariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') = 
+    Data.Foldable.foldl' (.|.) 0 $ Boxed.zipWith (\t e -> (.&. e) <$> t) (Boxed.fromList $ take count2 ts1') ts2'
+
+-- Finite tensor and infinite tensor product
+bitDot (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*) ts1' (Boxed.fromList $ take count1 ts2')
+
+-- Infinite tensor and finite tensor product
+bitDot (InfiniteTensor (Infinite.Covariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*) (Boxed.fromList $ take count2 ts1') ts2'
+
 -- In other cases cannot happen!
-dot _ _ _ _ _ _ t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
+bitDot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
 
 -- contraction error
+{-# INLINE contractionErr #-}
 contractionErr :: Index.TIndex   -- ^ Index of first dot product parameter
                -> Index.TIndex   -- ^ Index of second dot product parameter
                -> Tensor a       -- ^ Erorr message
@@ -476,27 +575,31 @@ contractionErr i1' i2' = Err $
     " and index2 is " ++ show i2'
 
 -- Tensors can be added, subtracted and multiplicated
-instance (
-    Num a, Bits a
-    ) => Num (Tensor a) where
+instance Num a => Num (Tensor a) where
 
     -- Adding - element by element
-    t1 + t2 = _elemByElem t1 t2 (+) $ zipT (+) (+.) (.+) (+)
+    {-# INLINE (+) #-}
+    t1 + t2 = _elemByElem t1 t2 (+) $ zipT (+) (.+) (+.) (+)
 
     -- Subtracting - element by element
-    t1 - t2 = _elemByElem t1 t2 (-) $ zipT (-) (-.) (.-) (-)
+    {-# INLINE (-) #-}
+    t1 - t2 = _elemByElem t1 t2 (-) $ zipT (-) (.-) (-.) (-)
 
     -- Multiplicating is treated as tensor product
     -- Tensor product applies Einstein summation convention
-    t1 * t2 = _elemByElem t1 t2 (*) $ dot (*) (*.) (.*) (*) (+) (+)
+    {-# INLINE (*) #-}
+    t1 * t2 = _elemByElem t1 t2 (*) dot
 
     -- Absolute value - element by element
+    {-# INLINE abs #-}
     abs t = abs <$> t
 
     -- Signum operation - element by element
+    {-# INLINE signum #-}
     signum t = signum <$> t
 
     -- Simple integer can be conveted to Scalar
+    {-# INLINE fromInteger #-}
     fromInteger x = Scalar $ fromInteger x
 
 -- Bit operations on tensors
@@ -505,26 +608,33 @@ instance (
     ) => Bits (Tensor a) where
 
     -- Bit sum - elem by elem
+    {-# INLINE (.|.) #-}
     t1 .|. t2 = _elemByElem t1 t2 (.|.) $ zipT (.|.) (\t e -> (.|. e) <$> t) (\e t -> (e .|.) <$> t) (.|.)
 
     -- Bit tensor product
     -- Summation and multiplication are replaced by its bit equivalents
     -- Two scalars are multiplicated by their values
-    t1 .&. t2 = _elemByElem t1 t2 (.&.) $ dot (.&.) (\t e -> (.&. e) <$> t) (\e t -> (e .&.) <$> t) (.&.) (.|.) (.|.)
+    {-# INLINE (.&.) #-}
+    t1 .&. t2 = _elemByElem t1 t2 (.&.) bitDot
 
     -- Bit exclusive sum (XOR) - elem by elem
+    {-# INLINE xor #-}
     t1 `xor` t2 = _elemByElem t1 t2 xor $ zipT xor (\t e -> (`xor` e) <$> t) (\e t -> (e `xor`) <$> t) xor
 
     -- Bit complement
+    {-# INLINE complement #-}
     complement = Multilinear.map complement
 
     -- Bit shift of all elements
+    {-# INLINE shift #-}
     shift t n = Multilinear.map (`shift` n) t
 
     -- Bit rotating of all elements
+    {-# INLINE rotate #-}
     rotate t n = Multilinear.map (`rotate` n) t
 
     -- Returns number of bits of elements of tensor, -1 for elements of undefined size
+    {-# INLINE bitSize #-}
     bitSize (Scalar x)          = fromMaybe (-1) $ bitSizeMaybe x
     bitSize (Err _)             = -1
     bitSize t =
@@ -533,6 +643,7 @@ instance (
         else fromMaybe (-1) $ bitSizeMaybe $ firstElem t
 
     -- Returns number of bits of elements of tensor
+    {-# INLINE bitSizeMaybe #-}
     bitSizeMaybe (Scalar x)          = bitSizeMaybe x
     bitSizeMaybe (Err _)             = Nothing
     bitSizeMaybe t =
@@ -541,6 +652,7 @@ instance (
         else bitSizeMaybe $ firstElem t
 
     -- Returns true if tensors element are signed
+    {-# INLINE isSigned #-}
     isSigned (Scalar x)          = isSigned x
     isSigned (Err _)             = False
     isSigned t =
@@ -548,21 +660,23 @@ instance (
         isSigned (firstElem t)
 
     -- bit i is a scalar value with the ith bit set and all other bits clear.
+    {-# INLINE bit #-}
     bit i = Scalar (bit i)
 
     -- Test bit - shoud retur True, if bit n if equal to 1.
     -- Tensors are entities with many elements, so this function always returns False.
     -- Do not use it, it is implemented only for legacy purposes.
+    {-# INLINE testBit #-}
     testBit _ _ = False
 
     -- Return the number of set bits in the argument. This number is known as the population count or the Hamming weight.
+    {-# INLINE popCount #-}
     popCount = popCountDefault
 
 -- Tensors can be divided by each other
-instance (
-    Fractional a, Bits a
-    ) => Fractional (Tensor a) where
+instance Fractional a => Fractional (Tensor a) where
 
+    {-# INLINE (/) #-}
     -- Scalar division return result of division of its values
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
     -- Tensor and scalar are divided value by value
@@ -575,117 +689,151 @@ instance (
     _ / _ = Err "TODO"
 
     -- A scalar can be generated from rational number
+    {-# INLINE fromRational #-}
     fromRational x = Scalar $ fromRational x
 
 -- Real-number functions on tensors.
 -- Function of tensor is tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (
-    Floating a, Bits a
-    ) => Floating (Tensor a) where
+instance Floating a => Floating (Tensor a) where
 
     {-| PI number -}
+    {-# INLINE pi #-}
     pi = Scalar pi
 
     {-| Exponential function. (exp t)[i] = exp( t[i] ) -}
+    {-# INLINE exp #-}
     exp t = exp <$> t
 
     {-| Natural logarithm. (log t)[i] = log( t[i] ) -}
+    {-# INLINE log #-}
     log t = log <$> t
 
     {-| Sinus. (sin t)[i] = sin( t[i] ) -}
+    {-# INLINE sin #-}
     sin t = sin <$> t
 
     {-| Cosinus. (cos t)[i] = cos( t[i] ) -}
+    {-# INLINE cos #-}
     cos t = cos <$> t
 
     {-| Inverse sinus. (asin t)[i] = asin( t[i] ) -}
+    {-# INLINE asin #-}
     asin t = asin <$> t
 
     {-| Inverse cosinus. (acos t)[i] = acos( t[i] ) -}
+    {-# INLINE acos #-}
     acos t = acos <$> t
 
     {-| Inverse tangent. (atan t)[i] = atan( t[i] ) -}
+    {-# INLINE atan #-}
     atan t = atan <$> t
 
     {-| Hyperbolic sinus. (sinh t)[i] = sinh( t[i] ) -}
+    {-# INLINE sinh #-}
     sinh t = sinh <$> t
 
     {-| Hyperbolic cosinus. (cosh t)[i] = cosh( t[i] ) -}
+    {-# INLINE cosh #-}
     cosh t = cosh <$> t
 
     {-| Inverse hyperbolic sinus. (asinh t)[i] = asinh( t[i] ) -}
+    {-# INLINE asinh #-}
     asinh t = acosh <$> t
 
     {-| Inverse hyperbolic cosinus. (acosh t)[i] = acosh (t[i] ) -}
+    {-# INLINE acosh #-}
     acosh t = acosh <$> t
 
     {-| Inverse hyperbolic tangent. (atanh t)[i] = atanh( t[i] ) -}
+    {-# INLINE atanh #-}
     atanh t = atanh <$> t
 
 -- Multilinear operations
-instance (
-    Num a, Bits a
-    ) => Multilinear Tensor a where
-
-    -- Add scalar left
-    x .+ t = (x+) <$> t
-
-    -- Subtract scalar left
-    x .- t = (x-) <$> t
-
-    -- Multiplicate by scalar left
-    x .* t = (x*) <$> t
+instance Num a => Multilinear Tensor a where
 
     -- Add scalar right
-    t +. x = (+x) <$> t
+    {-# INLINE (.+) #-}
+    t .+ x = (+x) <$> t
 
     -- Subtract scalar right
-    t -. x = (\p -> p - x) <$> t
+    {-# INLINE (.-) #-}
+    t .- x = (\p -> p - x) <$> t
 
     -- Multiplicate by scalar right
-    t *. x = (*x) <$> t
+    {-# INLINE (.*) #-}
+    t .* x = (*x) <$> t
+
+    -- Add scalar left
+    {-# INLINE (+.) #-}
+    x +. t = (x+) <$> t
+
+    -- Subtract scalar left
+    {-# INLINE (-.) #-}
+    x -. t = (x-) <$> t
+
+    -- Multiplicate by scalar left
+    {-# INLINE (*.) #-}
+    x *. t = (x*) <$> t
+
+    -- Two tensors sum
+    {-# INLINE (.+.) #-}
+    t1 .+. t2 = _elemByElem t1 t2 (+) $ zipT (+) (.+) (+.) (+)
+
+    -- Two tensors difference
+    {-# INLINE (.-.) #-}
+    t1 .-. t2 = _elemByElem t1 t2 (-) $ zipT (+) (.+) (+.) (+)
+
+    -- Tensor product
+    {-# INLINE (.*.) #-}
+    t1 .*. t2 = _elemByElem t1 t2 (+) dot
 
     -- List of all tensor indices
-    indices (Scalar _)          = []
-    indices (FiniteTensor i ts) = Index.toTIndex i : indices (head $ toList ts)
-    indices (InfiniteTensor i ts) = Index.toTIndex i : indices (head ts)
-    indices (SimpleFinite i _)  = [Index.toTIndex i]
-    indices (Err _)             = []
+    {-# INLINE indices #-}
+    indices x = case x of
+        Scalar _            -> []
+        FiniteTensor i ts   -> Index.toTIndex i : indices (head $ toList ts)
+        InfiniteTensor i ts -> Index.toTIndex i : indices (head ts)
+        SimpleFinite i _    -> [Index.toTIndex i]
+        Err _               -> []
 
     -- Get tensor order [ (contravariant,covariant)-type ]
-    order (Scalar _) = (0,0)
+    {-# INLINE order #-}
+    order x = case x of
+        Scalar _ -> (0,0)
+        SimpleFinite index _ -> case index of
+            Finite.Contravariant _ _ -> (1,0)
+            Finite.Covariant _ _     -> (0,1)
+            Finite.Indifferent _ _   -> (0,0)
+        Err _ -> (-1,-1)
+        _ -> let (cnvr, covr) = order $ firstTensor x
+             in case tensorIndex x of
+                Index.Contravariant _ _ -> (cnvr+1,covr)
+                Index.Covariant _ _     -> (cnvr,covr+1)
+                Index.Indifferent _ _   -> (cnvr,covr)
 
-    order (FiniteTensor (Finite.Contravariant _ _) t) = (cnvr+1,covr)
-        where (cnvr,covr) = order $ Data.List.head (toList t)
-    order (FiniteTensor (Finite.Covariant _ _) t) = (cnvr,covr+1)
-        where (cnvr,covr) = order $ Data.List.head (toList t)
-    order (FiniteTensor (Finite.Indifferent _ _) t) = (cnvr,covr)
-        where (cnvr,covr) = order $ Data.List.head (toList t)
-
-    order (InfiniteTensor (Infinite.Contravariant _) t) = (cnvr+1,covr)
-        where (cnvr,covr) = order $ Data.List.head t
-    order (InfiniteTensor (Infinite.Covariant _) t) = (cnvr,covr+1)
-        where (cnvr,covr) = order $ Data.List.head t
-    order (InfiniteTensor (Infinite.Indifferent _) t) = (cnvr,covr)
-        where (cnvr,covr) = order $ Data.List.head t
-
-    order (SimpleFinite (Finite.Contravariant _ _) _) = (1,0)
-    order (SimpleFinite (Finite.Covariant _ _) _) = (0,1)
-    order (SimpleFinite (Finite.Indifferent _ _) _) = (0,0)
-
-    order (Err _) = (-1,-1)
-
-    -- Get size of tensor index or Nothing if index is infinite or tensor
-    size (Scalar _)             = Left scalarIndices
-    size (SimpleFinite index _) = Right $ Finite.indexSize index
-    size (FiniteTensor index _) = Right $ Finite.indexSize index
-    size (InfiniteTensor _ _)   = Left infiniteIndex
-    size (Err msg)              = Left msg
+    -- Get size of tensor index or Left if index is infinite or tensor has no such index
+    {-# INLINE size #-}
+    size t iname = case t of
+        Scalar _             -> Left scalarIndices
+        SimpleFinite index _ -> 
+            if Index.indexName index == iname 
+            then Right $ Finite.indexSize index 
+            else Left indexNotFound
+        FiniteTensor index _ -> 
+            if Index.indexName index == iname
+            then Right $ Finite.indexSize index
+            else size (firstTensor t) iname
+        InfiniteTensor _ _   -> Left infiniteIndex
+        Err msg              -> Left msg
 
     -- Rename tensor index
+    {-# INLINE rename #-}
+
+    --Scalar has no indices to rename
     rename (Scalar x) _ _ = Scalar x
 
+    -- Rename finite tensor index
     rename (FiniteTensor i@(Finite.Contravariant count name) ts) before after
         | name == before = FiniteTensor (Finite.Contravariant count after) $ (\t' -> rename t' before after) <$> ts
         | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
@@ -696,6 +844,7 @@ instance (
         | name == before = FiniteTensor (Finite.Indifferent count after) $ (\t' -> rename t' before after) <$> ts
         | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
 
+    -- Rename infinite tensor index
     rename (InfiniteTensor i@(Infinite.Contravariant name) ts) before after
         | name == before = InfiniteTensor (Infinite.Contravariant after) $ (\t' -> rename t' before after) <$> ts
         | otherwise = InfiniteTensor i $ (\t' -> rename t' before after) <$> ts
@@ -706,6 +855,7 @@ instance (
         | name == before = InfiniteTensor (Infinite.Indifferent after) $ (\t' -> rename t' before after) <$> ts
         | otherwise = InfiniteTensor i $ (\t' -> rename t' before after) <$> ts
 
+    -- Rename simple tensor index
     rename t1@(SimpleFinite (Finite.Contravariant count name) ts) before after
         | name == before = SimpleFinite (Finite.Contravariant count after) ts
         | otherwise = t1
@@ -716,9 +866,11 @@ instance (
         | name == before = SimpleFinite (Finite.Indifferent count after) ts
         | otherwise = t1
 
+    -- Error tensor has no indices to rename
     rename (Err msg) _ _ = Err msg
 
     -- Raise an index
+    {-# INLINE (/\) #-}
     Scalar x /\ _ = Scalar x
     FiniteTensor index ts /\ n
         | Index.indexName index == n =
@@ -737,6 +889,7 @@ instance (
     Err msg /\ _ = Err msg
 
     -- Lower an index
+    {-# INLINE (\/) #-}
     Scalar x \/ _ = Scalar x
     FiniteTensor index ts \/ n
         | Index.indexName index == n =
@@ -755,6 +908,7 @@ instance (
     Err msg \/ _ = Err msg
 
     {-| Transpose a tensor (switch all indices types) -}
+    {-# INLINE transpose #-}
     transpose (Scalar x) = Scalar x
 
     transpose (FiniteTensor (Finite.Covariant count name) ts) =
@@ -781,6 +935,7 @@ instance (
     transpose (Err msg) = Err msg
 
     {-| Concatenation of two tensor with given index or by creating a new one -}
+    {-# INLINE augment #-}
     augment t1 t2 ind =
         let t1' = t1 <<<| ind
             t2' = t2 <<<| ind
@@ -788,6 +943,7 @@ instance (
 
     {-| Shift tensor index right -}
     {-| Moves given index one level deeper in recursion -}
+    {-# INLINE (|>>) #-}
     -- Error tensor has no indices to shift
     Err msg |>> _  = Err msg
     -- Scalar has no indices to shift
@@ -867,11 +1023,10 @@ instance (
 
 
 {-| List allows for random access to tensor elements -}
-instance (
-    Num a, Bits a
-    ) => Accessible Tensor a where
+instance Num a => Accessible Tensor a where
 
     {-| Accessing tensor elements -}
+    {-# INLINE el #-}
 
     -- Scalar has only one element
     el _ (Scalar x) _ = Scalar x
@@ -931,6 +1086,7 @@ instance (
     el _ (Err msg) _ = Err msg
 
     {-| Mapping with indices. -}
+    {-# INLINE iMap #-}
     iMap f t = iMap' t zeroList
         where
         zeroList = 0:zeroList
