@@ -24,7 +24,7 @@ import           Data.Serialize
 import           GHC.Generics
 import qualified Multilinear.Index as TIndex
 
-{-| Index of finite-dimension tensor with specified size -}
+{-| Index of finite-dimensional tensor with specified size -}
 data Index =
     Covariant {
         indexSize  :: Int,
@@ -40,7 +40,7 @@ data Index =
     }
     deriving (Eq, Generic)
 
-{-| Show instance of Finitwe -}
+{-| Show instance of Finite index -}
 instance Show Index where
     show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"

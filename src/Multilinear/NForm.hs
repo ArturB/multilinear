@@ -7,7 +7,7 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generates n-forms (tensors with n lower indices). 
+- This module provides convenient constructors that generates n-forms (tensors with n lower indices with finite or infinite size). 
 - Finitely-dimensional n-forms provide much greater performance than infinitely-dimensional
 
 -}
@@ -21,7 +21,6 @@ module Multilinear.NForm (
   Multilinear.NForm.dot, cross
 ) where
 
-
 import           Control.Monad.Primitive
 import qualified Data.Vector              as Boxed
 import           Multilinear.Generic
@@ -29,6 +28,12 @@ import           Multilinear.Index.Finite
 import qualified Multilinear.Tensor       as Tensor
 import           Statistics.Distribution
 import qualified System.Random.MWC        as MWC
+
+invalidIndices :: String
+invalidIndices = "Indices and its sizes incompatible with n-form structure!"
+
+invalidCrossProductIndices :: String
+invalidCrossProductIndices = "Indices and its sizes incompatible with cross product structure!"
 
 {-| Generate N-form as function of its indices -}
 {-# INLINE fromIndices #-}
@@ -42,7 +47,7 @@ fromIndices :: (
 fromIndices [d] [s] f = SimpleFinite (Covariant s [d]) $ Boxed.generate s (\x -> f [x])
 fromIndices (d:ds) (s:size) f = 
     FiniteTensor (Covariant s [d]) $ Boxed.generate s (\x -> fromIndices ds size (\dss -> f (x:dss)) )
-fromIndices _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
+fromIndices _ _ _ = Err invalidIndices
 
 {-| Generate N-form with all components equal to @v@ -}
 {-# INLINE Multilinear.NForm.const #-}
@@ -56,7 +61,7 @@ const :: (
 const [d] [s] v = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (Prelude.const v)
 const (d:ds) (s:size) v = 
     FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NForm.const ds size v
-const _ _ _ = Err "Indices and its sizes incompatible with n-vector structure!"
+const _ _ _ = Err invalidIndices
 
 {-| Generate n-vector with random real components with given probability distribution.
 The n-vector is wrapped in the IO monad. -}
@@ -80,15 +85,16 @@ randomDouble :: (
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated linear functional
 
-randomDouble [] [] d = do
-    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genContVar d gen
-    return $ Scalar component
+randomDouble [d] [s] distr = do
+    gen <- MWC.createSystemRandom
+    components <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    return $ SimpleFinite (Covariant s [d]) components
 
 randomDouble (d:ds) (s:size) distr = do
-  tensors <- sequence [randomDouble ds size distr | _ <- [0 .. s - 1] ]
-  return $  FiniteTensor (Covariant s [d]) $ Boxed.fromList tensors
+  tensors <- sequence $ Boxed.generate s $ \_ -> randomDouble ds size distr
+  return $ FiniteTensor (Covariant s [d]) tensors
 
-randomDouble _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomDouble _ _ _ = return $ Err invalidIndices
 
 {-| Generate n-vector with random integer components with given probability distribution.
 The n-vector is wrapped in the IO monad. -}
@@ -105,15 +111,16 @@ randomInt :: (
     -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Int)     -- ^ Generated n-vector
 
-randomInt [] [] d = do
-    component <- MWC.withSystemRandom . MWC.asGenIO $ \gen -> genDiscreteVar d gen
-    return $ Scalar component
+randomInt [d] [s] distr = do
+    gen <- MWC.createSystemRandom
+    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    return $ SimpleFinite (Covariant s [d]) component
 
 randomInt (d:ds) (s:size) distr = do
-  tensors <- sequence [randomInt ds size distr | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ Boxed.fromList tensors
+  tensors <- sequence $ Boxed.generate s $ \_ -> randomInt ds size distr
+  return $ FiniteTensor (Covariant s [d]) tensors
 
-randomInt _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomInt _ _ _ = return $ Err invalidIndices
 
 {-| Generate n-vector with random real components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
@@ -138,16 +145,16 @@ randomDoubleSeed :: (
     -> i2                -- ^ Randomness seed
     -> m (Tensor Double) -- ^ Generated n-vector
 
-randomDoubleSeed [] [] d seed = do
+randomDoubleSeed [d] [s] distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- genContVar d gen
-    return $ Scalar component
+    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    return $ SimpleFinite (Covariant s [d]) component
 
 randomDoubleSeed (d:ds) (s:size) distr seed = do
-  tensors <- sequence [randomDoubleSeed ds size distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ Boxed.fromList tensors
+  tensors <- sequence $ Boxed.generate s $ \_ -> randomDoubleSeed ds size distr seed
+  return $ FiniteTensor (Covariant s [d]) tensors
 
-randomDoubleSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomDoubleSeed _ _ _ _ = return $ Err invalidIndices
 
 {-| Generate n-vector with random integer components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
@@ -165,16 +172,16 @@ randomIntSeed :: (
     -> i2                -- ^ Randomness seed
     -> m (Tensor Int)    -- ^ Generated n-vector
 
-randomIntSeed [] [] d seed = do
+randomIntSeed [d] [s] distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- genDiscreteVar d gen
-    return $ Scalar component
+    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    return $ SimpleFinite (Covariant s [d]) component
 
 randomIntSeed (d:ds) (s:size) distr seed = do
-  tensors <- sequence [randomIntSeed ds size distr seed | _ <- [0 .. s - 1] ]
-  return $ FiniteTensor (Covariant s [d]) $ Boxed.fromList tensors
+  tensors <- sequence $ Boxed.generate s $ \_ -> randomIntSeed ds size distr seed
+  return $ FiniteTensor (Covariant s [d]) tensors
 
-randomIntSeed _ _ _ _ = return $ Err "Indices and its sizes not compatible with structure of n-vector!"
+randomIntSeed _ _ _ _ = return $ Err invalidIndices
 
 {-| 2-form representing a dot product -}
 {-# INLINE dot #-}
@@ -185,7 +192,7 @@ dot :: (
     -> Tensor a  -- ^ Generated dot product
 
 dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
-dot _ _ = Err "Indices and its sizes incompatible with dot product!"
+dot _ _ = Err invalidIndices
 
 {-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
 -- // TODO
@@ -199,4 +206,4 @@ cross :: (
 cross [i,j,k] size =
   Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
     (\[_] [_,_] -> 0)
-cross _ _ = Err "Indices and its sizes incompatible with cross product!"
+cross _ _ = Err invalidCrossProductIndices

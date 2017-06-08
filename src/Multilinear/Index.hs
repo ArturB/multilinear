@@ -7,6 +7,8 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
+Generic tensor index which may be finitely- or infinitely-dimensional. 
+
 -}
 
 {-# LANGUAGE DeriveGeneric #-}
@@ -23,7 +25,7 @@ import           Data.Hashable
 import           Data.Serialize
 import           GHC.Generics
 
-{-| Tensor index which may be lower (covariant), upper (contravariant) or indifferent. -}
+{-| Tensor index class which may be lower (covariant), upper (contravariant) or indifferent. -}
 class Index i where
 
     {-| Index name -}
@@ -49,7 +51,7 @@ class Index i where
     {-| Convert to generic index type -}
     toTIndex :: i -> TIndex
 
-{-| Generic index type with Maybe size field -}
+{-| Generic index type finitely- or infinitely-dimensional -}
 data TIndex =
     Covariant {
         indexSize  :: Maybe Int,
@@ -65,7 +67,7 @@ data TIndex =
     }
     deriving (Eq, Generic)
 
-{-| Show instance of Finitwe -}
+{-| Show tensor index -}
 instance Show TIndex where
     show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"

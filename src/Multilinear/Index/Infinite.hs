@@ -37,7 +37,7 @@ data Index =
     }
     deriving (Eq, Generic)
 
-{-| Show instance of Infinite -}
+{-| Show instance of Infinite index -}
 instance Show Index where
     show (Covariant n)     = "[" ++ n ++ "]"
     show (Contravariant n) = "<" ++ n ++ ">"

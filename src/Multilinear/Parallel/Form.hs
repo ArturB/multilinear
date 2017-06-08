@@ -1,25 +1,25 @@
 {-|
-Module      : Multilinear.Form
-Description : Linear functional constructors (finitely- or infinitely-dimensional)
+Module      : Multilinear.Parallel.Form
+Description : Parallel linear functional constructors (finitely- or infinitely-dimensional)
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generates a linear functionals
+- This module provides convenient constructors that generates a parallelizable linear functionals
 - Finitely-dimensional functionals provide much greater performance that infinitely-dimensional
 
 -}
 
-module Multilinear.Form (
+module Multilinear.Parallel.Form (
   -- * Generators
   -- ** Finite functionals
-  fromIndices, Multilinear.Form.const,
+  fromIndices, Multilinear.Parallel.Form.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
   -- ** Infinite functionals
-  fromIndices', Multilinear.Form.const',
+  fromIndices', Multilinear.Parallel.Form.const',
   -- * From files
   fromCSV, toCSV,
 ) where
@@ -33,7 +33,7 @@ import           Data.Either
 import           Data.Serialize
 import qualified Data.Vector                as Boxed
 import           Multilinear
-import           Multilinear.Generic
+import           Multilinear.Parallel.Generic
 import           Multilinear.Index.Finite   as Finite
 import           Multilinear.Index.Infinite as Infinite
 import           Statistics.Distribution

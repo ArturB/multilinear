@@ -7,14 +7,14 @@ Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generates a vector (tensor with one upper index) of finite or infinite size. 
+- This module provides convenient constructors that generates a vector (tensor with one upper index) in array ("Data.Vector") implementation
 - Finitely-dimensional vectors provide much greater performance than infinitely-dimensional 
 
 -}
 
-module Multilinear.Vector (
+module Multilinear.Parallel.Vector (
   -- * Generators
-  fromIndices, Multilinear.Vector.const,
+  fromIndices, Multilinear.Parallel.Vector.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
   -- * From files
@@ -30,7 +30,7 @@ import           Data.Either
 import           Data.Serialize
 import qualified Data.Vector                as Boxed
 import           Multilinear
-import           Multilinear.Generic
+import           Multilinear.Parallel.Generic
 import           Multilinear.Index.Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC

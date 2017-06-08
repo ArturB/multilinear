@@ -1,27 +1,27 @@
 {-|
-Module      : Multilinear.Tensor
-Description : Tensors constructors (finitely- or infinitely-dimensional)
+Module      : Multilinear.Parallel.Tensor
+Description : Parallelizable tensors constructors (finitely- or infinitely-dimensional)
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generate a arbitrary finitely- or infinitely-dimensional tensors. 
+- This module provides convenient constructors that generate a arbitrary, parallelizable tensors of finite or infinite size. 
 - Finitely-dimensional tensors provide much greater performance than inifitely-dimensional
 
 -}
 
-module Multilinear.Tensor (
+module Multilinear.Parallel.Tensor (
   -- * Generators
-  fromIndices, Multilinear.Tensor.const,
+  fromIndices, Multilinear.Parallel.Tensor.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed
 ) where
 
 import           Control.Monad.Primitive
 import qualified Data.Vector                as Boxed
-import           Multilinear.Generic
+import           Multilinear.Parallel.Generic
 import           Multilinear.Index.Finite   as Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC          as MWC
@@ -76,11 +76,11 @@ const ([],[]) ([d],[s]) v =
 
 -- If many indices are given, first generate upper indices recursively from indices list
 const (u:us,s:size) d v =
-    FiniteTensor (Contravariant s [u]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.const (us,size) d v
+    FiniteTensor (Contravariant s [u]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Parallel.Tensor.const (us,size) d v
 
 -- After upper indices, generate lower indices recursively from indices list
 const u (d:ds,s:size) v =
-    FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.const u (ds,size) v
+    FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Parallel.Tensor.const u (ds,size) v
 
 -- If there are indices without size or sizes without names, throw an error
 const us ds _ = Err $ invalidIndices us ds

@@ -150,6 +150,7 @@ module Multilinear (
     Accessible(..), StandardTensor(..)
 ) where
 
+import           Control.DeepSeq
 import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Maybe
 import           Data.Aeson
@@ -163,7 +164,8 @@ import           Multilinear.Index
 class (
   Num (t a),     -- Tensors may be added, subtracted and multiplicated
   Monoid (t a),  -- Tensors are monoids with concatenation as monoid operation
-  Functor t      -- Tensor should be a Functor for convenience
+  Functor t,     -- Tensor should be a Functor for convenience
+  NFData (t a)   -- Tensor must be possible to be fully evaluated - crucial for parallelization
   ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
@@ -189,18 +191,6 @@ class (
     {-| Multiply each element of tensor @t@ by scalar @a@ -}
     infixl 8 *.
     (.*) :: t a -> a -> t a
-
-    {-| Tensor adding - functionally equal to Num (+) but more efficient -}
-    infixl 7 .+.
-    (.+.) :: t a -> t a -> t a
-
-    {-| Tensor subtracting - functionally equal to Num (-) but more efficient -}
-    infixl 7 .-.
-    (.-.) :: t a -> t a -> t a
-
-    {-| Tensor multiplication - functionally equal to Num (*) but more efficient -}
-    infixl 7 .*.
-    (.*.) :: t a -> t a -> t a
 
     {-| List of all tensor indices -}
     indices :: t a -> [TIndex]

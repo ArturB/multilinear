@@ -1,60 +1,66 @@
 {-|
-Module      : Multilinear.NVector
-Description : N-Vectors constructors (finitely- or infinitely-dimensional)
+Module      : Multilinear.Parallel.NForm
+Description : Parallelizable N-Forms, dot and cross product and determinant
 Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
+License     : GLP-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generate a n-vector (tensor with n upper indices with finite or infinite size).  
-- Finitely-dimensional n-vectors provide much greater performance than infinitely-dimensional
+- This module provides convenient constructors that generates parallelizable n-forms (tensors with n lower indices of finite or infinite size).
+- Finitely-dimensional n-forms provide much greater performance than infinitely-dimensional
 
 -}
 
-module Multilinear.NVector (
-  -- * Generators
-  fromIndices, Multilinear.NVector.const,
+module Multilinear.Parallel.NForm (
+    -- * Generators
+  fromIndices, Multilinear.Parallel.NForm.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
+  -- * Common cases
+  Multilinear.Parallel.NForm.dot, cross
 ) where
 
 import           Control.Monad.Primitive
-import qualified Data.Vector                 as Boxed
-import           Multilinear.Generic
+import qualified Data.Vector                  as Boxed
 import           Multilinear.Index.Finite
+import           Multilinear.Parallel.Generic
+import qualified Multilinear.Parallel.Tensor  as Tensor
 import           Statistics.Distribution
-import qualified System.Random.MWC           as MWC
+import qualified System.Random.MWC            as MWC
 
 invalidIndices :: String
-invalidIndices = "Indices and its sizes incompatible with n-vector structure!"
+invalidIndices = "Indices and its sizes incompatible with n-form structure!"
 
-{-| Generate n-vector as function of its indices -}
+invalidCrossProductIndices :: String
+invalidCrossProductIndices = "Indices and its sizes incompatible with cross product structure!"
+
+{-| Generate N-form as function of its indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
     Num a
   ) => String        -- ^ Indices names (one characted per index)
     -> [Int]         -- ^ Indices sizes
     -> ([Int] -> a)  -- ^ Generator function
-    -> Tensor a      -- ^ Generated n-vector
+    -> Tensor a      -- ^ Generated N-form
 
-fromIndices [d] [s] f = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (\x -> f [x])
-fromIndices (d:ds) (s:size) f = 
-    FiniteTensor (Contravariant s [d]) $ Boxed.generate s (\x -> fromIndices ds size (\dss -> f (x:dss)) )
+fromIndices [d] [s] f = SimpleFinite (Covariant s [d]) $ Boxed.generate s (\x -> f [x])
+fromIndices (d:ds) (s:size) f =
+    FiniteTensor (Covariant s [d]) $ Boxed.generate s (\x -> fromIndices ds size (\dss -> f (x:dss)) )
 fromIndices _ _ _ = Err invalidIndices
 
-{-| Generate n-vector with all components equal to @v@ -}
+{-| Generate N-form with all components equal to @v@ -}
 {-# INLINE Multilinear.NForm.const #-}
 const :: (
     Num a
   ) => String    -- ^ Indices names (one characted per index)
     -> [Int]     -- ^ Indices sizes
-    -> a         -- ^ n-vector elements value
-    -> Tensor a  -- ^ Generated n-vector
+    -> a         -- ^ N-form elements value
+    -> Tensor a  -- ^ Generated N-form
 
 const [d] [s] v = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (Prelude.const v)
-const (d:ds) (s:size) v = 
-    FiniteTensor (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NVector.const ds size v
+const (d:ds) (s:size) v =
+    FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Parallel.NForm.const ds size v
 const _ _ _ = Err invalidIndices
 
 {-| Generate n-vector with random real components with given probability distribution.
@@ -82,11 +88,11 @@ randomDouble :: (
 randomDouble [d] [s] distr = do
     gen <- MWC.createSystemRandom
     components <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) components
+    return $ SimpleFinite (Covariant s [d]) components
 
 randomDouble (d:ds) (s:size) distr = do
   tensors <- sequence $ Boxed.generate s $ \_ -> randomDouble ds size distr
-  return $ FiniteTensor (Contravariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) tensors
 
 randomDouble _ _ _ = return $ Err invalidIndices
 
@@ -108,11 +114,11 @@ randomInt :: (
 randomInt [d] [s] distr = do
     gen <- MWC.createSystemRandom
     component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) component
+    return $ SimpleFinite (Covariant s [d]) component
 
 randomInt (d:ds) (s:size) distr = do
   tensors <- sequence $ Boxed.generate s $ \_ -> randomInt ds size distr
-  return $ FiniteTensor (Contravariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) tensors
 
 randomInt _ _ _ = return $ Err invalidIndices
 
@@ -142,11 +148,11 @@ randomDoubleSeed :: (
 randomDoubleSeed [d] [s] distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
     component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) component
+    return $ SimpleFinite (Covariant s [d]) component
 
 randomDoubleSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence $ Boxed.generate s $ \_ -> randomDoubleSeed ds size distr seed
-  return $ FiniteTensor (Contravariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) tensors
 
 randomDoubleSeed _ _ _ _ = return $ Err invalidIndices
 
@@ -169,10 +175,35 @@ randomIntSeed :: (
 randomIntSeed [d] [s] distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
     component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) component
+    return $ SimpleFinite (Covariant s [d]) component
 
 randomIntSeed (d:ds) (s:size) distr seed = do
   tensors <- sequence $ Boxed.generate s $ \_ -> randomIntSeed ds size distr seed
-  return $ FiniteTensor (Contravariant s [d]) tensors
+  return $ FiniteTensor (Covariant s [d]) tensors
 
 randomIntSeed _ _ _ _ = return $ Err invalidIndices
+
+{-| 2-form representing a dot product -}
+{-# INLINE dot #-}
+dot :: (
+    Num a
+  ) => String    -- ^ Indices names (one characted per index)
+    -> Int       -- ^ Size of tensor (dot product is a square tensor)
+    -> Tensor a  -- ^ Generated dot product
+
+dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
+dot _ _ = Err invalidIndices
+
+{-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
+-- // TODO
+{-# INLINE cross #-}
+cross :: (
+    Num a
+  ) => String    -- ^ Indices names (one characted per index)
+    -> Int       -- ^ Size of tensor (dot product is a square tensor)
+    -> Tensor a  -- ^ Generated dot product
+
+cross [i,j,k] size =
+  Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
+    (\[_] [_,_] -> 0)
+cross _ _ = Err invalidCrossProductIndices
