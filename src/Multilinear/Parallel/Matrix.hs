@@ -1,20 +1,20 @@
 {-|
-Module      : Multilinear.Matrix
-Description : Matrix constructors (finitely- or infinitely dimensional)
+Module      : Multilinear.Parallel.Matrix
+Description : Parallel matrix constructors (finitely- or infinitely dimensional)
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generates a matrix (finitely- or infinite-dimensional)
+- This module provides convenient constructors that generates a parallelizable matrices (finitely- or infinitely-dimensional)
 - Finitely-dimensional matrices provide much greater performance than infinitely-dimensional
 
 -}
 
-module Multilinear.Matrix (
+module Multilinear.Parallel.Matrix (
   -- * Generators
-  fromIndices, Multilinear.Matrix.const,
+  fromIndices, Multilinear.Parallel.Matrix.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
   -- * From files
@@ -30,7 +30,7 @@ import           Data.Either
 import           Data.Serialize
 import qualified Data.Vector                as Boxed
 import           Multilinear
-import           Multilinear.Generic
+import           Multilinear.Parallel.Generic
 import qualified Multilinear.Index          as TIndex
 import           Multilinear.Index.Finite   as Finite
 --import           Multilinear.Index.Infinite as Infinite

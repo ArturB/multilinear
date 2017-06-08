@@ -1,27 +1,27 @@
 {-|
-Module      : Multilinear.NVector
-Description : N-Vectors constructors (finitely- or infinitely-dimensional)
+Module      : Multilinear.Parallel.NVector
+Description : Parallelizable n-Vectors constructors (finitely- or infinitely-dimensional)
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module provides convenient constructors that generate a n-vector (tensor with n upper indices with finite or infinite size).  
+- This module provides convenient constructors that generate a parallelizable n-vectors (tensors with n upper indices with finite or infinite size).  
 - Finitely-dimensional n-vectors provide much greater performance than infinitely-dimensional
 
 -}
 
-module Multilinear.NVector (
+module Multilinear.Parallel.NVector (
   -- * Generators
-  fromIndices, Multilinear.NVector.const,
+  fromIndices, Multilinear.Parallel.NVector.const,
   randomDouble, randomDoubleSeed,
   randomInt, randomIntSeed,
 ) where
 
 import           Control.Monad.Primitive
 import qualified Data.Vector                 as Boxed
-import           Multilinear.Generic
+import           Multilinear.Parallel.Generic
 import           Multilinear.Index.Finite
 import           Statistics.Distribution
 import qualified System.Random.MWC           as MWC
@@ -54,7 +54,7 @@ const :: (
 
 const [d] [s] v = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (Prelude.const v)
 const (d:ds) (s:size) v = 
-    FiniteTensor (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NVector.const ds size v
+    FiniteTensor (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Parallel.NVector.const ds size v
 const _ _ _ = Err invalidIndices
 
 {-| Generate n-vector with random real components with given probability distribution.

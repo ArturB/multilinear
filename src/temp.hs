@@ -1,114 +1,92 @@
-{-Scalar x1 + Scalar x2 = Scalar $ x1 + x2
-    Scalar x + t = (x+) <$> t
-    t + Scalar x = (+x) <$> t
-    t1@(FiniteTensor index1 v1) + t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (+) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1+) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
-    t1@(SimpleFinite index1 v1) + t2@(SimpleFinite index2 v2)
-        | index1 == index2 = SimpleFinite index1 $ (+) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1+) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
-    t1@(SimpleFinite index1 v1) + t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (.+) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1+) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
-    t1@(FiniteTensor index1 v1) + t2@(SimpleFinite index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (+.) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1+) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (+t2) <$> tensorData t1
-    Err msg + _ = Err msg
-    _ + Err msg = Err msg-}
+
+-- dot product of two tensors
+dot' :: (
+    Num a, Bits a
+    ) => Tensor a                             -- ^ First dot product argument
+      -> Tensor a                             -- ^ Second dot product argument
+      -> Tensor a                             -- ^ Resulting dot product
+
+-- Two simple tensors product
+dot' (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 =
+        --let dotProduct v1 v2 = Boxed.sum $ Boxed.zipWith (*) v1 v2
+        Scalar $ Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Two finite tensors product
+dot' (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Simple tensor and finite tensor product
+dot' (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (.*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Finite tensor and simple tensor product
+dot' (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*.) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
+-- Simple tensor and infinite tensor product
+dot' (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') =
+    Boxed.sum $ Boxed.zipWith (.*) ts1' (Boxed.fromList $ Prelude.take count1 ts2')
+
+-- Infinite tensor and simple tensor product
+dot' (InfiniteTensor (Infinite.Covariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') =
+    Boxed.sum $ Boxed.zipWith (*.) (Boxed.fromList $ Prelude.take count2 ts1') ts2'
+
+-- Finite tensor and infinite tensor product
+dot' (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') =
+    Boxed.sum $ Boxed.zipWith (*) ts1' (Boxed.fromList $ Prelude.take count1 ts2')
+
+-- Infinite tensor and finite tensor product
+dot' (InfiniteTensor (Infinite.Covariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') =
+    Boxed.sum $ Boxed.zipWith (*) (Boxed.fromList $ Prelude.take count2 ts1') ts2'
+
+-- In other cases cannot happen!
+dot' t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
+
+-----------------------------------------------------------------------------
 
 
+-- Two simple tensors product
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = 
+        --let dotProduct v1 v2 = Boxed.sum $ Boxed.zipWith (*) v1 v2
+        Scalar $ Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
+-- Two finite tensors product
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
+-- Simple tensor and finite tensor product
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (.*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
-    {-Scalar x1 - Scalar x2 = Scalar $ x1 - x2
-    Scalar x - t = (\e -> x - e) <$> t
-    t - Scalar x = (\e -> e - x) <$> t
-    t1@(FiniteTensor index1 v1) - t2@(FiniteTensor index2 v2)
-        | index1 == index2 = FiniteTensor index1 $ (-) <$> v1 <*> v2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1-) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (\x -> x - t2) <$> tensorData t1
-    Err msg - _ = Err msg
-    _ - Err msg = Err msg-}
+-- Finite tensor and simple tensor product
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*.) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
-{-Scalar x1 * Scalar x2 = Scalar $ x1 * x2
-    -- Multiplicate by scalar is simply a map
-    Scalar x1 * t = (x1*) <$> t
-    t * Scalar x2 = (*x2) <$> t
-    -- Two tensors may be contracted or multiplicated elem by elem
-    t1@(FiniteTensor index1 _) * t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1 *) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
-        where
-        -- Contraction of covariant and contravariant index
-        FiniteTensor i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
-            | count1 == count2 = sum $ (*) <$> ts1' <*> ts2'
-            | otherwise = contractionErr i1 i2
-        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
-        contractionErr i1' i2' = Err $
-                "Tensor product: " ++ incompatibleTypes ++
-                " - index1 is " ++ show i1' ++
-                " and index2 is " ++ show i2'
-    t1@(SimpleFinite index1 ts1) * t2@(SimpleFinite index2 ts2)
-        | indexName index1 == indexName index2 = Scalar $ sum $ (*) <$> ts1 <*> ts2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1 *) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
-        where
-        -- Contraction of covariant and contravariant index
-        SimpleFinite i1@(Covariant count1 _) ts1' `dot` SimpleFinite i2@(Contravariant count2 _) ts2'
-            | count1 == count2 = Scalar $ sum $ (*) <$> ts1' <*> ts2'
-            | otherwise = contractionErr i1 i2
-        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
-        contractionErr i1' i2' = Err $
-                "Tensor product: " ++ incompatibleTypes ++
-                " - index1 is " ++ show i1' ++
-                " and index2 is " ++ show i2'
-    t1@(SimpleFinite index1 _) * t2@(FiniteTensor index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1 *) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
-        where
-        -- Contraction of covariant and contravariant index
-        SimpleFinite i1@(Covariant count1 _) ts1' `dot` FiniteTensor i2@(Contravariant count2 _) ts2'
-            | count1 == count2 = sum $ (.*) <$> ts1' <*> ts2'
-            | otherwise = contractionErr i1 i2
-        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
-        contractionErr i1' i2' = Err $
-                "Tensor product: " ++ incompatibleTypes ++
-                " - index1 is " ++ show i1' ++
-                " and index2 is " ++ show i2'
-    t1@(FiniteTensor index1 _) * t2@(SimpleFinite index2 _)
-        | indexName index1 == indexName index2 = t1 `dot` t2
-        | indexName index1 `Data.List.elem` indicesNames t2 =
-            FiniteTensor index2 $ (t1 *) <$> tensorData t2
-        | otherwise = FiniteTensor index1 $ (* t2) <$> tensorData t1
-        where
-        -- Contraction of covariant and contravariant index
-        FiniteTensor i1@(Covariant count1 _) ts1' `dot` SimpleFinite i2@(Contravariant count2 _) ts2'
-            | count1 == count2 = sum $ (*.) <$> ts1' <*> ts2'
-            | otherwise = contractionErr i1 i2
-        t1' `dot` t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
-        contractionErr i1' i2' = Err $
-                "Tensor product: " ++ incompatibleTypes ++
-                " - index1 is " ++ show i1' ++
-                " and index2 is " ++ show i2'
-    -- Multiplicating by error simply pushed this error forward
-    Err msg * _ = Err msg
-    _ * Err msg = Err msg -}
-  
-{-fmap f (FiniteTensor indexT (ZipList ts)) = case head ts of
-        Scalar _         -> {-FiniteTensor indexT $ ZipList [Scalar (f x) | Scalar x <- ts]-} Err "FiniteTensor of Scalars! Merge to SimpleTensor!"
-        FiniteTensor _ _ -> FiniteTensor indexT $ ZipList $ fmap (fmap f) ts
-        Err msg          -> Err msg  -}
+-- Simple tensor and infinite tensor product
+dot (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (.*) ts1' (Boxed.fromList $ take count1 ts2')
+
+-- Infinite tensor and simple tensor product
+dot (InfiniteTensor (Infinite.Covariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*.) (Boxed.fromList $ take count2 ts1') ts2'
+
+-- Finite tensor and infinite tensor product
+dot (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*) ts1' (Boxed.fromList $ take count1 ts2')
+
+-- Infinite tensor and finite tensor product
+dot (InfiniteTensor (Infinite.Covariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') = 
+    Boxed.sum $ Boxed.zipWith (*) (Boxed.fromList $ take count2 ts1') ts2'
+
+-- In other cases cannot happen!
+dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')

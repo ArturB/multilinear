@@ -13,59 +13,83 @@ module Main (
     main
 ) where
 
-import           Control.Applicative
+import           Control.DeepSeq
 import           Criterion.Main
-import           Criterion.Measurement      as Meas
+import           Criterion.Measurement              as Meas
 import           Criterion.Types
-import qualified Data.Vector                as Boxed
-import qualified Data.Vector.Unboxed        as Unboxed
+import           Data.Bits
+import qualified Data.Set                           as Set
+import           Data.Vector                        as Boxed
 import           Multilinear
+import qualified Multilinear.Form                    as Form
 import           Multilinear.Generic
-import           Multilinear.Generic.AsList
-import qualified Multilinear.Matrix.AsArray as Matrix.AsArray
-import qualified Multilinear.Matrix.AsList  as Matrix.AsList
-import qualified Multilinear.Vector.AsArray as Vector.AsArray
-import qualified Multilinear.Vector.AsList  as Vector.AsList
+import qualified Mutlilinear.Parallel.Generic        as Parallel
+import           Multilinear.Index                   as Index
+import           Multilinear.Index.Finite            as Finite
+import           Multilinear.Index.Infinite          as Infinite
+import qualified Multilinear.Matrix                  as Matrix
+import qualified Multilinear.Vector                  as Vector
+import qualified Multilinear.Tensor                  as Tensor
+import qualified Multilinear.Parallel.Matrix         as Parallel.Matrix
+import qualified Multilinear.Parallel.Vector         as Parallel.Vector
+import qualified Multilinear.Parallel.Tensor         as Parallel.Tensor
+import           Statistics.Distribution.Normal
+import           Statistics.Distribution.Exponential
+import           Statistics.Distribution.Geometric
 
-ml1 :: ListTensor Int
-ml1 = Matrix.AsList.fromIndices "ij" 200 200 $ \i j -> i + j
+incompatibleTypes :: String
+incompatibleTypes = "Incompatible tensor types!"
 
-ml2 :: ListTensor Int
-ml2 = Matrix.AsList.fromIndices "jk" 200 200 $ \j k -> j + k
+scalarIndices :: String
+scalarIndices = "Scalar has no indices!"
 
-vl :: ListTensor Int
-vl = Vector.AsList.fromIndices "k" 200 id
+invalidIndices :: String
+invalidIndices = "Indices and its sizes not compatible with structure of linear functional!"
 
-vl2 :: ListTensor Int
-vl2 = Vector.AsList.fromIndices "j" 200 id
+m1R :: IO (Tensor Double)
+m1R = Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
 
-ma1 :: VectorTensor Int
-ma1 = Matrix.AsArray.fromIndices "ij" 200 200 $ \i j -> i + j
+m2R :: IO (Tensor Double)
+m2R = Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
 
-ma2 :: VectorTensor Int
-ma2 = Matrix.AsArray.fromIndices "jk" 200 200 $ \j k -> j + k
+m1D :: Tensor Double
+m1D = Matrix.fromIndices "ij" 3000 3000 (\i j -> fromIntegral $ i + j)
 
-va :: VectorTensor Int
-va = Vector.AsArray.fromIndices "k" 200 id
+m2D :: Tensor Double
+m2D = Matrix.fromIndices "ij" 3000 3000 (\i j -> fromIntegral $ i * j)
 
-va2 :: VectorTensor Int
-va2 = Vector.AsArray.fromIndices "j" 200 id
+t1R :: IO (Tensor Int)
+t1R = Tensor.randomInt ("i", [1000]) ("j", [1000]) (geometric 0.5)
+
+t2R :: IO (Tensor Int)
+t2R = Tensor.randomInt ("j", [1000]) ("k", [1000]) (geometric 0.5)
+
+m1P :: IO (Parallel.Tensor Double)
+m1P = Parallel.Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
+
+m2P :: IO (Parallel.Tensor Double)
+m2P = Parallel.Matrix.randomDouble "jk" 1000 1000 (exponential 0.5)
+
+v2 :: Tensor Int
+v2 = Vector.fromIndices "j" 1000 id
+
+--mult :: Num a => Bits a => Tensor a -> Tensor a -> Tensor a
+--t1 `mult` t2 = _elemByElem t1 t2 (*) dot
 
 main :: IO ()
 main = do
-    {-let m1l = ml1 |>>> "j" :: ListTensor Int
-    let m2l = ml2 |>>> "j" :: ListTensor Int
-    let m1a = ma1 |>>> "j" :: VectorTensor Int
-    let m2a = ma2 |>>> "j" :: VectorTensor Int-}
-    let zl = Unboxed.generate 10000000 id
-    --mmList  <- Meas.measure ( nfIO $ print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl  ) 1
-    print $ Unboxed.sum $ Unboxed.zipWith (*) zl zl
-    {-mvList  <- Meas.measure ( nfIO $ print $ m1l * vl2      ) 1
-    mmArray <- Meas.measure ( nfIO $ print $ m1a * m2a * va ) 1
-    mvArray <- Meas.measure ( nfIO $ print $ m1a * va2      ) 1-}
-    --putStrLn $ "\nMultiply list matrix by matrix: "   ++ show (measCpuTime $ fst mmList)  ++ "s"
-    {-putStrLn $ "\nMultiply list matrix by vector: "   ++ show (measCpuTime $ fst mvList)  ++ "s"
-    putStrLn $ "\nMultiply array matrix by array matrix: " ++ show (measCpuTime $ fst mmArray) ++ "s"
-    putStrLn $ "\nMultiply array matrix by array vector: " ++ show (measCpuTime $ fst mvArray) ++ "s"-}
+    m1 <- m1P
+    m2 <- m2P
+    {-putStrLn "Matrix by matrix multiplying..."
+    mmList  <- Meas.measure ( nfIO $ print $ m1l `mult` m2l `mult` v ) 1
+    putStrLn "Matrix by vector multiplying..."
+    mvList <- Meas.measure ( nfIO $ print $ m1l * v2       ) 1
+    putStrLn $ "\nMultiply matrix by matrix: " Prelude.++ show (measCpuTime $ fst mmList) Prelude.++ "s"
+    putStrLn $ "\nMultiply matrix by vector: " Prelude.++ show (measCpuTime $ fst mvList) Prelude.++ "s"-}
+    --print commonIndices
+    (m1 * m2) `deepseq` putStrLn "End!"
+    --vec <- v
+    --print vec
+    --m1l `deepseq` putStrLn "End!"
     return ()
 

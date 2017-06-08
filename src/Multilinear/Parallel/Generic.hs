@@ -1,13 +1,13 @@
 {-|
-Module      : Multilinear.Generic.AsArray
-Description : Generic array tensor
+Module      : Multilinear.Parallel.Generic
+Description : Generic parallelizable array tensor
 Copyright   : (c) Artur M. Brodzki, 2017
 License     : GPL-3
 Maintainer  : artur.brodzki@gmail.com
 Stability   : experimental
 Portability : Windows/POSIX
 
-- This module contains generic implementation of tensor defined as nested arrays
+- This module contains implementation of tensor defined as nested arrays. Operations performed on this tensors are parallelized to as many cores as availabe.
 
 -}
 
@@ -18,10 +18,10 @@ Portability : Windows/POSIX
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies          #-}
 
-module Multilinear.Generic (
+module Multilinear.Parallel.Generic (
     Tensor(..), (!), mergeScalars,
     isScalar, isSimple, isFiniteTensor, isInfiniteTensor,
-    dot, _elemByElem, contractionErr, tensorIndex
+    Multilinear.Parallel.Generic.dot, _elemByElem, contractionErr, tensorIndex
 ) where
 
 import           Codec.Compression.GZip
@@ -29,21 +29,23 @@ import           Control.DeepSeq
 import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Maybe
+import           Control.Parallel.Strategies ()
 import           Data.Aeson
 import           Data.Bits
-import qualified Data.ByteString.Lazy       as ByteString
+import qualified Data.ByteString.Lazy        as ByteString
 import           Data.Foldable
-import qualified Data.List                  as List
+import qualified Data.List                   as List
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Serialize
-import qualified Data.Vector                as Boxed
-import           Data.Vector.Serialize      ()
+import qualified Data.Vector                 as Boxed
+import           Data.Vector.Serialize       ()
+import           Data.Vector.Strategies      ()
 import           GHC.Generics
 import           Multilinear
-import qualified Multilinear.Index          as Index
-import qualified Multilinear.Index.Finite   as Finite
-import qualified Multilinear.Index.Infinite as Infinite
+import qualified Multilinear.Index           as Index
+import qualified Multilinear.Index.Finite    as Finite
+import qualified Multilinear.Index.Infinite  as Infinite
 
 {-| ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -96,6 +98,7 @@ data Tensor a =
         {-| Error message -}
         errMessage :: String
     } deriving (Eq, Generic)
+
 
 {-| Return true if tensor is a scalar -}
 {-# INLINE isScalar #-}
@@ -193,6 +196,8 @@ instance FromJSON a => FromJSON (Tensor a)
 -- NFData instance
 instance NFData a => NFData (Tensor a)
 
+
+
 -- Print tensor
 instance (
     Show a
@@ -255,7 +260,7 @@ instance Functor Tensor where
         Scalar v                -> Scalar $ f v
         -- Mapping complex tensor does mapping element by element
         SimpleFinite index ts   -> SimpleFinite index (f <$> ts)
-        FiniteTensor index ts   -> FiniteTensor index $ fmap (fmap f) ts
+        FiniteTensor index ts   -> FiniteTensor index (fmap (fmap f) ts)
         InfiniteTensor index ts -> InfiniteTensor index $ fmap (fmap f) ts
         -- Mapping errors changes nothing
         Err msg                 -> Err msg
@@ -399,7 +404,7 @@ _elemByElem' t1@(InfiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 _elemByElem' (Err msg) _ _ _ = Err msg
 _elemByElem' _ (Err msg) _ _ = Err msg
 
-{-| Apply a tensor operator elem by elem. 
+{-| Apply a tensor operator elem by elem.
 For time & memory optimization, first push common indices right and mergeScalars of the result -}
 {-# INLINE _elemByElem #-}
 _elemByElem :: (Num a, NFData a)
@@ -413,10 +418,10 @@ _elemByElem t1 t2 f op =
         indices2 = indicesNames t2
         commonIndices = indices1 `List.intersect` indices2
         t1' = if not (commonIndices `List.isSuffixOf` indices1)
-              then foldl' (|>>>) t1 commonIndices 
+              then foldl' (|>>>) t1 commonIndices
               else t1
-        t2' = if not (commonIndices `List.isSuffixOf` indices1) 
-              then foldl' (|>>>) t2 commonIndices 
+        t2' = if not (commonIndices `List.isSuffixOf` indices1)
+              then foldl' (|>>>) t2 commonIndices
               else t2
     in  mergeScalars $ _elemByElem' t1' t2' f op
 
@@ -595,7 +600,7 @@ instance (Num a, NFData a) => Num (Tensor a) where
     -- Multiplicating is treated as tensor product
     -- Tensor product applies Einstein summation convention
     {-# INLINE (*) #-}
-    t1 * t2 = _elemByElem t1 t2 (*) dot
+    t1 * t2 = _elemByElem t1 t2 (*) Multilinear.Parallel.Generic.dot
 
     -- Absolute value - element by element
     {-# INLINE abs #-}
