@@ -18,12 +18,11 @@ import           Criterion.Main
 import           Criterion.Measurement              as Meas
 import           Criterion.Types
 import           Data.Bits
-import qualified Data.Set                           as Set
 import           Data.Vector                        as Boxed
 import           Multilinear
 import qualified Multilinear.Form                    as Form
 import           Multilinear.Generic
-import qualified Mutlilinear.Parallel.Generic        as Parallel
+import qualified Multilinear.Parallel.Generic        as Parallel
 import           Multilinear.Index                   as Index
 import           Multilinear.Index.Finite            as Finite
 import           Multilinear.Index.Infinite          as Infinite
@@ -50,7 +49,7 @@ m1R :: IO (Tensor Double)
 m1R = Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
 
 m2R :: IO (Tensor Double)
-m2R = Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
+m2R = Matrix.randomDouble "jk" 1000 1000 (exponential 0.5)
 
 m1D :: Tensor Double
 m1D = Matrix.fromIndices "ij" 3000 3000 (\i j -> fromIntegral $ i + j)
@@ -78,8 +77,8 @@ v2 = Vector.fromIndices "j" 1000 id
 
 main :: IO ()
 main = do
-    m1 <- m1P
-    m2 <- m2P
+    m1 <- m1R
+    m2 <- m2R
     {-putStrLn "Matrix by matrix multiplying..."
     mmList  <- Meas.measure ( nfIO $ print $ m1l `mult` m2l `mult` v ) 1
     putStrLn "Matrix by vector multiplying..."
