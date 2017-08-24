@@ -25,7 +25,7 @@ ml2 :: Tensor Int
 ml2 = Matrix.fromIndices "jk" 1000 1000 $ \j k -> j + k
 
 vl :: Tensor Int
-vl = Vector.fromIndices "k" 1000 id
+vl = Vector.fromIndices "k" 1000 id 
 
 --vl2 :: Tensor Int
 --vl2 = Vector.fromIndices "j" 500 id
