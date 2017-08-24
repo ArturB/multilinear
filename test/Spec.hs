@@ -15,22 +15,20 @@ module Main (
 
 import           Multilinear
 import           Multilinear.Generic
-import qualified Multilinear.Matrix.AsArray as Matrix.AsArray
-import qualified Multilinear.Matrix.AsList  as Matrix.AsList
-import qualified Multilinear.Vector.AsArray as Vector.AsArray
-import qualified Multilinear.Vector.AsList  as Vector.AsList
+import qualified Multilinear.Matrix as Matrix
+import qualified Multilinear.Vector as Vector
 
-ml1 :: ListTensor Int
-ml1 = Matrix.AsList.fromIndices "ij" 500 500 $ \i j -> i + j
+ml1 :: Tensor Int
+ml1 = Matrix.fromIndices "ij" 1000 1000 $ \i j -> i + j
 
-ml2 :: ListTensor Int
-ml2 = Matrix.AsList.fromIndices "jk" 500 500 $ \j k -> j + k
+ml2 :: Tensor Int
+ml2 = Matrix.fromIndices "jk" 1000 1000 $ \j k -> j + k
 
-vl :: ListTensor Int
-vl = Vector.AsList.fromIndices "k" 500 id
+vl :: Tensor Int
+vl = Vector.fromIndices "k" 1000 id
 
-vl2 :: ListTensor Int
-vl2 = Vector.AsList.fromIndices "j" 500 id
+--vl2 :: Tensor Int
+--vl2 = Vector.fromIndices "j" 500 id
 
 main :: IO ()
 main = do
