@@ -14,32 +14,30 @@ Portability : Windows/POSIX
 
 module Multilinear.Vector (
   -- * Generators
-  fromIndices, Multilinear.Vector.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed,
+  Multilinear.Vector.fromIndices, 
+  Multilinear.Vector.const,
+  Multilinear.Vector.randomDouble, 
+  Multilinear.Vector.randomDoubleSeed,
+  Multilinear.Vector.randomInt, 
+  Multilinear.Vector.randomIntSeed,
   -- * From files
-  fromCSV, toCSV,
+  Multilinear.Vector.fromCSV, 
+  Multilinear.Vector.toCSV,
 ) where
 
 import           Control.DeepSeq
 import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
-import           Data.CSV.Enumerator
-import           Data.Either
 import           Data.Serialize
-import qualified Data.Vector                as Boxed
 import           Multilinear
 import           Multilinear.Generic
-import           Multilinear.Index.Finite
+import           Multilinear.Tensor         as Tensor
+import           Multilinear.Matrix         as Matrix
 import           Statistics.Distribution
-import qualified System.Random.MWC          as MWC
 
 invalidIndices :: String
 invalidIndices = "Indices and its sizes not compatible with structure of vector!"
-
-deserializationError :: String
-deserializationError = "Components deserialization error!"
 
 {-| Generate vector as function of indices -}
 {-# INLINE fromIndices #-}
@@ -50,9 +48,8 @@ fromIndices :: (
     -> (Int -> a)    -- ^ Generator function - returns a vector component at index @i@
     -> Tensor a      -- ^ Generated vector
 
-fromIndices x = case x of
-    [d] -> \s f -> SimpleFinite (Contravariant s [d]) $ Boxed.generate s f
-    _   -> \_ _ -> Err invalidIndices
+fromIndices [i] s f = Tensor.fromIndices ([i],[s]) ([],[]) $ \[x] [] -> f x
+fromIndices _ _ _ = Err invalidIndices
 
 {-| Generate vector with all components equal to some @v@ -}
 {-# INLINE Multilinear.Vector.const #-}
@@ -63,9 +60,8 @@ const :: (
     -> a           -- ^ Value of each element
     -> Tensor a    -- ^ Generated vector
 
-const x = case x of
-    [d] -> \s v -> SimpleFinite (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) v
-    _   -> \_ _ -> Err invalidIndices
+const [i] s = Tensor.const ([i],[s]) ([],[])
+const _ _ = \_ -> Err invalidIndices
 
 {-| Generate vector with random real components with given probability distribution.
 The vector is wrapped in the IO monad. -}
@@ -88,12 +84,8 @@ randomDouble :: (
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated vector
 
-randomDouble x = case x of 
-  [i] -> \s d -> do
-    gen <- MWC.createSystemRandom
-    components <- sequence $ Boxed.generate s $ \_ -> genContVar d gen
-    return $ SimpleFinite (Contravariant s [i]) components
-  _   -> \_ _ -> return $ Err invalidIndices
+randomDouble [i] s = Tensor.randomDouble ([i],[s]) ([],[])
+randomDouble _ _ = \_ -> return $ Err invalidIndices
 
 {-| Generate vector with random integer components with given probability distribution.
 The vector is wrapped in the IO monad. -}
@@ -110,12 +102,8 @@ randomInt :: (
     -> d                -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Int)  -- ^ Generated vector
 
-randomInt x = case x of 
-  [i] -> \s d -> do
-    gen <- MWC.createSystemRandom
-    components <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar d gen
-    return $ SimpleFinite (Contravariant s [i]) components
-  _   -> \_ _ -> return $ Err invalidIndices
+randomInt [i] s = Tensor.randomInt ([i],[s]) ([],[])
+randomInt _ _ = \_ -> return $ Err invalidIndices
 
 {-| Generate vector with random real components with given probability distribution and given seed.
 The vector is wrapped in a monad. -}
@@ -139,12 +127,8 @@ randomDoubleSeed :: (
     -> Int                -- ^ Randomness seed
     -> m (Tensor Double)  -- ^ Generated vector
 
-randomDoubleSeed x = case x of 
-  [i] -> \s d seed -> do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    components <- sequence $ Boxed.generate s $ \_ ->  genContVar d gen
-    return $ SimpleFinite (Contravariant s [i]) components
-  _   -> \_ _ _ -> return $ Err invalidIndices
+randomDoubleSeed [i] s = Tensor.randomDoubleSeed ([i],[s]) ([],[])
+randomDoubleSeed _ _ = \_ _ -> return $ Err invalidIndices
 
 {-| Generate vector with random integer components with given probability distribution and given seed.
 The vector is wrapped in a monad. -}
@@ -162,12 +146,8 @@ randomIntSeed :: (
     -> Int             -- ^ Randomness seed
     -> m (Tensor Int)  -- ^ Generated vector
 
-randomIntSeed x = case x of 
-  [i] -> \s d seed -> do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    components <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar d gen
-    return $ SimpleFinite (Contravariant s [i]) components
-  _   -> \_ _ _ -> return $ Err invalidIndices
+randomIntSeed [i] s = Tensor.randomIntSeed ([i],[s]) ([],[])
+randomIntSeed _ _ = \_ _ -> return $ Err invalidIndices
 
 {-| Read vector components from CSV file. Reads only the first row of the file. -}
 {-# INLINE fromCSV #-}
@@ -178,16 +158,10 @@ fromCSV :: (
     -> Char                                 -- ^ Separator expected to be used in this CSV file
     -> EitherT SomeException IO (Tensor a)  -- ^ Generated vector or error message
 
-fromCSV x = case x of 
-  [i] -> \fileName separator -> do
-    csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
-    let firstLine = head csv
-    let components = decode <$> firstLine
-    let readSize = length $ rights components
-    if readSize > 0
-    then return $ SimpleFinite (Contravariant readSize [i]) $ Boxed.fromList (rights components)
-    else EitherT $ return $ Left $ SomeException $ TypeError deserializationError
-  _   -> \_ _ -> return $ Err invalidIndices
+fromCSV [i] fileName separator = do
+  m <- Matrix.fromCSV [i,i] fileName separator
+  right $ (m ! 0) /\ [i]
+fromCSV _ _ _ = right $ Err invalidIndices
 
 {-| Write vector to CSV file. -}
 {-# INLINE toCSV #-}
@@ -198,12 +172,5 @@ toCSV :: (
     -> Char       -- ^ Separator expected to be used in this CSV file
     -> IO Int     -- ^ Number of rows written
 
-toCSV t = case t of
-  (SimpleFinite (Contravariant _ _)  elems) -> \fileName separator -> 
-    let encodedElems = [Boxed.toList $ encode <$> elems]
-    in
-      if length (indices t) == 1
-      then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
-      else return 0
-  _ -> \_ _ -> return 0
+toCSV = Matrix.toCSV
 

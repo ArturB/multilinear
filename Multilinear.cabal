@@ -62,9 +62,26 @@ test-suite Multilinear-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
-                     , Multilinear
-                     , transformers
-  ghc-options:         -Wall -Werror -O2 -threaded -rtsopts -with-rtsopts=-N
+                    ,  Multilinear
+                    ,  aeson
+                    ,  bytestring
+                    ,  cereal
+                    ,  cereal-vector
+                    ,  containers
+                    ,  csv-enumerator
+                    ,  deepseq
+                    ,  either
+                    ,  hashable
+                    ,  lens
+                    ,  mwc-random
+                    ,  parallel
+                    ,  primitive
+                    ,  statistics
+                    ,  transformers
+                    ,  vector
+                    ,  vector-strategies
+                    ,  zlib
+  ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
   default-extensions:  
 
@@ -76,10 +93,25 @@ benchmark Multilinear-bench
                      , criterion
                      , deepseq
                      , Multilinear
+                     , aeson
+                     , bytestring
+                     , cereal
+                     , cereal-vector
+                     , containers
+                     , csv-enumerator
+                     , deepseq
+                     , either
+                     , hashable
+                     , lens
                      , mwc-random
+                     , parallel
+                     , primitive
                      , statistics
+                     , transformers
                      , vector
-  ghc-options:         -Wall -O2 -threaded -rtsopts -with-rtsopts=-N
+                     , vector-strategies
+                     , zlib
+  ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
   default-extensions:  
 

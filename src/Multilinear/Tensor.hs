@@ -14,9 +14,13 @@ Portability : Windows/POSIX
 
 module Multilinear.Tensor (
   -- * Generators
-  fromIndices, Multilinear.Tensor.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed
+  Multilinear.Tensor.fromIndices, 
+  Multilinear.Tensor.generate,
+  Multilinear.Tensor.const,
+  Multilinear.Tensor.randomDouble, 
+  Multilinear.Tensor.randomDoubleSeed,
+  Multilinear.Tensor.randomInt, 
+  Multilinear.Tensor.randomIntSeed
 ) where
 
 import           Control.Monad.Primitive
@@ -44,7 +48,7 @@ fromIndices ([u],[s]) ([],[]) f =
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 fromIndices ([],[]) ([d],[s]) f = 
-  SimpleFinite (Covariant s [d]) $ Boxed.generate s $ \x -> f [x] []
+  SimpleFinite (Covariant s [d]) $ Boxed.generate s $ \x -> f [] [x]
 
 -- If many indices are given, first generate upper indices recursively from indices list
 fromIndices (u:us,s:size) d f =
@@ -56,6 +60,29 @@ fromIndices u (d:ds,s:size) f =
 
 -- If there are indices without size or sizes without names, throw an error
 fromIndices us ds _ = Err $ invalidIndices us ds
+
+{-| Generate tensor composed of other tensors -}
+{-# INLINE generate #-}
+generate :: (
+    Num a
+    ) => (String,[Int])                 -- ^ Upper indices names (one character per index) and its sizes
+      -> (String,[Int])                 -- ^ Lower indices names (one character per index) and its sizes
+      -> ([Int] -> [Int] -> Tensor a)   -- ^ Generator function (f [u1,u2,...] [d1,d2,...] returns a tensor element at t [u1,u2,...] [d1,d2,...])
+      -> Tensor a                       -- ^ Generated tensor
+
+-- If no indices are given, generate a tensor by using generator function
+generate ([],[]) ([],[]) f = f [] []
+
+-- If many indices are given, first generate upper indices recursively from indices list
+generate (u:us,s:size) d f =
+    FiniteTensor (Contravariant s [u]) $ Boxed.generate s (\x -> generate (us,size) d (\uss dss -> f (x:uss) dss) )
+
+-- After upper indices, generate lower indices recursively from indices list
+generate u (d:ds,s:size) f =
+    FiniteTensor (Covariant s [d]) $ Boxed.generate s (\x -> generate u (ds,size) (\uss dss -> f uss (x:dss)) )
+
+-- If there are indices without size or sizes without names, throw an error
+generate us ds _ = Err $ invalidIndices us ds
 
 {-| Generate tensor with all components equal to @v@ -}
 {-# INLINE Multilinear.Tensor.const #-}

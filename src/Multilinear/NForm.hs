@@ -14,20 +14,21 @@ Portability : Windows/POSIX
 
 module Multilinear.NForm (
     -- * Generators
-  fromIndices, Multilinear.NForm.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed,
+  Multilinear.NForm.fromIndices, 
+  Multilinear.NForm.const,
+  Multilinear.NForm.randomDouble, 
+  Multilinear.NForm.randomDoubleSeed,
+  Multilinear.NForm.randomInt, 
+  Multilinear.NForm.randomIntSeed,
   -- * Common cases
-  Multilinear.NForm.dot, cross
+  Multilinear.NForm.dot, 
+  Multilinear.NForm.cross
 ) where
 
 import           Control.Monad.Primitive
-import qualified Data.Vector              as Boxed
 import           Multilinear.Generic
-import           Multilinear.Index.Finite
 import qualified Multilinear.Tensor       as Tensor
 import           Statistics.Distribution
-import qualified System.Random.MWC        as MWC
 
 invalidIndices :: String
 invalidIndices = "Indices and its sizes incompatible with n-form structure!"
@@ -44,10 +45,7 @@ fromIndices :: (
     -> ([Int] -> a)  -- ^ Generator function
     -> Tensor a      -- ^ Generated N-form
 
-fromIndices [d] [s] f = SimpleFinite (Covariant s [d]) $ Boxed.generate s (\x -> f [x])
-fromIndices (d:ds) (s:size) f = 
-    FiniteTensor (Covariant s [d]) $ Boxed.generate s (\x -> fromIndices ds size (\dss -> f (x:dss)) )
-fromIndices _ _ _ = Err invalidIndices
+fromIndices d ds f = Tensor.fromIndices ([],[]) (d,ds) $ \[] -> f
 
 {-| Generate N-form with all components equal to @v@ -}
 {-# INLINE Multilinear.NForm.const #-}
@@ -58,10 +56,7 @@ const :: (
     -> a         -- ^ N-form elements value
     -> Tensor a  -- ^ Generated N-form
 
-const [d] [s] v = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (Prelude.const v)
-const (d:ds) (s:size) v = 
-    FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NForm.const ds size v
-const _ _ _ = Err invalidIndices
+const d ds = Tensor.const ([],[]) (d,ds)
 
 {-| Generate n-vector with random real components with given probability distribution.
 The n-vector is wrapped in the IO monad. -}
@@ -85,16 +80,7 @@ randomDouble :: (
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated linear functional
 
-randomDouble [d] [s] distr = do
-    gen <- MWC.createSystemRandom
-    components <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
-    return $ SimpleFinite (Covariant s [d]) components
-
-randomDouble (d:ds) (s:size) distr = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomDouble ds size distr
-  return $ FiniteTensor (Covariant s [d]) tensors
-
-randomDouble _ _ _ = return $ Err invalidIndices
+randomDouble d ds = Tensor.randomDouble ([],[]) (d,ds)
 
 {-| Generate n-vector with random integer components with given probability distribution.
 The n-vector is wrapped in the IO monad. -}
@@ -111,16 +97,7 @@ randomInt :: (
     -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Int)     -- ^ Generated n-vector
 
-randomInt [d] [s] distr = do
-    gen <- MWC.createSystemRandom
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
-    return $ SimpleFinite (Covariant s [d]) component
-
-randomInt (d:ds) (s:size) distr = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomInt ds size distr
-  return $ FiniteTensor (Covariant s [d]) tensors
-
-randomInt _ _ _ = return $ Err invalidIndices
+randomInt d ds = Tensor.randomInt ([],[]) (d,ds)
 
 {-| Generate n-vector with random real components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
@@ -138,23 +115,14 @@ The form is wrapped in a monad. -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
 {-# INLINE randomDoubleSeed #-}
 randomDoubleSeed :: (
-    ContGen d, Integral i2, PrimMonad m
+    ContGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
     -> [Int]             -- ^ Number of elements
     -> d                 -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> i2                -- ^ Randomness seed
+    -> Int               -- ^ Randomness seed
     -> m (Tensor Double) -- ^ Generated n-vector
 
-randomDoubleSeed [d] [s] distr seed = do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
-    return $ SimpleFinite (Covariant s [d]) component
-
-randomDoubleSeed (d:ds) (s:size) distr seed = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomDoubleSeed ds size distr seed
-  return $ FiniteTensor (Covariant s [d]) tensors
-
-randomDoubleSeed _ _ _ _ = return $ Err invalidIndices
+randomDoubleSeed d ds = Tensor.randomDoubleSeed ([],[]) (d,ds)
 
 {-| Generate n-vector with random integer components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
@@ -165,23 +133,14 @@ The form is wrapped in a monad. -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 {-# INLINE randomIntSeed #-}
 randomIntSeed :: (
-    DiscreteGen d, Integral i2, PrimMonad m
+    DiscreteGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
     -> [Int]             -- ^ Number of elements
     -> d                 -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> i2                -- ^ Randomness seed
+    -> Int               -- ^ Randomness seed
     -> m (Tensor Int)    -- ^ Generated n-vector
 
-randomIntSeed [d] [s] distr seed = do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
-    return $ SimpleFinite (Covariant s [d]) component
-
-randomIntSeed (d:ds) (s:size) distr seed = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomIntSeed ds size distr seed
-  return $ FiniteTensor (Covariant s [d]) tensors
-
-randomIntSeed _ _ _ _ = return $ Err invalidIndices
+randomIntSeed d ds = Tensor.randomIntSeed ([],[]) (d,ds)
 
 {-| 2-form representing a dot product -}
 {-# INLINE dot #-}
