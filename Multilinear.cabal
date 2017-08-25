@@ -54,7 +54,7 @@ library
                     ,  vector-strategies
                     ,  zlib
   default-language:    Haskell2010
-  ghc-options:         -Wall -Werror -O2
+  ghc-options:         -Wall -Werror -O2 -fllvm -optlo-O3
   default-extensions:  
 
 test-suite Multilinear-test
@@ -81,7 +81,7 @@ test-suite Multilinear-test
                     ,  vector
                     ,  vector-strategies
                     ,  zlib
-  ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -O2 -fllvm -optlo-O3 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
   default-extensions:  
 
@@ -111,7 +111,7 @@ benchmark Multilinear-bench
                      , vector
                      , vector-strategies
                      , zlib
-  ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -O2 -fllvm -optlo-O3 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
   default-extensions:  
 
