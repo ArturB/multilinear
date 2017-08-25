@@ -14,20 +14,18 @@ Portability : Windows/POSIX
 
 module Multilinear.NVector (
   -- * Generators
-  fromIndices, Multilinear.NVector.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed,
+  Multilinear.NVector.fromIndices, 
+  Multilinear.NVector.const,
+  Multilinear.NVector.randomDouble, 
+  Multilinear.NVector.randomDoubleSeed,
+  Multilinear.NVector.randomInt, 
+  Multilinear.NVector.randomIntSeed,
 ) where
 
 import           Control.Monad.Primitive
-import qualified Data.Vector                 as Boxed
 import           Multilinear.Generic
-import           Multilinear.Index.Finite
+import           Multilinear.Tensor          as Tensor
 import           Statistics.Distribution
-import qualified System.Random.MWC           as MWC
-
-invalidIndices :: String
-invalidIndices = "Indices and its sizes incompatible with n-vector structure!"
 
 {-| Generate n-vector as function of its indices -}
 {-# INLINE fromIndices #-}
@@ -38,10 +36,7 @@ fromIndices :: (
     -> ([Int] -> a)  -- ^ Generator function
     -> Tensor a      -- ^ Generated n-vector
 
-fromIndices [d] [s] f = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (\x -> f [x])
-fromIndices (d:ds) (s:size) f = 
-    FiniteTensor (Contravariant s [d]) $ Boxed.generate s (\x -> fromIndices ds size (\dss -> f (x:dss)) )
-fromIndices _ _ _ = Err invalidIndices
+fromIndices u us f = Tensor.fromIndices (u,us) ([],[]) $ \uis [] -> f uis
 
 {-| Generate n-vector with all components equal to @v@ -}
 {-# INLINE Multilinear.NForm.const #-}
@@ -52,10 +47,7 @@ const :: (
     -> a         -- ^ n-vector elements value
     -> Tensor a  -- ^ Generated n-vector
 
-const [d] [s] v = SimpleFinite (Contravariant s [d]) $ Boxed.generate s (Prelude.const v)
-const (d:ds) (s:size) v = 
-    FiniteTensor (Contravariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.NVector.const ds size v
-const _ _ _ = Err invalidIndices
+const u us = Tensor.const (u,us) ([],[])
 
 {-| Generate n-vector with random real components with given probability distribution.
 The n-vector is wrapped in the IO monad. -}
@@ -79,16 +71,7 @@ randomDouble :: (
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated linear functional
 
-randomDouble [d] [s] distr = do
-    gen <- MWC.createSystemRandom
-    components <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) components
-
-randomDouble (d:ds) (s:size) distr = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomDouble ds size distr
-  return $ FiniteTensor (Contravariant s [d]) tensors
-
-randomDouble _ _ _ = return $ Err invalidIndices
+randomDouble u us = Tensor.randomDouble (u,us) ([],[])
 
 {-| Generate n-vector with random integer components with given probability distribution.
 The n-vector is wrapped in the IO monad. -}
@@ -105,16 +88,7 @@ randomInt :: (
     -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Int)     -- ^ Generated n-vector
 
-randomInt [d] [s] distr = do
-    gen <- MWC.createSystemRandom
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) component
-
-randomInt (d:ds) (s:size) distr = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomInt ds size distr
-  return $ FiniteTensor (Contravariant s [d]) tensors
-
-randomInt _ _ _ = return $ Err invalidIndices
+randomInt u us = Tensor.randomInt (u,us) ([],[])
 
 {-| Generate n-vector with random real components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
@@ -132,23 +106,14 @@ The form is wrapped in a monad. -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
 {-# INLINE randomDoubleSeed #-}
 randomDoubleSeed :: (
-    ContGen d, Integral i2, PrimMonad m
+    ContGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
     -> [Int]             -- ^ Number of elements
     -> d                 -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> i2                -- ^ Randomness seed
+    -> Int               -- ^ Randomness seed
     -> m (Tensor Double) -- ^ Generated n-vector
 
-randomDoubleSeed [d] [s] distr seed = do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) component
-
-randomDoubleSeed (d:ds) (s:size) distr seed = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomDoubleSeed ds size distr seed
-  return $ FiniteTensor (Contravariant s [d]) tensors
-
-randomDoubleSeed _ _ _ _ = return $ Err invalidIndices
+randomDoubleSeed u us = Tensor.randomDoubleSeed (u,us) ([],[])
 
 {-| Generate n-vector with random integer components with given probability distribution and given seed.
 The form is wrapped in a monad. -}
@@ -159,20 +124,11 @@ The form is wrapped in a monad. -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
 {-# INLINE randomIntSeed #-}
 randomIntSeed :: (
-    DiscreteGen d, Integral i2, PrimMonad m
+    DiscreteGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
     -> [Int]             -- ^ Number of elements
     -> d                 -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> i2                -- ^ Randomness seed
+    -> Int               -- ^ Randomness seed
     -> m (Tensor Int)    -- ^ Generated n-vector
 
-randomIntSeed [d] [s] distr seed = do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
-    return $ SimpleFinite (Contravariant s [d]) component
-
-randomIntSeed (d:ds) (s:size) distr seed = do
-  tensors <- sequence $ Boxed.generate s $ \_ -> randomIntSeed ds size distr seed
-  return $ FiniteTensor (Contravariant s [d]) tensors
-
-randomIntSeed _ _ _ _ = return $ Err invalidIndices
+randomIntSeed u us = Tensor.randomIntSeed (u,us) ([],[])

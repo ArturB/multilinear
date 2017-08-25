@@ -15,35 +15,33 @@ Portability : Windows/POSIX
 module Multilinear.Form (
   -- * Generators
   -- ** Finite functionals
-  fromIndices, Multilinear.Form.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed,
+  Multilinear.Form.fromIndices, 
+  Multilinear.Form.const,
+  Multilinear.Form.randomDouble,
+   Multilinear.Form.randomDoubleSeed,
+  Multilinear.Form.randomInt, 
+  Multilinear.Form.randomIntSeed,
   -- ** Infinite functionals
-  fromIndices', Multilinear.Form.const',
+  Multilinear.Form.fromIndices', 
+  Multilinear.Form.const',
   -- * From files
-  fromCSV, toCSV,
+  Multilinear.Form.fromCSV, 
+  Multilinear.Form.toCSV,
 ) where
 
 import           Control.DeepSeq
 import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
-import           Data.CSV.Enumerator
-import           Data.Either
 import           Data.Serialize
-import qualified Data.Vector                as Boxed
-import           Multilinear
 import           Multilinear.Generic
-import           Multilinear.Index.Finite   as Finite
 import           Multilinear.Index.Infinite as Infinite
+import           Multilinear.Tensor         as Tensor
+import           Multilinear.Matrix         as Matrix
 import           Statistics.Distribution
-import qualified System.Random.MWC          as MWC
 
 invalidIndices :: String
 invalidIndices = "Indices and its sizes not compatible with structure of linear functional!"
-
-deserializationError :: String
-deserializationError = "Components deserialization error!"
 
 -- * Finite functional generators
 
@@ -56,9 +54,8 @@ fromIndices :: (
     -> (Int -> a)    -- ^ Generator function - returns a linear functional component at index @i@
     -> Tensor a      -- ^ Generated linear functional
 
-fromIndices i = case i of
-    [d] -> \s f -> SimpleFinite (Finite.Covariant s [d]) $ Boxed.generate s f
-    _   -> \_ _ -> Err invalidIndices
+fromIndices [i] s f = Tensor.fromIndices ([],[]) ([i],[s]) $ \[] [x] -> f x
+fromIndices _ _ _ = Err invalidIndices
 
 {-| Generate linear functional with all components equal to some @v@ -}
 {-# INLINE Multilinear.Form.const #-}
@@ -69,9 +66,8 @@ const :: (
     -> a           -- ^ Value of each element
     -> Tensor a    -- ^ Generated linear functional
 
-const i = case i of
-    [d] -> \s v -> SimpleFinite (Finite.Covariant s [d]) $ Boxed.replicate (fromIntegral s) v
-    _   -> \_ _ -> Err invalidIndices
+const [i] s = Tensor.const ([],[]) ([i],[s])
+const _ _ = \_ -> Err invalidIndices
 
 {-| Generate linear functional with random real components with given probability distribution.
 The functional is wrapped in the IO monad. -}
@@ -94,12 +90,8 @@ randomDouble :: (
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated linear functional
 
-randomDouble x = case x of
-  [i] -> \s d -> do
-    gen <- MWC.createSystemRandom
-    components <- sequence $ Boxed.generate s $ \_ -> genContVar d gen
-    return $ SimpleFinite (Finite.Covariant s [i]) components
-  _   -> \_ _ -> return $ Err invalidIndices
+randomDouble [i] s = Tensor.randomDouble ([],[]) ([i],[s])
+randomDouble _ _ = \_ -> return $ Err invalidIndices
 
 {-| Generate linear functional with random integer components with given probability distribution.
 The functional is wrapped in the IO monad. -}
@@ -116,12 +108,8 @@ randomInt :: (
     -> d                  -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Int)    -- ^ Generated linear functional
 
-randomInt x = case x of
-  [i] -> \s d -> do
-    gen <- MWC.createSystemRandom
-    components <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar d gen
-    return $ SimpleFinite (Finite.Covariant s [i]) components
-  _  -> \_ _ -> return $ Err invalidIndices
+randomInt [i] s = Tensor.randomInt ([],[]) ([i],[s])
+randomInt _ _ = \_ -> return $ Err invalidIndices
 
 {-| Generate linear functional with random real components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
@@ -145,12 +133,8 @@ randomDoubleSeed :: (
     -> Int                    -- ^ Randomness seed
     -> m (Tensor Double)      -- ^ Generated linear functional
 
-randomDoubleSeed x = case x of
-  [i] -> \s d seed -> do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    components <- sequence $ Boxed.generate s $ \_ -> genContVar d gen
-    return $ SimpleFinite (Finite.Covariant s [i]) components
-  _  -> \_ _ _ -> return $ Err invalidIndices
+randomDoubleSeed [i] s = Tensor.randomDoubleSeed ([],[]) ([i],[s])
+randomDoubleSeed _ _ = \_ _ -> return $ Err invalidIndices
 
 {-| Generate linear functional with random integer components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
@@ -168,20 +152,10 @@ randomIntSeed :: (
     -> Int                   -- ^ Randomness seed
     -> m (Tensor Int)        -- ^ Generated linear functional
 
-randomIntSeed x = case x of
-  [i] -> \s d seed -> do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    components <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar d gen
-    return $ SimpleFinite (Finite.Covariant s [i]) components
-  _  -> \_ _ _ -> return $ Err invalidIndices
-
-
-
+randomIntSeed [i] s = Tensor.randomIntSeed ([],[]) ([i],[s])
+randomIntSeed _ _ = \_ _ -> return $ Err invalidIndices
 
 -- ** Infinite functionals generators
-
-
-
 
 {-| Generate linear functional as function of indices -}
 {-# INLINE fromIndices' #-}
@@ -207,11 +181,7 @@ const' i = case i of
     [d] -> \v -> InfiniteTensor (Infinite.Covariant [d]) $ (\_ -> Scalar v) <$> ([0..] :: [Int])
     _   -> \_ -> Err invalidIndices
 
-
-
 -- * From files
-
-
 
 {-| Read linear functional components from CSV file. Reads only the first row of the file. -}
 {-# INLINE fromCSV #-}
@@ -222,16 +192,10 @@ fromCSV :: (
     -> Char                                      -- ^ Separator expected to be used in this CSV file
     -> EitherT SomeException IO (Tensor a)       -- ^ Generated linear functional or error message
 
-fromCSV x = case x of
-  [i] -> \fileName separator -> do
-    csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
-    let firstLine = head csv
-    let components = decode <$> firstLine
-    let readSize = length $ rights components
-    if readSize > 0
-    then return $ SimpleFinite (Finite.Covariant readSize [i]) $ Boxed.fromList (rights components)
-    else EitherT $ return $ Left $ SomeException $ TypeError deserializationError
-  _  -> \_ _ -> return $ Err invalidIndices
+fromCSV [i] fileName separator = do
+  m <- Matrix.fromCSV [i,i] fileName separator
+  right $ m ! 0
+fromCSV _ _ _ = right $ Err invalidIndices
 
 {-| Write linear functional to CSV file. -}
 {-# INLINE toCSV #-}
@@ -242,12 +206,4 @@ toCSV :: (
     -> Char       -- ^ Separator expected to be used in this CSV file
     -> IO Int     -- ^ Number of rows written
 
-toCSV t = case t of
-  (FiniteTensor (Finite.Covariant _ _) elems) -> \fileName separator ->
-    let encodedElems = [Boxed.toList $ encode <$> elems]
-    in
-      if length (indices t) == 1
-      then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
-      else return 0
-  _ -> \_ _ -> return 0
-
+toCSV = Matrix.toCSV

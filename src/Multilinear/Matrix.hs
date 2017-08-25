@@ -14,11 +14,15 @@ Portability : Windows/POSIX
 
 module Multilinear.Matrix (
   -- * Generators
-  fromIndices, Multilinear.Matrix.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed,
+  Multilinear.Matrix.fromIndices, 
+  Multilinear.Matrix.const,
+  Multilinear.Matrix.randomDouble, 
+  Multilinear.Matrix.randomDoubleSeed,
+  Multilinear.Matrix.randomInt, 
+  Multilinear.Matrix.randomIntSeed,
   -- * From files
-  fromCSV, toCSV
+  Multilinear.Matrix.fromCSV, 
+  Multilinear.Matrix.toCSV
 ) where
 
 import           Control.DeepSeq
@@ -33,9 +37,8 @@ import           Multilinear
 import           Multilinear.Generic
 import qualified Multilinear.Index          as TIndex
 import           Multilinear.Index.Finite   as Finite
---import           Multilinear.Index.Infinite as Infinite
+import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
-import qualified System.Random.MWC          as MWC
 
 invalidIndices :: String
 invalidIndices = "Indices and its sizes not compatible with structure of matrix!"
@@ -53,13 +56,8 @@ fromIndices :: (
     -> (Int -> Int -> a)    -- ^ Generator function - returns a matrix component at @i,j@
     -> Tensor a             -- ^ Generated matrix
 
-fromIndices x = case x of
-    [u,d] -> \su sd f -> 
-      FiniteTensor (Finite.Contravariant su [u]) $
-        Boxed.generate su (
-          SimpleFinite (Finite.Covariant sd [d]) . Boxed.generate sd . f
-      )
-    _ -> \_ _ _ -> Err invalidIndices
+fromIndices [u,d] us ds f = Tensor.fromIndices ([u],[us]) ([d],[ds]) $ \[ui] [di] -> f ui di
+fromIndices _ _ _ _ = Err invalidIndices
 
 {-| Generate matrix with all components equal to @v@ -}
 {-# INLINE Multilinear.Matrix.const #-}
@@ -71,12 +69,8 @@ const :: (
     -> a         -- ^ Value of matrix components
     -> Tensor a  -- ^ Generated matrix
 
-const x = case x of
-  [u,d] -> \su sd v -> 
-      FiniteTensor (Finite.Contravariant su [u]) $
-        Boxed.replicate (fromIntegral su) $
-          SimpleFinite (Finite.Covariant sd [d]) $ Boxed.replicate (fromIntegral sd) v
-  _ -> \_ _ _ -> Err invalidIndices
+const [u,d] us ds = Tensor.const ([u],[us]) ([d],[ds])
+const _ _ _ = \_ -> Err invalidIndices
 
 {-| Generate matrix with random real components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
@@ -100,18 +94,8 @@ randomDouble :: (
     -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Double)  -- ^ Generated matrix
 
-randomDouble x = case x of
-  [u,d] -> \su sd dist -> do
-    gen <- MWC.createSystemRandom
-    components <-
-      sequence $ Boxed.generate su $ \_ -> 
-        sequence $ Boxed.generate sd $ \_ -> genContVar dist gen
-
-    return $ 
-      FiniteTensor (Finite.Contravariant su [u]) $ 
-        SimpleFinite (Finite.Covariant sd [d]) <$> components
-
-  _ -> \_ _ _ -> return $ Err invalidIndices
+randomDouble [u,d] us ds = Tensor.randomDouble ([u],[us]) ([d],[ds])
+randomDouble _ _ _ = \_ -> return $ Err invalidIndices
 
 {-| Generate matrix with random integer components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
@@ -129,18 +113,8 @@ randomInt :: (
     -> d                -- ^ Discrete probability distribution (as from "Statistics.Distribution")
     -> IO (Tensor Int)  -- ^ Generated matrix
 
-randomInt x = case x of
-  [u,d] -> \su sd dist -> do
-    gen <- MWC.createSystemRandom
-    components <-
-      sequence $ Boxed.generate su $ \_ -> 
-        sequence $ Boxed.generate sd $ \_ -> genDiscreteVar dist gen
-
-    return $ 
-      FiniteTensor (Finite.Contravariant su [u]) $ 
-        SimpleFinite (Finite.Covariant sd [d]) <$> components
-
-  _ -> \_ _ _ -> return $ Err invalidIndices
+randomInt [u,d] us ds = Tensor.randomInt ([u],[us]) ([d],[ds])
+randomInt _ _ _ = \_ -> return $ Err invalidIndices
 
 {-| Generate matrix with random real components with given probability distribution and given seed.
 The matrix is wrapped in the a monad. -}
@@ -165,19 +139,8 @@ randomDoubleSeed :: (
     -> Int                 -- ^ Randomness seed
     -> m (Tensor Double)   -- ^ Generated matrix
 
-randomDoubleSeed x = case x of
-  [u,d] -> \su sd dist seed -> do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    components <-
-      sequence $ Boxed.generate su $ \_ -> 
-        sequence $ Boxed.generate sd $ \_ -> 
-          genContVar dist gen
-
-    return $ 
-      FiniteTensor (Finite.Contravariant su [u]) $ 
-        SimpleFinite (Finite.Covariant sd [d]) <$> components
-
-  _ -> \_ _ _ _ -> return $ Err invalidIndices
+randomDoubleSeed [u,d] us ds = Tensor.randomDoubleSeed ([u],[us]) ([d],[ds])
+randomDoubleSeed _ _ _ = \_ _ -> return $ Err invalidIndices
 
 {-| Generate matrix with random integer components with given probability distribution. and given seed.
 The matrix is wrapped in a monad. -}
@@ -196,19 +159,8 @@ randomIntSeed :: (
     -> Int                 -- ^ Randomness seed
     -> m (Tensor Int)      -- ^ Generated matrix
 
-randomIntSeed x = case x of
-  [u,d] -> \su sd dist seed -> do
-    gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    components <-
-      sequence $ Boxed.generate su $ \_ -> 
-        sequence $ Boxed.generate sd $ \_ -> 
-          genDiscreteVar dist gen
-
-    return $ 
-      FiniteTensor (Finite.Contravariant su [u]) $ 
-        SimpleFinite (Finite.Covariant sd [d]) <$> components
-
-  _ -> \_ _ _ _ -> return $ Err invalidIndices
+randomIntSeed [u,d] us ds = Tensor.randomIntSeed ([u],[us]) ([d],[ds])
+randomIntSeed _ _ _ = \_ _ -> return $ Err invalidIndices
 
 {-| Read matrix components from CSV file. -}
 {-# INLINE fromCSV #-}
@@ -243,9 +195,9 @@ toCSV :: (
     -> Char      -- ^ Separator expected to be used in this CSV file
     -> IO Int    -- ^ Number of rows written
 
-toCSV t = case t of
-  (FiniteTensor (Finite.Contravariant _ _) rows) -> \fileName separator ->
-    let elems = Boxed.toList $ Boxed.toList . tensorsFinite <$> rows
+toCSV t = case order t of
+  (1,1) -> \fileName separator ->
+    let elems = Boxed.toList $ Boxed.toList . tensorsFinite <$> tensorsFinite t
         encodedElems = (encode . scalarVal <$>) <$> elems
     in
       if length (indices t) == 2 && TIndex.isCovariant (indices t !! 1)

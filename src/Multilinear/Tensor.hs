@@ -44,7 +44,7 @@ fromIndices ([u],[s]) ([],[]) f =
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 fromIndices ([],[]) ([d],[s]) f = 
-  SimpleFinite (Covariant s [d]) $ Boxed.generate s $ \x -> f [x] []
+  SimpleFinite (Covariant s [d]) $ Boxed.generate s $ \x -> f [] [x]
 
 -- If many indices are given, first generate upper indices recursively from indices list
 fromIndices (u:us,s:size) d f =
