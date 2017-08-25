@@ -17,6 +17,7 @@ import           Multilinear
 import           Multilinear.Generic
 import qualified Multilinear.Matrix as Matrix
 import qualified Multilinear.Vector as Vector
+import qualified Multilinear.Tensor as Tensor
 --import qualified Multilinear.Form as Form
 --import           Statistics.Distribution.Normal
 
@@ -35,9 +36,10 @@ vl = Vector.fromIndices "k" 5 id
 main :: IO ()
 main = do
     putStrLn "Start..."
-    let m2 = ml2 |>>> "j"
+    --let m2 = ml2 |>>> "j"
     --let res = ml1 * m2 * vl
-    print $ ml1 * m2
+    let tengen [k] [] = if k == 0 then ml1 else 2 *. tengen [k - 1] []
+    print $ Tensor.generate ("k",[10]) ([],[]) tengen
     print vl
     putStr "End..."
 

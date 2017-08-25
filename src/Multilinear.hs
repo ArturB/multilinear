@@ -167,27 +167,27 @@ class (
   ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
-    infixl 7 .+
+    infixl 7 +.
     (+.) :: a -> t a -> t a
 
     {-| Subtract each element of tensor @t@ from scalar scalar left -}
-    infixl 7 .-
+    infixl 7 -.
     (-.) :: a -> t a -> t a
 
     {-| Multiply scalar @a@ by each element of tensor @t@ -}
-    infixl 8 .*
+    infixl 8 *.
     (*.) :: a -> t a -> t a
 
     {-| Add each element of tensor @t@ to scalar @a@ -}
-    infixl 7 +.
+    infixl 7 .+
     (.+) :: t a -> a -> t a
 
     {-| Subtract scalar @a@ from each element of tensor @t@ -}
-    infixl 7 -.
+    infixl 7 .-
     (.-) :: t a -> a -> t a
 
     {-| Multiply each element of tensor @t@ by scalar @a@ -}
-    infixl 8 *.
+    infixl 8 .*
     (.*) :: t a -> a -> t a
 
     {-| Tensor adding - functionally equal to Num (+) but more efficient -}
