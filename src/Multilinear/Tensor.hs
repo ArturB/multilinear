@@ -14,9 +14,12 @@ Portability : Windows/POSIX
 
 module Multilinear.Tensor (
   -- * Generators
-  fromIndices, Multilinear.Tensor.const,
-  randomDouble, randomDoubleSeed,
-  randomInt, randomIntSeed
+  Multilinear.Tensor.fromIndices, 
+  Multilinear.Tensor.const,
+  Multilinear.Tensor.randomDouble, 
+  Multilinear.Tensor.randomDoubleSeed,
+  Multilinear.Tensor.randomInt, 
+  Multilinear.Tensor.randomIntSeed
 ) where
 
 import           Control.Monad.Primitive

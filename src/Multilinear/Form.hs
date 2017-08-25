@@ -155,8 +155,6 @@ randomIntSeed :: (
 randomIntSeed [i] s = Tensor.randomIntSeed ([],[]) ([i],[s])
 randomIntSeed _ _ = \_ _ -> return $ Err invalidIndices
 
--- ** Infinite functionals generators
-
 {-| Generate linear functional as function of indices -}
 {-# INLINE fromIndices' #-}
 fromIndices' :: (
