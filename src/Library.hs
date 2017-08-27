@@ -23,7 +23,8 @@ module Multilinear.Library (
     module NForm,
     module Tensor,
     module Vector,
-    module X
+    module X,
+    module Unsafe
 ) where
 
 -- Re-export other library modules
@@ -55,3 +56,5 @@ import           Statistics.Distribution.Laplace         as X
 import           Statistics.Distribution.Normal          as X
 import           Statistics.Distribution.StudentT        as X
 import           Statistics.Distribution.Uniform         as X
+
+import           System.IO.Unsafe                        as Unsafe
