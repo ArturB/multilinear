@@ -27,7 +27,7 @@ module Multilinear.Library (
 ) where
 
 -- Re-export other library modules
-import qualified Multilinear
+import           Multilinear
 import qualified Multilinear.Form                        as Form
 import           Multilinear.Generic                     as Generic
 import qualified Multilinear.Index                       as Index
