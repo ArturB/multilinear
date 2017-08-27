@@ -476,37 +476,80 @@ dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.
     | count1 == count2 = 
         Scalar $ Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = 
+        SimpleFinite i1 $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = 
+        SimpleFinite i1 $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
 -- Two finite tensors product
 dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = FiniteTensor i1 $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = FiniteTensor i1 $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+
 
 -- Simple tensor and finite tensor product
 dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.zipWith (*.) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = FiniteTensor i1 $ Boxed.zipWith (*.) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = FiniteTensor i1 $ Boxed.zipWith (*.) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
 -- Finite tensor and simple tensor product
 dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.zipWith (.*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = FiniteTensor i1 $ Boxed.zipWith (.*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = FiniteTensor i1 $ Boxed.zipWith (.*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
 
 -- Simple tensor and infinite tensor product
 dot (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
     Boxed.sum $ Boxed.zipWith (*.) ts1' (Boxed.fromList $ take count1 ts2')
+dot (SimpleFinite (Finite.Contravariant count1 _) ts1') (InfiniteTensor i2@(Infinite.Contravariant _) ts2') = 
+    InfiniteTensor i2 $ Boxed.toList $ Boxed.zipWith (*.) ts1' (Boxed.fromList $ take count1 ts2')
+dot (SimpleFinite (Finite.Covariant count1 _) ts1') (InfiniteTensor i2@(Infinite.Covariant _) ts2') = 
+    InfiniteTensor i2 $ Boxed.toList $ Boxed.zipWith (*.) ts1' (Boxed.fromList $ take count1 ts2')
 
 -- Infinite tensor and simple tensor product
 dot (InfiniteTensor (Infinite.Covariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') = 
     Boxed.sum $ Boxed.zipWith (.*) (Boxed.fromList $ take count2 ts1') ts2'
+dot (InfiniteTensor i1@(Infinite.Contravariant _) ts1') (SimpleFinite (Finite.Contravariant count2 _) ts2') = 
+    InfiniteTensor i1 $ Boxed.toList $ Boxed.zipWith (.*) (Boxed.fromList $ take count2 ts1') ts2'
+dot (InfiniteTensor i1@(Infinite.Covariant _) ts1') (SimpleFinite (Finite.Covariant count2 _) ts2') = 
+    InfiniteTensor i1 $ Boxed.toList $ Boxed.zipWith (.*) (Boxed.fromList $ take count2 ts1') ts2'
 
 -- Finite tensor and infinite tensor product
 dot (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor (Infinite.Contravariant _) ts2') = 
     Boxed.sum $ Boxed.zipWith (*) ts1' (Boxed.fromList $ take count1 ts2')
+dot (FiniteTensor (Finite.Contravariant count1 _) ts1') (InfiniteTensor i2@(Infinite.Contravariant _) ts2') = 
+    InfiniteTensor i2 $ Boxed.toList $ Boxed.zipWith (*) ts1' (Boxed.fromList $ take count1 ts2')
+dot (FiniteTensor (Finite.Covariant count1 _) ts1') (InfiniteTensor i2@(Infinite.Covariant _) ts2') = 
+    InfiniteTensor i2 $ Boxed.toList $ Boxed.zipWith (*) ts1' (Boxed.fromList $ take count1 ts2')
 
 -- Infinite tensor and finite tensor product
 dot (InfiniteTensor (Infinite.Covariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') = 
     Boxed.sum $ Boxed.zipWith (*) (Boxed.fromList $ take count2 ts1') ts2'
+dot (InfiniteTensor i1@(Infinite.Contravariant _) ts1') (FiniteTensor (Finite.Contravariant count2 _) ts2') = 
+    InfiniteTensor i1 $ Boxed.toList $ Boxed.zipWith (*) (Boxed.fromList $ take count2 ts1') ts2'
+dot (InfiniteTensor i1@(Infinite.Covariant _) ts1') (FiniteTensor (Finite.Covariant count2 _) ts2') = 
+    InfiniteTensor i1 $ Boxed.toList $ Boxed.zipWith (*) (Boxed.fromList $ take count2 ts1') ts2'
 
 -- In other cases cannot happen!
 dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
@@ -824,47 +867,18 @@ instance Num a => Multilinear Tensor a where
         InfiniteTensor _ _   -> Left infiniteIndex
         Err msg              -> Left msg
 
-    -- Rename tensor index
-    {-# INLINE rename #-}
-
-    --Scalar has no indices to rename
-    rename (Scalar x) _ _ = Scalar x
-
-    -- Rename finite tensor index
-    rename (FiniteTensor i@(Finite.Contravariant count name) ts) before after
-        | name == before = FiniteTensor (Finite.Contravariant count after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (FiniteTensor i@(Finite.Covariant count name) ts) before after
-        | name == before = FiniteTensor (Finite.Covariant count after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (FiniteTensor i@(Finite.Indifferent count name) ts) before after
-        | name == before = FiniteTensor (Finite.Indifferent count after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = FiniteTensor i $ (\t' -> rename t' before after) <$> ts
-
-    -- Rename infinite tensor index
-    rename (InfiniteTensor i@(Infinite.Contravariant name) ts) before after
-        | name == before = InfiniteTensor (Infinite.Contravariant after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = InfiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (InfiniteTensor i@(Infinite.Covariant name) ts) before after
-        | name == before = InfiniteTensor (Infinite.Covariant after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = InfiniteTensor i $ (\t' -> rename t' before after) <$> ts
-    rename (InfiniteTensor i@(Infinite.Indifferent name) ts) before after
-        | name == before = InfiniteTensor (Infinite.Indifferent after) $ (\t' -> rename t' before after) <$> ts
-        | otherwise = InfiniteTensor i $ (\t' -> rename t' before after) <$> ts
-
-    -- Rename simple tensor index
-    rename t1@(SimpleFinite (Finite.Contravariant count name) ts) before after
-        | name == before = SimpleFinite (Finite.Contravariant count after) ts
-        | otherwise = t1
-    rename t1@(SimpleFinite (Finite.Covariant count name) ts) before after
-        | name == before = SimpleFinite (Finite.Covariant count after) ts
-        | otherwise = t1
-    rename t1@(SimpleFinite (Finite.Indifferent count name) ts) before after
-        | name == before = SimpleFinite (Finite.Indifferent count after) ts
-        | otherwise = t1
-
-    -- Error tensor has no indices to rename
-    rename (Err msg) _ _ = Err msg
+    -- Rename tensor indices
+    {-# INLINE ($|) #-}
+    
+    Scalar x $| _ = Scalar x
+    SimpleFinite (Finite.Contravariant isize _) ts $| (u:_, _) = SimpleFinite (Finite.Contravariant isize [u]) ts
+    SimpleFinite (Finite.Covariant isize _) ts $| (_, d:_) = SimpleFinite (Finite.Covariant isize [d]) ts
+    FiniteTensor (Finite.Contravariant isize _) ts $| (u:us, ds) = FiniteTensor (Finite.Contravariant isize [u]) $ ($| (us,ds)) <$> ts
+    FiniteTensor (Finite.Covariant isize _) ts $| (us, d:ds) = FiniteTensor (Finite.Covariant isize [d]) $ ($| (us,ds)) <$> ts
+    InfiniteTensor (Infinite.Contravariant _) ts $| (u:us, ds) = InfiniteTensor (Infinite.Contravariant [u]) $ ($| (us,ds)) <$> ts
+    InfiniteTensor (Infinite.Covariant _) ts $| (us, d:ds) = InfiniteTensor (Infinite.Covariant [d]) $ ($| (us,ds)) <$> ts
+    Err msg $| _ = Err msg
+    t $| _ = t
 
     -- Raise an index
     {-# INLINE (/\) #-}
