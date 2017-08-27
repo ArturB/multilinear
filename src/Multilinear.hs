@@ -287,7 +287,7 @@ class (
     -- ^ Left shift of an index is equivalent to right shift of its predecessor in recursion @p@, if only @p@ exists, so:
     -- Given a tensor t[i1,i2,i3,...]: @shiftLeft t "i3" == t[i1,i3,i2,...] == shiftRight t "i2"@
     shiftLeft t n
-        | isJust $ predecessor n (indicesNames t) = shiftRight t (fromJust $ predecessor n (indicesNames t))
+        | isJust (predecessor n (indicesNames t)) = shiftRight t (fromJust $ predecessor n (indicesNames t))
         | otherwise = t
         where
         predecessor x (a1:a2:as) = if x == a2 then Just a1 else predecessor x (a2:as)
@@ -297,12 +297,12 @@ class (
     {-| @t <<| "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
     infixl 9 <<|
     (<<|) :: t a -> String -> t a
-    t <<| n = shiftRight t n
+    t <<| n = shiftLeft t n
 
     {-| Shift tensor index leftmost. Elements of tensor as indexed with indices names becomes unchanged. -}
     {-| @shiftLeftmost t "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
     shiftLeftmost :: t a -> String -> t a
-    shiftLeftmost t n = until (\x -> n == last (indicesNames x)) (<<| n) t
+    shiftLeftmost t n = until (\x -> n == head (indicesNames x)) (<<| n) t
 
     {-| Infix equivalent of 'shiftLeftmost' -}
     {-| @t <<<| "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}

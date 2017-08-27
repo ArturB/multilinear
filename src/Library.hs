@@ -13,7 +13,7 @@ Defines main tyclasses to deal with multilinear algebra and re-exports content o
 
 {-# OPTIONS_GHC -w #-}
 
-module Multilinear.Library (
+module Library (
     module Form,
     module Generic,
     module Index,
@@ -23,11 +23,12 @@ module Multilinear.Library (
     module NForm,
     module Tensor,
     module Vector,
-    module X
+    module X,
+    module Unsafe
 ) where
 
 -- Re-export other library modules
-import qualified Multilinear
+import           Multilinear
 import qualified Multilinear.Form                        as Form
 import           Multilinear.Generic                     as Generic
 import qualified Multilinear.Index                       as Index
@@ -55,3 +56,5 @@ import           Statistics.Distribution.Laplace         as X
 import           Statistics.Distribution.Normal          as X
 import           Statistics.Distribution.StudentT        as X
 import           Statistics.Distribution.Uniform         as X
+
+import           System.IO.Unsafe                        as Unsafe
