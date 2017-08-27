@@ -225,8 +225,9 @@ class (
     (|==|) :: t a -> t a -> Bool
     t1 |==| t2 = equiv t1 t2
 
-    {-| @rename t "i" "j"@ renames index @i@ of tensor @t@ to @j@ -}
-    rename :: t a -> String -> String -> t a
+    {-| @t $| "ij" "kl"@ renames upper indices of tensor @t@ to @ij@ and lower indices to @kl@ -}
+    infix 9 $|
+    ($|) :: t a -> (String,String) -> t a
 
     {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
     raise :: t a -> String -> t a

@@ -38,9 +38,7 @@ main = do
     putStrLn "Start..."
     --let m2 = ml2 |>>> "j"
     --let res = ml1 * m2 * vl
-    let tengen [k] [] = if k == 0 then ml1 else 2 *. tengen [k - 1] []
-    print $ Tensor.generate ("k",[10]) ([],[]) tengen
-    print vl
+    print $ ml1 $| ("a","b") * ml2 $| ("c","d")
     putStr "End..."
 
 
