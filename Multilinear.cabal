@@ -21,7 +21,7 @@ library
                     ,  Multilinear.Index
                     ,  Multilinear.Index.Finite
                     ,  Multilinear.Index.Infinite
-                    ,  Multilinear.Library
+                    ,  Library
                     ,  Multilinear.Matrix
                     ,  Multilinear.NForm
                     ,  Multilinear.NVector

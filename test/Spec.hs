@@ -23,10 +23,10 @@ import qualified Multilinear.Tensor as Tensor
 --import           Statistics.Distribution.Normal
 
 ml1 :: Tensor Int
-ml1 = Matrix.fromIndices "ij" 300 300 $ \i j -> i * j
+ml1 = Matrix.fromIndices "ij" 1000 1000 $ \i j -> i * j
 
 ml2 :: Tensor Int
-ml2 = Matrix.fromIndices "jk" 300 300 $ \j k -> j * k
+ml2 = Matrix.fromIndices "jk" 1000 1000 $ \j k -> j * k
 
 vl :: Tensor Int
 vl = Vector.fromIndices "k" 1000 id 
@@ -37,8 +37,7 @@ vl = Vector.fromIndices "k" 1000 id
 main :: IO ()
 main = do
     putStrLn "Start..."
-    let m2 = ml2 |>>> "j"
-    print $ (Vector.fromIndices "a" 1000 id + Form.fromIndices "b" 1000 id) * (Form.fromIndices "c" 1000 id + Vector.fromIndices "b" 1000 id) * vl $| ("c","")
+    print $ ml1 * ml2 * vl
     putStr "End..."
 
 
