@@ -13,7 +13,7 @@ Defines main tyclasses to deal with multilinear algebra and re-exports content o
 
 {-# OPTIONS_GHC -w #-}
 
-module Multilinear.Library (
+module Library (
     module Form,
     module Generic,
     module Index,
