@@ -15,6 +15,7 @@ module Main (
 
 import           Multilinear
 import           Multilinear.Generic
+import qualified Multilinear.Form   as Form
 import qualified Multilinear.Matrix as Matrix
 import qualified Multilinear.Vector as Vector
 import qualified Multilinear.Tensor as Tensor
@@ -22,13 +23,13 @@ import qualified Multilinear.Tensor as Tensor
 --import           Statistics.Distribution.Normal
 
 ml1 :: Tensor Int
-ml1 = Matrix.fromIndices "ij" 5 5 $ \i j -> i + j
+ml1 = Matrix.fromIndices "ij" 300 300 $ \i j -> i * j
 
 ml2 :: Tensor Int
-ml2 = Matrix.fromIndices "jk" 5 5 $ \j k -> j + k
+ml2 = Matrix.fromIndices "jk" 300 300 $ \j k -> j * k
 
 vl :: Tensor Int
-vl = Vector.fromIndices "k" 5 id 
+vl = Vector.fromIndices "k" 1000 id 
 
 --vl2 :: Tensor Int
 --vl2 = Vector.fromIndices "j" 500 id
@@ -36,9 +37,8 @@ vl = Vector.fromIndices "k" 5 id
 main :: IO ()
 main = do
     putStrLn "Start..."
-    --let m2 = ml2 |>>> "j"
-    --let res = ml1 * m2 * vl
-    print $ ml1 $| ("a","b") * ml2 $| ("c","d")
+    let m2 = ml2 |>>> "j"
+    print $ (Vector.fromIndices "a" 1000 id + Form.fromIndices "b" 1000 id) * (Form.fromIndices "c" 1000 id + Vector.fromIndices "b" 1000 id) * vl $| ("c","")
     putStr "End..."
 
 
