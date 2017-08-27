@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><a name="line-2"></a><span class="hs-comment">-- Module    : Statistics.Types</span><span>
+</span><a name="line-3"></a><span class="hs-comment">-- Copyright : (c) 2009 Bryan O'Sullivan</span><span>
+</span><a name="line-4"></a><span class="hs-comment">-- License   : BSD3</span><span>
+</span><a name="line-5"></a><span class="hs-comment">--</span><span>
+</span><a name="line-6"></a><span class="hs-comment">-- Maintainer  : bos@serpentine.com</span><span>
+</span><a name="line-7"></a><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><a name="line-8"></a><span class="hs-comment">-- Portability : portable</span><span>
+</span><a name="line-9"></a><span class="hs-comment">--</span><span>
+</span><a name="line-10"></a><span class="hs-comment">-- Types for working with statistics.</span><span>
+</span><a name="line-11"></a><span>
+</span><a name="line-12"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Statistics</span><span class="hs-operator">.</span><span class="hs-identifier">Types</span><span>
+</span><a name="line-13"></a><span>    </span><span class="hs-special">(</span><span>
+</span><a name="line-14"></a><span>      </span><a href="Statistics.Types.html#Estimator"><span class="hs-identifier hs-type">Estimator</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-15"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Statistics.Types.html#Sample"><span class="hs-identifier hs-type">Sample</span></a><span>
+</span><a name="line-16"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Statistics.Types.html#WeightedSample"><span class="hs-identifier hs-type">WeightedSample</span></a><span>
+</span><a name="line-17"></a><span>    </span><span class="hs-special">,</span><span> </span><a href="Statistics.Types.html#Weights"><span class="hs-identifier hs-type">Weights</span></a><span>
+</span><a name="line-18"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-19"></a><span>
+</span><a name="line-20"></a><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">Vector</span><span class="hs-operator">.</span><span class="hs-identifier">Unboxed</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">U</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Vector</span><span class="hs-special">)</span><span>
+</span><a name="line-21"></a><span>
+</span><a name="line-22"></a><span class="hs-comment">-- | Sample data.</span><span>
+</span><a name="line-23"></a><span class="hs-keyword">type</span><span> </span><a name="Sample"><a href="Statistics.Types.html#Sample"><span class="hs-identifier">Sample</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">U</span><span class="hs-operator hs-type">.</span><span class="hs-identifier hs-type">Vector</span><span> </span><span class="hs-identifier hs-type">Double</span><span>
+</span><a name="line-24"></a><span>
+</span><a name="line-25"></a><span class="hs-comment">-- | Sample with weights. First element of sample is data, second is weight</span><span>
+</span><a name="line-26"></a><span class="hs-keyword">type</span><span> </span><a name="WeightedSample"><a href="Statistics.Types.html#WeightedSample"><span class="hs-identifier">WeightedSample</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">U</span><span class="hs-operator hs-type">.</span><span class="hs-identifier hs-type">Vector</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Double</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Double</span><span class="hs-special">)</span><span>
+</span><a name="line-27"></a><span>
+</span><a name="line-28"></a><span class="hs-comment">-- | An estimator of a property of a sample, such as its 'mean'.</span><span>
+</span><a name="line-29"></a><span class="hs-comment">--</span><span>
+</span><a name="line-30"></a><span class="hs-comment">-- The use of an algebraic data type here allows functions such as</span><span>
+</span><a name="line-31"></a><span class="hs-comment">-- 'jackknife' and 'bootstrapBCA' to use more efficient algorithms</span><span>
+</span><a name="line-32"></a><span class="hs-comment">-- when possible.</span><span>
+</span><a name="line-33"></a><span class="hs-keyword">data</span><span> </span><a name="Estimator"><a href="Statistics.Types.html#Estimator"><span class="hs-identifier">Estimator</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="Mean"><a href="Statistics.Types.html#Mean"><span class="hs-identifier">Mean</span></a></a><span>
+</span><a name="line-34"></a><span>               </span><span class="hs-glyph">|</span><span> </span><a name="Variance"><a href="Statistics.Types.html#Variance"><span class="hs-identifier">Variance</span></a></a><span>
+</span><a name="line-35"></a><span>               </span><span class="hs-glyph">|</span><span> </span><a name="VarianceUnbiased"><a href="Statistics.Types.html#VarianceUnbiased"><span class="hs-identifier">VarianceUnbiased</span></a></a><span>
+</span><a name="line-36"></a><span>               </span><span class="hs-glyph">|</span><span> </span><a name="StdDev"><a href="Statistics.Types.html#StdDev"><span class="hs-identifier">StdDev</span></a></a><span>
+</span><a name="line-37"></a><span>               </span><span class="hs-glyph">|</span><span> </span><a name="Function"><a href="Statistics.Types.html#Function"><span class="hs-identifier">Function</span></a></a><span> </span><span class="hs-special">(</span><a href="Statistics.Types.html#Sample"><span class="hs-identifier hs-type">Sample</span></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">Double</span><span class="hs-special">)</span><span>
+</span><a name="line-38"></a><span>
+</span><a name="line-39"></a><span class="hs-comment">-- | Weights for affecting the importance of elements of a sample.</span><span>
+</span><a name="line-40"></a><span class="hs-keyword">type</span><span> </span><a name="Weights"><a href="Statistics.Types.html#Weights"><span class="hs-identifier">Weights</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-type">U</span><span class="hs-operator hs-type">.</span><span class="hs-identifier hs-type">Vector</span><span> </span><span class="hs-identifier hs-type">Double</span><span>
+</span><a name="line-41"></a></pre></body></html>
