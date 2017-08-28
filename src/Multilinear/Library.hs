@@ -25,7 +25,8 @@ module Multilinear.Library (
     module Vector,
     module X,
     module Unsafe,
-    module Trans
+    module Trans,
+    module Either
 ) where
 
 -- Re-export other library modules
@@ -60,3 +61,4 @@ import           Statistics.Distribution.Uniform         as X
 
 import           System.IO.Unsafe                        as Unsafe
 import           Control.Monad.Trans.Class               as Trans
+import           Control.Monad.Trans.Either              as Either
