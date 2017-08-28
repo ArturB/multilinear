@@ -21,7 +21,7 @@ library
                     ,  Multilinear.Index
                     ,  Multilinear.Index.Finite
                     ,  Multilinear.Index.Infinite
-                    ,  Library
+                    ,  Multilinear.Library
                     ,  Multilinear.Matrix
                     ,  Multilinear.NForm
                     ,  Multilinear.NVector
@@ -51,7 +51,6 @@ library
                     ,  statistics
                     ,  transformers
                     ,  vector
-                    ,  vector-strategies
                     ,  zlib
   default-language:    Haskell2010
   ghc-options:         -Wall -Werror -O2
@@ -79,7 +78,6 @@ test-suite Multilinear-test
                     ,  statistics
                     ,  transformers
                     ,  vector
-                    ,  vector-strategies
                     ,  zlib
   ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
@@ -109,7 +107,6 @@ benchmark Multilinear-bench
                      , statistics
                      , transformers
                      , vector
-                     , vector-strategies
                      , zlib
   ghc-options:         -O2 -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
