@@ -226,7 +226,7 @@ class (
     t1 |==| t2 = equiv t1 t2
 
     {-| @t $| "ij" "kl"@ renames upper indices of tensor @t@ to @ij@ and lower indices to @kl@ -}
-    infix 9 $|
+    infix 8 $|
     ($|) :: t a -> (String,String) -> t a
 
     {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
@@ -234,7 +234,7 @@ class (
     raise t i = t /\ i
 
     {-| Infix equivalent of 'raise' -}
-    infixl 8 /\
+    infixl 7 /\
     (/\) :: t a -> String -> t a
     t /\ i = raise t i
 
@@ -243,7 +243,7 @@ class (
     lower t i = t \/ i
 
     {-| Infix equivalent of 'lower' -}
-    infixl 8 \/
+    infixl 7 \/
     (\/) :: t a -> String -> t a
     t \/ i = lower t i
 
@@ -382,7 +382,7 @@ class Multilinear t a => Accessible t a where
     el :: t a -> (String,[Int]) -> t a
 
     {-| Infix equivalent for el -}
-    infixl 8 $$|
+    infixl 9 $$|
     ($$|) :: t a -> (String,[Int]) -> t a
     t $$| is = el t is
 
