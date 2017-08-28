@@ -213,8 +213,8 @@ class (
     {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
     order :: t a -> (Int,Int)
 
-    {-| Return size of index with given name of Nothing if index is infinite-dimensional -}
-    size :: t a -> String -> Either String Int
+    {-| Return size of index with given name -}
+    size :: t a -> String -> Int
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
     equiv :: t a -> t a -> Bool
@@ -379,7 +379,12 @@ class Multilinear t a => Accessible t a where
         Values of other indices are insignificant -}
     {-| If given index value is out of range, then modulo operation is performed:
         el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
-    el :: [String] -> t a -> [Int] -> t a
+    el :: t a -> (String,[Int]) -> t a
+
+    {-| Infix equivalent for el -}
+    infixl 8 $$|
+    ($$|) :: t a -> (String,[Int]) -> t a
+    t $$| is = el t is
 
     {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
     {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
