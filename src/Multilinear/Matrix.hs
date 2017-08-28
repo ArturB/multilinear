@@ -197,8 +197,8 @@ toCSV :: (
 
 toCSV t = case order t of
   (1,1) -> \fileName separator ->
-    let elems = Boxed.toList $ Boxed.toList . tensorsFinite <$> tensorsFinite t
-        encodedElems = (encode . scalarVal <$>) <$> elems
+    let elems = Boxed.toList $ Boxed.toList . tensorScalars <$> tensorsFinite t
+        encodedElems = (encode <$>) <$> elems
     in
       if length (indices t) == 2 && TIndex.isCovariant (indices t !! 1)
       then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
