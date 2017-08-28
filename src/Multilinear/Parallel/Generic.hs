@@ -811,17 +811,17 @@ instance Num a => Multilinear Tensor a where
     -- Get size of tensor index or Left if index is infinite or tensor has no such index
     {-# INLINE size #-}
     size t iname = case t of
-        Scalar _             -> Left scalarIndices
+        Scalar _             -> error scalarIndices
         SimpleFinite index _ -> 
             if Index.indexName index == iname 
-            then Right $ Finite.indexSize index 
-            else Left indexNotFound
+            then Finite.indexSize index 
+            else error indexNotFound
         FiniteTensor index _ -> 
             if Index.indexName index == iname
-            then Right $ Finite.indexSize index
+            then Finite.indexSize index
             else size (firstTensor t) iname
-        InfiniteTensor _ _   -> Left infiniteIndex
-        Err msg              -> Left msg
+        InfiniteTensor _ _   -> error infiniteIndex
+        Err msg              -> error msg
 
     -- Rename tensor index
     {-# INLINE ($|) #-}
@@ -988,83 +988,83 @@ instance Num a => Multilinear Tensor a where
         contents <- lift $ ByteString.readFile name
         MaybeT $ return $ Multilinear.fromJSON contents
 
-
 {-| List allows for random access to tensor elements -}
 instance Num a => Accessible Tensor a where
-
-    {-| Accessing tensor elements -}
-    {-# INLINE el #-}
-
-    -- Scalar has only one element
-    el _ (Scalar x) _ = Scalar x
-
-    -- simple tensor case
-    el inds t1@(SimpleFinite index1 _) vals =
-            -- zip indices with their given values
-        let indvals = zip inds vals
-            -- find value for simple tensor index if given
-            val = Data.List.find (\(n,_) -> n == Index.indexName index1) indvals
-            -- if value for current index is given
-        in  if isJust val
-            -- then get it from current tensor
-            then t1 ! snd (fromJust val)
-            -- otherwise return whole tensor - no filtering defined
-            else t1
-
-    -- finite tensor case
-    el inds t1@(FiniteTensor index1 v1) vals =
-            -- zip indices with their given values
-        let indvals = zip inds vals
-            -- find value for current index if given
-            val = Data.List.find (\(n,_) -> n == Index.indexName index1) indvals
-            -- and remove used index from indices list
-            indvals1 = Data.List.filter (\(n,_) -> n /= Index.indexName index1) indvals
-            -- indices unused so far
-            inds1 = fst $ unzip indvals1
-            -- and its corresponding values
-            vals1 = snd $ unzip indvals1
-            -- if value for current index was given
-        in  if isJust val
-            -- then get it from current tensor and recursively process other indices
-            then el inds1 (t1 ! snd (fromJust val)) vals1
-            -- otherwise recursively access elements of all child tensors
-            else FiniteTensor index1 $ (\t -> el inds t vals) <$> v1
-
-    -- infinite tensor case
-    el inds t1@(InfiniteTensor index1 v1) vals =
-            -- zip indices with their given values
-        let indvals = zip inds vals
-            -- find value for current index if given
-            val = Data.List.find (\(n,_) -> n == Index.indexName index1) indvals
-            -- and remove used index from indices list
-            indvals1 = Data.List.filter (\(n,_) -> n /= Index.indexName index1) indvals
-            -- indices unused so far
-            inds1 = fst $ unzip indvals1
-            -- and its corresponding values
-            vals1 = snd $ unzip indvals1
-            -- if value for current index was given
-        in  if isJust val
-            -- then get it from current tensor and recursively process other indices
-            then el inds1 (t1 ! snd (fromJust val)) vals1
-            -- otherwise recursively access elements of all child tensors
-            else InfiniteTensor index1 $ (\t -> el inds t vals) <$> v1
-
-    -- accessing elements of erorr tensor simply pushes this error further
-    el _ (Err msg) _ = Err msg
-
-    {-| Mapping with indices. -}
-    {-# INLINE iMap #-}
-    iMap f t = iMap' t zeroList
-        where
-        zeroList = 0:zeroList
-
-        iMap' (Scalar x) inds =
-            Scalar $ f inds x
-        iMap' (SimpleFinite index ts) inds =
-            SimpleFinite index $ Boxed.imap (\i e -> f (inds ++ [i]) e) ts
-        iMap' (FiniteTensor index ts) inds =
-            FiniteTensor index $ Boxed.imap (\i e -> iMap' e (inds ++ [i])) ts
-        iMap' (InfiniteTensor index  ts) inds =
-            InfiniteTensor index $ (\tind -> iMap' (fst tind) $ inds ++ [snd tind]) <$> zip ts [0..]
-        iMap' (Err msg) _  =
-            Err msg
+    
+        {-| Accessing tensor elements -}
+        {-# INLINE el #-}
+    
+        -- Scalar has only one element
+        el (Scalar x) _ = Scalar x
+    
+        -- simple tensor case
+        el t1@(SimpleFinite index1 _) (inds,vals) =
+                -- zip indices with their given values
+            let indvals = zip inds vals
+                -- find value for simple tensor index if given
+                val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
+                -- if value for current index is given
+            in  if isJust val
+                -- then get it from current tensor
+                then t1 ! snd (fromJust val)
+                -- otherwise return whole tensor - no filtering defined
+                else t1
+    
+        -- finite tensor case
+        el t1@(FiniteTensor index1 v1) (inds,vals) =
+                -- zip indices with their given values
+            let indvals = zip inds vals
+                -- find value for current index if given
+                val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
+                -- and remove used index from indices list
+                indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
+                -- indices unused so far
+                inds1 = fst $ unzip indvals1
+                -- and its corresponding values
+                vals1 = snd $ unzip indvals1
+                -- if value for current index was given
+            in  if isJust val
+                -- then get it from current tensor and recursively process other indices
+                then el (t1 ! snd (fromJust val)) (inds1,vals1)
+                -- otherwise recursively access elements of all child tensors
+                else FiniteTensor index1 $ (\t -> el t (inds,vals)) <$> v1
+    
+        -- infinite tensor case
+        el t1@(InfiniteTensor index1 v1) (inds,vals) =
+                -- zip indices with their given values
+            let indvals = zip inds vals
+                -- find value for current index if given
+                val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
+                -- and remove used index from indices list
+                indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
+                -- indices unused so far
+                inds1 = fst $ unzip indvals1
+                -- and its corresponding values
+                vals1 = snd $ unzip indvals1
+                -- if value for current index was given
+            in  if isJust val
+                -- then get it from current tensor and recursively process other indices
+                then el (t1 ! snd (fromJust val)) (inds1,vals1)
+                -- otherwise recursively access elements of all child tensors
+                else InfiniteTensor index1 $ (\t -> el  t (inds,vals)) <$> v1
+    
+        -- accessing elements of erorr tensor simply pushes this error further
+        el (Err msg) _ = Err msg
+    
+        {-| Mapping with indices. -}
+        {-# INLINE iMap #-}
+        iMap f t = iMap' t zeroList
+            where
+            zeroList = 0:zeroList
+    
+            iMap' (Scalar x) inds =
+                Scalar $ f inds x
+            iMap' (SimpleFinite index ts) inds =
+                SimpleFinite index $ Boxed.imap (\i e -> f (inds ++ [i]) e) ts
+            iMap' (FiniteTensor index ts) inds =
+                FiniteTensor index $ Boxed.imap (\i e -> iMap' e (inds ++ [i])) ts
+            iMap' (InfiniteTensor index  ts) inds =
+                InfiniteTensor index $ (\tind -> iMap' (fst tind) $ inds ++ [snd tind]) <$> zip ts [0..]
+            iMap' (Err msg) _  =
+                Err msg
+    

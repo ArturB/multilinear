@@ -863,17 +863,17 @@ instance Num a => Multilinear Tensor a where
     -- Get size of tensor index or Left if index is infinite or tensor has no such index
     {-# INLINE size #-}
     size t iname = case t of
-        Scalar _             -> Left scalarIndices
+        Scalar _             -> error scalarIndices
         SimpleFinite index _ -> 
             if Index.indexName index == iname 
-            then Right $ Finite.indexSize index 
-            else Left indexNotFound
+            then Finite.indexSize index 
+            else error indexNotFound
         FiniteTensor index _ -> 
             if Index.indexName index == iname
-            then Right $ Finite.indexSize index
+            then Finite.indexSize index
             else size (firstTensor t) iname
-        InfiniteTensor _ _   -> Left infiniteIndex
-        Err msg              -> Left msg
+        InfiniteTensor _ _   -> error infiniteIndex
+        Err msg              -> error msg
 
     -- Rename tensor indices
     {-# INLINE ($|) #-}
@@ -1048,14 +1048,14 @@ instance Num a => Accessible Tensor a where
     {-# INLINE el #-}
 
     -- Scalar has only one element
-    el _ (Scalar x) _ = Scalar x
+    el (Scalar x) _ = Scalar x
 
     -- simple tensor case
-    el inds t1@(SimpleFinite index1 _) vals =
+    el t1@(SimpleFinite index1 _) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for simple tensor index if given
-            val = Data.List.find (\(n,_) -> n == Index.indexName index1) indvals
+            val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
             -- if value for current index is given
         in  if isJust val
             -- then get it from current tensor
@@ -1064,13 +1064,13 @@ instance Num a => Accessible Tensor a where
             else t1
 
     -- finite tensor case
-    el inds t1@(FiniteTensor index1 v1) vals =
+    el t1@(FiniteTensor index1 v1) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for current index if given
-            val = Data.List.find (\(n,_) -> n == Index.indexName index1) indvals
+            val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
             -- and remove used index from indices list
-            indvals1 = Data.List.filter (\(n,_) -> n /= Index.indexName index1) indvals
+            indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
             -- indices unused so far
             inds1 = fst $ unzip indvals1
             -- and its corresponding values
@@ -1078,18 +1078,18 @@ instance Num a => Accessible Tensor a where
             -- if value for current index was given
         in  if isJust val
             -- then get it from current tensor and recursively process other indices
-            then el inds1 (t1 ! snd (fromJust val)) vals1
+            then el (t1 ! snd (fromJust val)) (inds1,vals1)
             -- otherwise recursively access elements of all child tensors
-            else FiniteTensor index1 $ (\t -> el inds t vals) <$> v1
+            else FiniteTensor index1 $ (\t -> el t (inds,vals)) <$> v1
 
     -- infinite tensor case
-    el inds t1@(InfiniteTensor index1 v1) vals =
+    el t1@(InfiniteTensor index1 v1) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for current index if given
-            val = Data.List.find (\(n,_) -> n == Index.indexName index1) indvals
+            val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
             -- and remove used index from indices list
-            indvals1 = Data.List.filter (\(n,_) -> n /= Index.indexName index1) indvals
+            indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
             -- indices unused so far
             inds1 = fst $ unzip indvals1
             -- and its corresponding values
@@ -1097,12 +1097,12 @@ instance Num a => Accessible Tensor a where
             -- if value for current index was given
         in  if isJust val
             -- then get it from current tensor and recursively process other indices
-            then el inds1 (t1 ! snd (fromJust val)) vals1
+            then el (t1 ! snd (fromJust val)) (inds1,vals1)
             -- otherwise recursively access elements of all child tensors
-            else InfiniteTensor index1 $ (\t -> el inds t vals) <$> v1
+            else InfiniteTensor index1 $ (\t -> el  t (inds,vals)) <$> v1
 
     -- accessing elements of erorr tensor simply pushes this error further
-    el _ (Err msg) _ = Err msg
+    el (Err msg) _ = Err msg
 
     {-| Mapping with indices. -}
     {-# INLINE iMap #-}
