@@ -24,7 +24,8 @@ module Multilinear.Library (
     module Tensor,
     module Vector,
     module X,
-    module Unsafe
+    module Unsafe,
+    module Trans
 ) where
 
 -- Re-export other library modules
@@ -58,3 +59,4 @@ import           Statistics.Distribution.StudentT        as X
 import           Statistics.Distribution.Uniform         as X
 
 import           System.IO.Unsafe                        as Unsafe
+import           Control.Monad.Trans.Class               as Trans
