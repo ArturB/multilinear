@@ -180,8 +180,8 @@ firstTensor x = case x of
 t ! i = case t of
     Scalar _            -> Err scalarIndices
     Err msg             -> Err msg
-    SimpleFinite _  ts  -> Scalar $ ts Boxed.! i
-    FiniteTensor _  ts  -> ts Boxed.! i
+    SimpleFinite ind ts -> if i >= Finite.indexSize ind then error ("Index + " ++ show ind ++ " out of bonds!") else Scalar $ ts Boxed.! i
+    FiniteTensor _ ts   -> ts Boxed.! i
     InfiniteTensor _ ts -> ts !! i
 
 -- Binary serialization instance
