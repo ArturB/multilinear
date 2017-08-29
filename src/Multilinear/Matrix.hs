@@ -35,7 +35,6 @@ import           Data.Serialize
 import qualified Data.Vector                as Boxed
 import           Multilinear
 import           Multilinear.Generic
-import qualified Multilinear.Index          as TIndex
 import           Multilinear.Index.Finite   as Finite
 import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
@@ -197,11 +196,9 @@ toCSV :: (
 
 toCSV t = case order t of
   (1,1) -> \fileName separator ->
-    let elems = Boxed.toList $ Boxed.toList . tensorScalars <$> tensorsFinite t
+    let t' = _standardize t
+        elems = Boxed.toList $ Boxed.toList . tensorScalars <$> tensorsFinite t'
         encodedElems = (encode <$>) <$> elems
-    in
-      if length (indices t) == 2 && TIndex.isCovariant (indices t !! 1)
-      then writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
-      else return 0
+    in  writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
 
   _ -> \_ _ -> return 0

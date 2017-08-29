@@ -22,7 +22,7 @@ Portability : Windows/POSIX
 module Multilinear.Generic (
     Tensor(..), (!), mergeScalars,
     isScalar, isSimple, isFiniteTensor, isInfiniteTensor,
-    dot, _elemByElem, contractionErr, tensorIndex
+    dot, _elemByElem, contractionErr, tensorIndex, _standardize
 ) where
 
 import           Codec.Compression.GZip
@@ -194,6 +194,10 @@ instance FromJSON a => FromJSON (Tensor a)
 -- NFData instance
 instance NFData a => NFData (Tensor a)
 
+-- move contravariant indices to lower recursion level
+_standardize :: Num a => Tensor a -> Tensor a
+_standardize tens = foldr' (\i t -> if Index.isContravariant i then t <<<| Index.indexName i else t) tens $ indices tens
+
 -- Print tensor
 instance (
     Show a, Num a
@@ -246,10 +250,6 @@ instance (
         _showHorizontal :: (Show a, Foldable c) => c a -> String
         _showHorizontal container =
             "[" ++ tail (foldl' (\string e -> string ++ "," ++ show e) "" container) ++ "]"
-
-        -- move contravariant indices to lower recursion level
-        _standardize :: Num a => Tensor a -> Tensor a
-        _standardize tens = foldr' (\i t -> if Index.isContravariant i then t <<<| Index.indexName i else t) tens $ indices tens
 
 -- Tensor is a functor
 instance Functor Tensor where
