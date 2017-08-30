@@ -11,6 +11,20 @@ import qualified Multilinear.Matrix         as Matrix
 import qualified Multilinear.Tensor         as Tensor
 import qualified Multilinear.Vector         as Vector
 
+-- PARAMETRY SKRYPTU
+fi     = signum  -- funkcja aktywacji perceptronu
+layers = 10      -- liczba warstw perceptronu
+
+mlp_input         = "mlp_input.csv"          -- dane uczące dla perceptronu
+mlp_expected      = "mlp_expected.csv"       -- dane oczekiwane dla percepttronu
+mlp_classify      = "mlp_classify.csv"       -- dane do klasyfikacji na nauczonym perceptronie
+mlp_output        = "mlp_output.csv"         -- wyjście perceptronu
+hopfield_input    = "hopfield_input.csv"     -- wzorce do zpamiętania dla sieci Hopfielda
+hopfield_classify = "hopfield_classify.csv"  -- dane do klasyfikacji dla sieci Hopfielda
+hopfield_output   = "hopfield_output.csv"    -- wyjście sieci Hopfielda
+
+
+-- PERCEPTRON WIELOWARSTWOWY
 perceptron :: Int                    -- ns:  liczba neuronów w warstwie
            -> Int                    -- ks:  liczba warstw 
            -> Int                    -- ps:  liczba wektorów uczących
@@ -27,7 +41,7 @@ perceptron ns ks ps cs x e c =
       nextWeights w x e =
         let ygen [k] [] = -- tensor wyjść
               if k == 0 then x $| ("j","") 
-              else signum $ w $$| ("k",[k - 1]) $| ("i","j") * ygen [k-1] [] $| ("j","")
+              else fi <$> w $$| ("k",[k - 1]) $| ("i","j") * ygen [k-1] [] $| ("j","")
             y = Tensor.generate ("k",[ks + 1]) ("",[]) $ \[k] [] -> ygen [k] []
             -- tensor wejścia-wyjścia omega
             om = Tensor.generate ("k",[ks]) ("",[]) $ 
@@ -44,10 +58,10 @@ perceptron ns ks ps cs x e c =
       -- uczenie sieci
       learnedNetwork = foldr (\(x,e) w -> nextWeights w x e) zero $ zip xl el
       -- praca nauczonej sieci
-      out t = signum $ learnedNetwork $$| ("k",[ks-1]) $| ("i","j") * c t $| ("j","")
+      out t = fi <$> learnedNetwork $$| ("k",[ks-1]) $| ("i","j") * c t $| ("j","")
   in  Tensor.generate ("",[]) ("t",[cs]) $ \[] [t] -> out t
 
-
+-- SIEĆ HOPFIELDA
 hopfield :: Int        -- ns: liczba neuronów w sieci
         -> Int         -- ps: liczba wzorców do zapamiętania
         -> Int         -- cs: liczba wzorców do klasyfikacji
@@ -66,16 +80,15 @@ hopfield ns ps cs x c =
       -- klasyfikacja zadanych wektorów
   in  Tensor.generate ("",[]) ("t",[cs]) $ \[] [t] -> y ((c $| ("i","t")) $$| ("t",[t]))
 
-
-prog :: Int -- liczba warstw
-     -> EitherT SomeException IO ()
-prog ks = do
+-- OPERACJE WEJŚCIA/WYJŚCIA
+prog :: EitherT SomeException IO ()
+prog = do
   -- wczytywanie danych
-  mlpInput :: Tensor Double <- Matrix.fromCSV "tj" "mlp_input.csv" ';'
-  mlpExp :: Tensor Double <- Matrix.fromCSV "tj" "mlp_expected.csv" ';'
-  mlpClas :: Tensor Double <- Matrix.fromCSV "tj" "mlp_classify.csv" ';'
-  hopInput :: Tensor Int <- Matrix.fromCSV "tj" "hopfield_input.csv" ';'
-  hopClas :: Tensor Int <- Matrix.fromCSV "tj" "hopfield_classify.csv" ';'
+  mlpInput :: Tensor Double <- Matrix.fromCSV "tj" mlp_input ';'
+  mlpExp :: Tensor Double <- Matrix.fromCSV "tj" mlp_expected ';'
+  mlpClas :: Tensor Double <- Matrix.fromCSV "tj" mlp_classify ';'
+  hopInput :: Tensor Int <- Matrix.fromCSV "tj" hopfield_input ';'
+  hopClas :: Tensor Int <- Matrix.fromCSV "tj" hopfield_classify ';'
   let mx t = Multilinear.transpose $ mlpInput $$| ("t",[t])
   let me t = Multilinear.transpose $ mlpExp $$| ("t",[t])
   let mc t = Multilinear.transpose $ mlpClas $$| ("t",[t])
@@ -85,18 +98,16 @@ prog ks = do
          (mlpInput `size` "j", mlpExp `size` "t", mlpClas `size` "t", 
          hopInput `size` "j", hopInput `size` "t", hopClas `size` "t")
   -- perceptron
-  let mlp_net = perceptron ns_mlp ks ps_mlp cs_mlp mx me mc
-  smlp <- lift $ Matrix.toCSV mlp_net "mlp_output.csv" ';'
+  let mlp_net = perceptron ns_mlp layers ps_mlp cs_mlp mx me mc
+  smlp <- lift $ Matrix.toCSV mlp_net mlp_output ';'
   -- hopfield
   let hop_net = hopfield ns_hop ps_hop cs_hop hx hc
-  shop <- lift $ Matrix.toCSV hop_net "hopfield_output.csv" ';'
-  lift $ putStrLn $ "Perceptron: " ++ show smlp ++ " vectors saved to 'mlp_output.csv'"
-  lift $ putStrLn $ "Hopfield: " ++ show shop ++ " vectors saved to 'hopfield_output.csv'"
+  shop <- lift $ Matrix.toCSV hop_net hopfield_output ';'
+  lift $ putStrLn $ "Perceptron: " ++ show smlp ++ " vectors saved to '" ++ mlp_output ++ "'."
+  lift $ putStrLn $ "Hopfield: " ++ show shop ++ " vectors saved to '" ++ hopfield_output ++ "'."
   return ()
 
 -- ENTRY POINT
-main :: IO ()
-main = do
-  x <- runEitherT $ prog 10
-  print x
+main :: IO (Either SomeException ())
+main = runEitherT prog
   
