@@ -22,7 +22,7 @@ Portability : Windows/POSIX
 module Multilinear.Generic (
     Tensor(..), (!), mergeScalars,
     isScalar, isSimple, isFiniteTensor, isInfiniteTensor,
-    dot, _elemByElem, contractionErr, tensorIndex
+    dot, _elemByElem, contractionErr, tensorIndex, _standardize
 ) where
 
 import           Codec.Compression.GZip
@@ -180,8 +180,8 @@ firstTensor x = case x of
 t ! i = case t of
     Scalar _            -> Err scalarIndices
     Err msg             -> Err msg
-    SimpleFinite _  ts  -> Scalar $ ts Boxed.! i
-    FiniteTensor _  ts  -> ts Boxed.! i
+    SimpleFinite ind ts -> if i >= Finite.indexSize ind then error ("Index + " ++ show ind ++ " out of bonds!") else Scalar $ ts Boxed.! i
+    FiniteTensor ind ts -> if i >= Finite.indexSize ind then error ("Index + " ++ show ind ++ " out of bonds!") else ts Boxed.! i
     InfiniteTensor _ ts -> ts !! i
 
 -- Binary serialization instance
@@ -193,6 +193,10 @@ instance FromJSON a => FromJSON (Tensor a)
 
 -- NFData instance
 instance NFData a => NFData (Tensor a)
+
+-- move contravariant indices to lower recursion level
+_standardize :: Num a => Tensor a -> Tensor a
+_standardize tens = foldr' (\i t -> if Index.isContravariant i then t <<<| Index.indexName i else t) tens $ indices tens
 
 -- Print tensor
 instance (
@@ -246,10 +250,6 @@ instance (
         _showHorizontal :: (Show a, Foldable c) => c a -> String
         _showHorizontal container =
             "[" ++ tail (foldl' (\string e -> string ++ "," ++ show e) "" container) ++ "]"
-
-        -- move contravariant indices to lower recursion level
-        _standardize :: Num a => Tensor a -> Tensor a
-        _standardize tens = foldr' (\i t -> if Index.isContravariant i then t <<<| Index.indexName i else t) tens $ indices tens
 
 -- Tensor is a functor
 instance Functor Tensor where

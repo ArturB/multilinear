@@ -23,9 +23,7 @@ module Multilinear.Library (
     module NForm,
     module Tensor,
     module Vector,
-    module X,
-    module Unsafe,
-    module Trans
+    module X
 ) where
 
 -- Re-export other library modules
@@ -58,5 +56,7 @@ import           Statistics.Distribution.Normal          as X
 import           Statistics.Distribution.StudentT        as X
 import           Statistics.Distribution.Uniform         as X
 
-import           System.IO.Unsafe                        as Unsafe
-import           Control.Monad.Trans.Class               as Trans
+import           System.IO.Unsafe                        as X
+import           Control.Monad.Trans.Class               as X
+import           Control.Monad.Trans.Either              as X
+import           Control.Exception.Base                  as X
