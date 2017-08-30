@@ -15,80 +15,21 @@ module Main (
 
 import           Control.DeepSeq
 import           Criterion.Main
-import           Criterion.Measurement              as Meas
+import           Criterion.Measurement               as Meas
 import           Criterion.Types
-import           Data.Bits
-import           Data.Vector                        as Boxed
-import           Multilinear
-import qualified Multilinear.Form                    as Form
 import           Multilinear.Generic
-import qualified Multilinear.Parallel.Generic        as Parallel
-import           Multilinear.Index                   as Index
-import           Multilinear.Index.Finite            as Finite
-import           Multilinear.Index.Infinite          as Infinite
 import qualified Multilinear.Matrix                  as Matrix
-import qualified Multilinear.Vector                  as Vector
-import qualified Multilinear.Tensor                  as Tensor
-import qualified Multilinear.Parallel.Matrix         as Parallel.Matrix
-import qualified Multilinear.Parallel.Vector         as Parallel.Vector
-import qualified Multilinear.Parallel.Tensor         as Parallel.Tensor
-import           Statistics.Distribution.Normal
-import           Statistics.Distribution.Exponential
-import           Statistics.Distribution.Geometric
 
-incompatibleTypes :: String
-incompatibleTypes = "Incompatible tensor types!"
+m1 :: Tensor Double
+m1 = Matrix.fromIndices "ij" 1000 1000 $ \i j -> fromIntegral (2*i) - exp (fromIntegral j)
 
-scalarIndices :: String
-scalarIndices = "Scalar has no indices!"
-
-invalidIndices :: String
-invalidIndices = "Indices and its sizes not compatible with structure of linear functional!"
-
-m1R :: IO (Tensor Double)
-m1R = Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
-
-m2R :: IO (Tensor Double)
-m2R = Matrix.randomDouble "jk" 1000 1000 (exponential 0.5)
-
-m1D :: Tensor Double
-m1D = Matrix.fromIndices "ij" 3000 3000 (\i j -> fromIntegral $ i + j)
-
-m2D :: Tensor Double
-m2D = Matrix.fromIndices "ij" 3000 3000 (\i j -> fromIntegral $ i * j)
-
-t1R :: IO (Tensor Int)
-t1R = Tensor.randomInt ("i", [1000]) ("j", [1000]) (geometric 0.5)
-
-t2R :: IO (Tensor Int)
-t2R = Tensor.randomInt ("j", [1000]) ("k", [1000]) (geometric 0.5)
-
-m1P :: IO (Parallel.Tensor Double)
-m1P = Parallel.Matrix.randomDouble "ij" 1000 1000 (exponential 0.5)
-
-m2P :: IO (Parallel.Tensor Double)
-m2P = Parallel.Matrix.randomDouble "jk" 1000 1000 (exponential 0.5)
-
-v2 :: Tensor Int
-v2 = Vector.fromIndices "j" 1000 id
-
---mult :: Num a => Bits a => Tensor a -> Tensor a -> Tensor a
---t1 `mult` t2 = _elemByElem t1 t2 (*) dot
+m2 :: Tensor Double
+m2 = Matrix.fromIndices "jk" 1000 1000 $ \i j -> sin (fromIntegral i) + cos (fromIntegral j)
 
 main :: IO ()
 main = do
-    m1 <- m1R
-    m2 <- m2R
-    {-putStrLn "Matrix by matrix multiplying..."
-    mmList  <- Meas.measure ( nfIO $ print $ m1l `mult` m2l `mult` v ) 1
-    putStrLn "Matrix by vector multiplying..."
-    mvList <- Meas.measure ( nfIO $ print $ m1l * v2       ) 1
-    putStrLn $ "\nMultiply matrix by matrix: " Prelude.++ show (measCpuTime $ fst mmList) Prelude.++ "s"
-    putStrLn $ "\nMultiply matrix by vector: " Prelude.++ show (measCpuTime $ fst mvList) Prelude.++ "s"-}
-    --print commonIndices
-    (m1 * m2) `deepseq` putStrLn "End!"
-    --vec <- v
-    --print vec
-    --m1l `deepseq` putStrLn "End!"
+    putStrLn "Two matrices 1000x1000 multiplying..."
+    (meas,_)  <- Meas.measure ( nfIO $ (m1 * m2) `deepseq` putStrLn "End!" ) 1
+    putStrLn $ "Measured time: " ++ show (measCpuTime meas) ++ " s."
     return ()
 
