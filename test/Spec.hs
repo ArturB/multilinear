@@ -12,16 +12,16 @@ import qualified Multilinear.Tensor         as Tensor
 import qualified Multilinear.Vector         as Vector
 
 -- PARAMETRY SKRYPTU
-fi :: (Double -> Double) = signum  -- funkcja aktywacji perceptronu
-layers :: Int            = 10      -- liczba warstw perceptronu
+fi     = signum  -- funkcja aktywacji perceptronu
+layers = 10      -- liczba warstw perceptronu
 
-mlp_input         :: String = "mlp_input.csv"          -- dane uczące dla perceptronu
-mlp_expected      :: String = "mlp_expected.csv"       -- dane oczekiwane dla percepttronu
-mlp_classify      :: String = "mlp_classify.csv"       -- dane do klasyfikacji na nauczonym perceptronie
-mlp_output        :: String = "mlp_output.csv"         -- wyjście perceptronu
-hopfield_input    :: String = "hopfield_input.csv"     -- wzorce do zpamiętania dla sieci Hopfielda
-hopfield_classify :: String = "hopfield_classify.csv"  -- dane do klasyfikacji dla sieci Hopfielda
-hopfield_output   :: String = "hopfield_output.csv"    -- wyjście sieci Hopfielda
+mlp_input         = "mlp_input.csv"          -- dane uczące dla perceptronu
+mlp_expected      = "mlp_expected.csv"       -- dane oczekiwane dla percepttronu
+mlp_classify      = "mlp_classify.csv"       -- dane do klasyfikacji na nauczonym perceptronie
+mlp_output        = "mlp_output.csv"         -- wyjście perceptronu
+hopfield_input    = "hopfield_input.csv"     -- wzorce do zpamiętania dla sieci Hopfielda
+hopfield_classify = "hopfield_classify.csv"  -- dane do klasyfikacji dla sieci Hopfielda
+hopfield_output   = "hopfield_output.csv"    -- wyjście sieci Hopfielda
 
 
 -- PERCEPTRON WIELOWARSTWOWY
@@ -41,7 +41,7 @@ perceptron ns ks ps cs x e c =
       nextWeights w x e =
         let ygen [k] [] = -- tensor wyjść
               if k == 0 then x $| ("j","") 
-              else fi $ w $$| ("k",[k - 1]) $| ("i","j") * ygen [k-1] [] $| ("j","")
+              else fi <$> w $$| ("k",[k - 1]) $| ("i","j") * ygen [k-1] [] $| ("j","")
             y = Tensor.generate ("k",[ks + 1]) ("",[]) $ \[k] [] -> ygen [k] []
             -- tensor wejścia-wyjścia omega
             om = Tensor.generate ("k",[ks]) ("",[]) $ 
@@ -58,7 +58,7 @@ perceptron ns ks ps cs x e c =
       -- uczenie sieci
       learnedNetwork = foldr (\(x,e) w -> nextWeights w x e) zero $ zip xl el
       -- praca nauczonej sieci
-      out t = fi $ learnedNetwork $$| ("k",[ks-1]) $| ("i","j") * c t $| ("j","")
+      out t = fi <$> learnedNetwork $$| ("k",[ks-1]) $| ("i","j") * c t $| ("j","")
   in  Tensor.generate ("",[]) ("t",[cs]) $ \[] [t] -> out t
 
 -- SIEĆ HOPFIELDA
@@ -82,7 +82,7 @@ hopfield ns ps cs x c =
 
 -- OPERACJE WEJŚCIA/WYJŚCIA
 prog :: EitherT SomeException IO ()
-prog ks = do
+prog = do
   -- wczytywanie danych
   mlpInput :: Tensor Double <- Matrix.fromCSV "tj" mlp_input ';'
   mlpExp :: Tensor Double <- Matrix.fromCSV "tj" mlp_expected ';'
@@ -108,6 +108,6 @@ prog ks = do
   return ()
 
 -- ENTRY POINT
-main :: IO ()
+main :: IO (Either SomeException ())
 main = runEitherT prog
   
