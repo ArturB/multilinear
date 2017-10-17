@@ -1072,9 +1072,9 @@ instance Num a => Accessible Tensor a where
             -- and remove used index from indices list
             indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
             -- indices unused so far
-            inds1 = fst $ unzip indvals1
+            inds1 = Data.List.map fst indvals1
             -- and its corresponding values
-            vals1 = snd $ unzip indvals1
+            vals1 = Data.List.map snd indvals1
             -- if value for current index was given
         in  if isJust val
             -- then get it from current tensor and recursively process other indices
@@ -1091,9 +1091,9 @@ instance Num a => Accessible Tensor a where
             -- and remove used index from indices list
             indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
             -- indices unused so far
-            inds1 = fst $ unzip indvals1
+            inds1 = Data.List.map fst indvals1
             -- and its corresponding values
-            vals1 = snd $ unzip indvals1
+            vals1 = Data.List.map snd indvals1
             -- if value for current index was given
         in  if isJust val
             -- then get it from current tensor and recursively process other indices
