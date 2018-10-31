@@ -1,0 +1,104 @@
+name:                multilinear
+version:             0.8.0.0
+github:              "ArturB/multilinear"
+license:             BSD3
+author:              "Artur M. Brodzki"
+maintainer:          "artur@brodzki.org"
+copyright:           "2018 Artur M. Brodzki"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+synopsis:            Efficient (multi)linear algebra implementation
+category:            Machine learning
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/ArturB/multilinear#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+ghc-options:
+- -O2
+- -Wall
+
+library:
+  source-dirs: src
+  dependencies:
+  - aeson
+  - bytestring
+  - cereal
+  - cereal-vector
+  - containers
+  - csv-enumerator
+  - deepseq
+  - either
+  - hashable
+  - lens
+  - mwc-random
+  - parallel
+  - primitive
+  - statistics
+  - transformers
+  - vector
+  - zlib
+
+tests:
+  multilinear-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N  
+    dependencies:
+    - multilinear
+    - aeson
+    - bytestring
+    - cereal
+    - cereal-vector
+    - containers
+    - csv-enumerator
+    - deepseq
+    - either
+    - hashable
+    - lens
+    - mwc-random
+    - parallel
+    - primitive
+    - statistics
+    - transformers
+    - vector
+    - zlib
+
+benchmarks:
+  multilinear-bench:
+    main:                Bench.hs
+    source-dirs:         benchmark
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - criterion
+    - deepseq
+    - multilinear
+    - aeson
+    - bytestring
+    - cereal
+    - cereal-vector
+    - containers
+    - csv-enumerator
+    - deepseq
+    - either
+    - hashable
+    - lens
+    - mwc-random
+    - parallel
+    - primitive
+    - statistics
+    - transformers
+    - vector
+    - zlib
