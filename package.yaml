@@ -1,5 +1,5 @@
 name:                multilinear
-version:             0.8.0.0
+version:             0.2.0
 github:              "ArturB/multilinear"
 license:             BSD3
 author:              "Artur M. Brodzki"
@@ -23,7 +23,6 @@ dependencies:
 ghc-options:
 - -O2
 - -Wall
-- -Werror
 default-extensions:
 - DeriveGeneric
 - FlexibleContexts
