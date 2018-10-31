@@ -21,10 +21,10 @@ import           Multilinear.Generic
 import qualified Multilinear.Matrix                  as Matrix
 
 m1 :: Tensor Double
-m1 = Matrix.fromIndices "ij" 1000 1000 $ \i j -> fromIntegral (2*i) - exp (fromIntegral j)
+m1 = Matrix.fromIndices "ij" 100 100 $ \i j -> fromIntegral (2*i) - exp (fromIntegral j)
 
 m2 :: Tensor Double
-m2 = Matrix.fromIndices "jk" 1000 1000 $ \i j -> sin (fromIntegral i) + cos (fromIntegral j)
+m2 = Matrix.fromIndices "jk" 100 100 $ \i j -> sin (fromIntegral i) + cos (fromIntegral j)
 
 main :: IO ()
 main = do
