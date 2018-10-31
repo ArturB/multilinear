@@ -68,6 +68,7 @@ tests:
     - mwc-random
     - parallel
     - primitive
+    - process
     - statistics
     - transformers
     - vector

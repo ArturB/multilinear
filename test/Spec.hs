@@ -15,13 +15,13 @@ import qualified Multilinear.Vector         as Vector
 fi     = signum  -- funkcja aktywacji perceptronu
 layers = 10      -- liczba warstw perceptronu
 
-mlp_input         = "mlp_input.csv"          -- dane uczące dla perceptronu
-mlp_expected      = "mlp_expected.csv"       -- dane oczekiwane dla percepttronu
-mlp_classify      = "mlp_classify.csv"       -- dane do klasyfikacji na nauczonym perceptronie
-mlp_output        = "mlp_output.csv"         -- wyjście perceptronu
-hopfield_input    = "hopfield_input.csv"     -- wzorce do zpamiętania dla sieci Hopfielda
-hopfield_classify = "hopfield_classify.csv"  -- dane do klasyfikacji dla sieci Hopfielda
-hopfield_output   = "hopfield_output.csv"    -- wyjście sieci Hopfielda
+mlp_input         = "test/data/mlp_input.csv"          -- dane uczące dla perceptronu
+mlp_expected      = "test/data/mlp_expected.csv"       -- dane oczekiwane dla percepttronu
+mlp_classify      = "test/data/mlp_classify.csv"       -- dane do klasyfikacji na nauczonym perceptronie
+mlp_output        = "test/data/mlp_output.csv"         -- wyjście perceptronu
+hopfield_input    = "test/data/hopfield_input.csv"     -- wzorce do zpamiętania dla sieci Hopfielda
+hopfield_classify = "test/data/hopfield_classify.csv"  -- dane do klasyfikacji dla sieci Hopfielda
+hopfield_output   = "test/data/hopfield_output.csv"    -- wyjście sieci Hopfielda
 
 
 -- PERCEPTRON WIELOWARSTWOWY
