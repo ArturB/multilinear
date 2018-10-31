@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.NVector
 Description : N-Vectors constructors (finitely- or infinitely-dimensional)
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 

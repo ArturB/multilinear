@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.Vector
 Description : Vector constructors (finitely- or infinitely-dimensional)
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -19,21 +19,12 @@ module Multilinear.Vector (
   Multilinear.Vector.randomDouble, 
   Multilinear.Vector.randomDoubleSeed,
   Multilinear.Vector.randomInt, 
-  Multilinear.Vector.randomIntSeed,
-  -- * From files
-  Multilinear.Vector.fromCSV, 
-  Multilinear.Vector.toCSV,
+  Multilinear.Vector.randomIntSeed
 ) where
 
-import           Control.DeepSeq
-import           Control.Exception
 import           Control.Monad.Primitive
-import           Control.Monad.Trans.Either
-import           Data.Serialize
-import           Multilinear.Class          as Multilinear
 import           Multilinear.Generic
 import           Multilinear.Tensor         as Tensor
-import           Multilinear.Matrix         as Matrix
 import           Statistics.Distribution
 
 invalidIndices :: String
@@ -148,29 +139,4 @@ randomIntSeed :: (
 
 randomIntSeed [i] s = Tensor.randomIntSeed ([i],[s]) ([],[])
 randomIntSeed _ _ = \_ _ -> return $ Err invalidIndices
-
-{-| Read vector components from CSV file. Reads only the first row of the file. -}
-{-# INLINE fromCSV #-}
-fromCSV :: (
-    Num a, NFData a, Serialize a
-  ) => String                               -- ^ Index name (one character)
-    -> String                               -- ^ CSV file name
-    -> Char                                 -- ^ Separator expected to be used in this CSV file
-    -> EitherT SomeException IO (Tensor a)  -- ^ Generated vector or error message
-
-fromCSV [i] fileName separator = do
-  m <- Matrix.fromCSV [i,i] fileName separator
-  right $ (m ! 0) /\ [i]
-fromCSV _ _ _ = right $ Err invalidIndices
-
-{-| Write vector to CSV file. -}
-{-# INLINE toCSV #-}
-toCSV :: (
-    Num a, NFData a, Serialize a
-  ) => Tensor a   -- ^ vector to serialize
-    -> String     -- ^ CSV file name
-    -> Char       -- ^ Separator expected to be used in this CSV file
-    -> IO Int     -- ^ Number of rows written
-
-toCSV = Matrix.toCSV
 

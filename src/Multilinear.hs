@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear
 Description : A (multi)linear algbra library.
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -142,7 +142,7 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 -}
 
 module Multilinear (
-    module Form,
+    {-module Form,
     module Generic,
     module Index,
     module Index.Finite,
@@ -151,11 +151,11 @@ module Multilinear (
     module NForm,
     module Tensor,
     module Vector,
-    module X
+    module X-}
 ) where
 
 -- Re-export other library modules
-import           Multilinear.Class                       as Multilinear
+{-import           Multilinear.Class                       as Multilinear
 import qualified Multilinear.Form                        as Form
 import           Multilinear.Generic                     as Generic
 import qualified Multilinear.Index                       as Index
@@ -186,3 +186,4 @@ import           System.IO.Unsafe                        as X
 import           Control.Monad.Trans.Class               as X
 import           Control.Monad.Trans.Either              as X
 import           Control.Exception.Base                  as X
+-}

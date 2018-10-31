@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.Index.Finite
 Description : Finite-dimensional tensor index.
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -16,9 +16,6 @@ module Multilinear.Index.Finite (
 ) where
 
 import           Control.DeepSeq
-import           Data.Aeson
-import           Data.Hashable
-import           Data.Serialize
 import           GHC.Generics
 import qualified Multilinear.Index as TIndex
 
@@ -79,22 +76,10 @@ instance TIndex.Index Index where
     toTIndex (Contravariant size name) = TIndex.Contravariant (Just size) name
     toTIndex (Indifferent size name)   = TIndex.Indifferent (Just size) name
 
-{-| Binary serialization and deserialization |-}
-instance Serialize Index
-
-{-| Serialization to and from JSON |-}
-instance FromJSON Index
-instance   ToJSON Index
-
-{-| NFData instance -}
-instance NFData Index
-
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
 instance Ord Index where
     ind1 <= ind2 = indexSize ind1 <= indexSize ind2
 
-{-| Indices can be hashed by hash functions |-}
-{-| Used to allow to put tensors to typical unordered containers |-}
-instance Hashable Index
-
+-- NFData instance
+instance NFData Index

@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.Matrix
 Description : Matrix constructors (finitely- or infinitely dimensional)
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -20,30 +20,15 @@ module Multilinear.Matrix (
   Multilinear.Matrix.randomDoubleSeed,
   Multilinear.Matrix.randomInt, 
   Multilinear.Matrix.randomIntSeed,
-  -- * From files
-  Multilinear.Matrix.fromCSV, 
-  Multilinear.Matrix.toCSV
 ) where
 
-import           Control.DeepSeq
-import           Control.Exception
 import           Control.Monad.Primitive
-import           Control.Monad.Trans.Either
-import           Data.CSV.Enumerator
-import           Data.Either
-import           Data.Serialize
-import qualified Data.Vector                as Boxed
-import           Multilinear.Class          as Multilinear
 import           Multilinear.Generic
-import           Multilinear.Index.Finite   as Finite
 import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
 
 invalidIndices :: String
 invalidIndices = "Indices and its sizes not compatible with structure of matrix!"
-
-deserializationError :: String
-deserializationError = "Components deserialization error!"
 
 {-| Generate matrix as function of its indices -}
 {-# INLINE fromIndices #-}
@@ -160,45 +145,3 @@ randomIntSeed :: (
 
 randomIntSeed [u,d] us ds = Tensor.randomIntSeed ([u],[us]) ([d],[ds])
 randomIntSeed _ _ _ = \_ _ -> return $ Err invalidIndices
-
-{-| Read matrix components from CSV file. -}
-{-# INLINE fromCSV #-}
-fromCSV :: (
-    Num a, NFData a, Serialize a
-  ) => String                                  -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
-    -> String                                  -- ^ CSV file name
-    -> Char                                    -- ^ Separator expected to be used in this CSV file
-    -> EitherT SomeException IO (Tensor a)     -- ^ Generated matrix or error message
-
-fromCSV x = case x of
-  [u,d] -> \fileName separator -> do
-    csv <- EitherT $ readCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName
-    let components = (decode <$> ) <$> csv
-    let rows = length components
-    let columns = if rows > 0 then length $ rights (head components) else 0
-    if rows > 0 && columns > 0
-    then return $ 
-      FiniteTensor (Finite.Contravariant rows [u]) $ (
-        SimpleFinite (Finite.Covariant columns [d]) . Boxed.fromList . rights
-      ) <$> Boxed.fromList components
-    else EitherT $ return $ Left $ SomeException $ TypeError deserializationError
-
-  _ -> \_ _ -> return $ Err invalidIndices
-
-{-| Write matrix to CSV file. -}
-{-# INLINE toCSV                    #-}
-toCSV :: (
-    Num a, NFData a, Serialize a
-  ) => Tensor a  -- ^ Matrix to serialize
-    -> String    -- ^ CSV file name
-    -> Char      -- ^ Separator expected to be used in this CSV file
-    -> IO Int    -- ^ Number of rows written
-
-toCSV t = case order t of
-  (1,1) -> \fileName separator ->
-    let t' = _standardize t
-        elems = Boxed.toList $ Boxed.toList . tensorScalars <$> tensorsFinite t'
-        encodedElems = (encode <$>) <$> elems
-    in  writeCSVFile (CSVS separator (Just '"') (Just '"') separator) fileName encodedElems
-
-  _ -> \_ _ -> return 0

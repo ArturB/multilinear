@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.Generic.AsArray
 Description : Generic array tensor
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -17,21 +17,13 @@ module Multilinear.Generic (
     dot, _elemByElem, contractionErr, tensorIndex, _standardize
 ) where
 
-import           Codec.Compression.GZip
 import           Control.DeepSeq
-import           Control.Monad.Trans.Class
-import           Control.Monad.Trans.Either
-import           Control.Monad.Trans.Maybe
-import           Data.Aeson
 import           Data.Bits
-import qualified Data.ByteString.Lazy       as ByteString
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
 import           Data.Monoid
-import           Data.Serialize
 import qualified Data.Vector                as Boxed
-import           Data.Vector.Serialize      ()
 import           GHC.Generics
 import           Multilinear.Class          as Multilinear
 import qualified Multilinear.Index          as Index
@@ -175,13 +167,6 @@ t ! i = case t of
     SimpleFinite ind ts -> if i >= Finite.indexSize ind then error ("Index + " ++ show ind ++ " out of bonds!") else Scalar $ ts Boxed.! i
     FiniteTensor ind ts -> if i >= Finite.indexSize ind then error ("Index + " ++ show ind ++ " out of bonds!") else ts Boxed.! i
     InfiniteTensor _ ts -> ts !! i
-
--- Binary serialization instance
-instance Serialize a => Serialize (Tensor a)
--- JSON serialization instance
-instance ToJSON a => ToJSON (Tensor a)
--- JSON deserialization instance
-instance FromJSON a => FromJSON (Tensor a)
 
 -- NFData instance
 instance NFData a => NFData (Tensor a)
@@ -1002,35 +987,6 @@ instance Num a => Multilinear Tensor a where
             -- and reconstruct tensor with transposed elements
             in  mergeScalars $ InfiniteTensor index2 $ InfiniteTensor index1 <$> transposed
         | otherwise = t1
-
-    {-| Serialize to binary string -}
-    toBinary = Data.Serialize.encodeLazy
-
-    {-| Write to binary file. Uses compression with gzip -}
-    toBinaryFile name = ByteString.writeFile name . compress . toBinary
-
-    {-| Deserialize from binary string -}
-    fromBinary = Data.Serialize.decodeLazy
-
-    {-| Read from binary file -}
-    fromBinaryFile name = do
-        contents <- lift $ ByteString.readFile name
-        EitherT $ return $ fromBinary $ decompress contents
-
-
-    {-| Serialize to JSON string -}
-    toJSON = Data.Aeson.encode
-
-    {-| Write to JSON file -}
-    toJSONFile name = ByteString.writeFile name . Multilinear.toJSON
-
-    {-| Deserialize from JSON string -}
-    fromJSON = Data.Aeson.decode
-
-    {-| Read from JSON file -}
-    fromJSONFile name = do
-        contents <- lift $ ByteString.readFile name
-        MaybeT $ return $ Multilinear.fromJSON contents
 
 
 {-| List allows for random access to tensor elements -}

@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.Form
 Description : Linear functional constructors (finitely- or infinitely-dimensional)
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -23,21 +23,13 @@ module Multilinear.Form (
   Multilinear.Form.randomIntSeed,
   -- ** Infinite functionals
   Multilinear.Form.fromIndices', 
-  Multilinear.Form.const',
-  -- * From files
-  Multilinear.Form.fromCSV, 
-  Multilinear.Form.toCSV,
+  Multilinear.Form.const'
 ) where
 
-import           Control.DeepSeq
-import           Control.Exception
 import           Control.Monad.Primitive
-import           Control.Monad.Trans.Either
-import           Data.Serialize
 import           Multilinear.Generic
 import           Multilinear.Index.Infinite as Infinite
 import           Multilinear.Tensor         as Tensor
-import           Multilinear.Matrix         as Matrix
 import           Statistics.Distribution
 
 invalidIndices :: String
@@ -179,29 +171,3 @@ const' i = case i of
     [d] -> \v -> InfiniteTensor (Infinite.Covariant [d]) $ (\_ -> Scalar v) <$> ([0..] :: [Int])
     _   -> \_ -> Err invalidIndices
 
--- * From files
-
-{-| Read linear functional components from CSV file. Reads only the first row of the file. -}
-{-# INLINE fromCSV #-}
-fromCSV :: (
-    Num a, NFData a, Serialize a
-  ) => String                                    -- ^ Index name (one character)
-    -> String                                    -- ^ CSV file name
-    -> Char                                      -- ^ Separator expected to be used in this CSV file
-    -> EitherT SomeException IO (Tensor a)       -- ^ Generated linear functional or error message
-
-fromCSV [i] fileName separator = do
-  m <- Matrix.fromCSV [i,i] fileName separator
-  right $ m ! 0
-fromCSV _ _ _ = right $ Err invalidIndices
-
-{-| Write linear functional to CSV file. -}
-{-# INLINE toCSV #-}
-toCSV :: (
-    Num a, NFData a, Serialize a
-  ) => Tensor a   -- ^ Functional to serialize
-    -> String     -- ^ CSV file name
-    -> Char       -- ^ Separator expected to be used in this CSV file
-    -> IO Int     -- ^ Number of rows written
-
-toCSV = Matrix.toCSV

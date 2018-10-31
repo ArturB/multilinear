@@ -65,6 +65,7 @@ tests:
     - cereal
     - cereal-vector
     - containers
+    - criterion
     - csv-enumerator
     - deepseq
     - either

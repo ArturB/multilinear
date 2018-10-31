@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.NForm
 Description : N-Forms, dot and cross product and determinant
-Copyright   : (c) Artur M. Brodzki, 2017
+Copyright   : (c) Artur M. Brodzki, 2018
 License     : GLP-3
-Maintainer  : artur.brodzki@gmail.com
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 

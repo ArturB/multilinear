@@ -29,4 +29,4 @@ If you want to contribute to this library, contact with me.
 ### Who do I talk to? ###
 
 All copyrights to Artur M. Brodzki.
-Contact mail: artur.brodzki@gmail.com
+Contact mail: artur@brodzki.org

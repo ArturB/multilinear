@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear
 Description : A (multi)linear algbra library.
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -98,6 +98,7 @@ If you want to do a matrix multiplication, a lower index of first matrix must ha
    | [k:4] [3,4,5,6]
    | [k:4] [4,5,6,7]
 >>> m1 * m2
+
 \<i:3\>
    | [k:4] [30,40,50,60]
    | [k:4] [40,50,60,70]
@@ -146,12 +147,7 @@ module Multilinear.Class (
     Accessible(..)
 ) where
 
-import           Control.Monad.Trans.Either
-import           Control.Monad.Trans.Maybe
-import           Data.Aeson
-import qualified Data.ByteString.Lazy       as ByteString
 import           Data.Maybe
-import           Data.Serialize
 import           Data.Set
 import           Multilinear.Index
 
@@ -314,57 +310,6 @@ class (
     {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
     map :: (a -> b) -> t a -> t b
     map = fmap
-
-    {-| Serialize to binary string -}
-    toBinary :: (
-        Serialize a
-        ) => t a                     -- ^ Tensor to serialize
-          -> ByteString.ByteString   -- ^ Tensor serialized to binary string
-
-    {-| Write to binary file. Uses compression with gzip -}
-    toBinaryFile :: (
-        Serialize a
-        ) => String         -- ^ File name
-          -> t a            -- ^ Tensor to serialize
-          -> IO ()
-
-    {-| Deserialize from binary string -}
-    fromBinary :: (
-        Serialize a
-        ) => ByteString.ByteString          -- ^ Binary string to deserialize
-          -> Either String (t a)            -- ^ Deserialized tensor or deserialization error message
-
-    {-| Read from binary file -}
-    fromBinaryFile :: (
-        Serialize a
-        ) => String                             -- ^ File name
-          -> EitherT String IO (t a)            -- ^ Deserialized tensor or deserialization error message - either way, wrapped in the IO monad
-
-
-    {-| Serialize to JSON string -}
-    toJSON :: (
-        ToJSON a
-        ) => t a                     -- ^ Tensor to serialize
-          -> ByteString.ByteString   -- ^ Binary string with JSON-encoded tensor
-
-    {-| Write to JSON file -}
-    toJSONFile :: (
-        ToJSON a
-        ) => String          -- ^ File name
-          -> t a             -- ^ Tensor to serialize
-          -> IO ()
-
-    {-| Deserialize from JSON string -}
-    fromJSON :: (
-        FromJSON a
-        ) => ByteString.ByteString    -- ^ Binary string with JSON-encoded tensor
-          -> Maybe (t a)              -- ^ Deserialized tensor or an error
-
-    {-| Read from JSON file -}
-    fromJSONFile :: (
-        FromJSON a
-        ) => String                      -- ^ File name
-          -> MaybeT IO (t a)             -- ^ Deserialized tensor or an error, either way wrapped in the IO monad
 
 
 {-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
