@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8a5a11f7a9cb5377086ef4bfb78447c00d0280abc294f0e0153d690e7c37fdf4
+-- hash: 09ad059341b710e3e23b23fc7dd26e748133587ca50e4e2186206a7681cd0d29
 
 name:           multilinear
 version:        0.8.0.0
@@ -28,12 +28,12 @@ source-repository head
 library
   exposed-modules:
       Multilinear
+      Multilinear.Class
       Multilinear.Form
       Multilinear.Generic
       Multilinear.Index
       Multilinear.Index.Finite
       Multilinear.Index.Infinite
-      Multilinear.Library
       Multilinear.Matrix
       Multilinear.NForm
       Multilinear.NVector

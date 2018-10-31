@@ -30,7 +30,7 @@ import           Control.Exception
 import           Control.Monad.Primitive
 import           Control.Monad.Trans.Either
 import           Data.Serialize
-import           Multilinear
+import           Multilinear.Class          as Multilinear
 import           Multilinear.Generic
 import           Multilinear.Tensor         as Tensor
 import           Multilinear.Matrix         as Matrix

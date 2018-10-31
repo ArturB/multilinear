@@ -40,7 +40,7 @@ import           Data.Serialize
 import qualified Data.Vector                as Boxed
 import           Data.Vector.Serialize      ()
 import           GHC.Generics
-import           Multilinear
+import           Multilinear.Class          as Multilinear
 import qualified Multilinear.Index          as Index
 import qualified Multilinear.Index.Finite   as Finite
 import qualified Multilinear.Index.Infinite as Infinite

@@ -29,7 +29,7 @@ import           Data.CSV.Enumerator
 import           Data.Either
 import           Data.Serialize
 import qualified Data.Vector                as Boxed
-import           Multilinear
+import           Multilinear.Class          as Multilinear
 import           Multilinear.Parallel.Generic
 import qualified Multilinear.Index          as TIndex
 import           Multilinear.Index.Finite   as Finite

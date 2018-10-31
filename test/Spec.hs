@@ -5,7 +5,7 @@ module Main where
 import           Control.Exception.Base
 import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Class
-import           Multilinear
+import           Multilinear.Class          as Multilinear
 import           Multilinear.Generic
 import qualified Multilinear.Matrix         as Matrix
 import qualified Multilinear.Tensor         as Tensor
