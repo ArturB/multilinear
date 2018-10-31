@@ -141,13 +141,9 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 
 -}
 
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeFamilies          #-}
-
 module Multilinear.Class (
     Multilinear(..),
-    Accessible(..), StandardTensor(..)
+    Accessible(..)
 ) where
 
 import           Control.Monad.Trans.Either
@@ -390,12 +386,3 @@ class Multilinear t a => Accessible t a where
     {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
     iMap :: ([Int] -> a -> b) -> t a -> t b
     -- // TODO
-
-class StandardTensor t c a where
-    type TensorIndex t c a
-
-    scalar :: a -> t c a
-
-    simple :: TensorIndex t c a -> c a -> t c a
-
-    tensor :: TensorIndex t c a -> c (t c a) -> t c a

@@ -11,8 +11,6 @@ Finite-dimensional tensor index.
 
 -}
 
-{-# LANGUAGE DeriveGeneric #-}
-
 module Multilinear.Index.Finite (
     Index(..),
 ) where

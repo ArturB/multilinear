@@ -11,13 +11,6 @@ Portability : Windows/POSIX
 
 -}
 
-{-# LANGUAGE DataKinds             #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeFamilies          #-}
-
 module Multilinear.Parallel.Generic (
     Tensor(..), (!), mergeScalars,
     isScalar, isSimple, isFiniteTensor, isInfiniteTensor,

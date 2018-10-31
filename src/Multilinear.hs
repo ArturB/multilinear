@@ -141,8 +141,6 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 
 -}
 
-{-# OPTIONS_GHC -w #-}
-
 module Multilinear (
     module Form,
     module Generic,

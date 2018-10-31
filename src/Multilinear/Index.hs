@@ -11,8 +11,6 @@ Generic tensor index which may be finitely- or infinitely-dimensional.
 
 -}
 
-{-# LANGUAGE DeriveGeneric #-}
-
 module Multilinear.Index (
     Index(..),
     TIndex(..)

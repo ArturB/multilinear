@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 09ad059341b710e3e23b23fc7dd26e748133587ca50e4e2186206a7681cd0d29
+-- hash: f947cfcdd14e80b7af4eab56cae3d94507b750e8c45d1e58aae11a6a73736375
 
 name:           multilinear
 version:        0.8.0.0
@@ -50,6 +50,7 @@ library
       Paths_multilinear
   hs-source-dirs:
       src
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances MultiParamTypeClasses
   ghc-options: -O2 -Wall
   build-depends:
       aeson
@@ -79,6 +80,7 @@ test-suite multilinear-test
       Paths_multilinear
   hs-source-dirs:
       test
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances MultiParamTypeClasses
   ghc-options: -O2 -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -110,6 +112,7 @@ benchmark multilinear-bench
       Paths_multilinear
   hs-source-dirs:
       benchmark
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances MultiParamTypeClasses
   ghc-options: -O2 -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

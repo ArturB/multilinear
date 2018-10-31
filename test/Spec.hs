@@ -1,5 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Main where
 
 import           Control.Exception.Base
@@ -84,11 +82,11 @@ hopfield ns ps cs x c =
 prog :: EitherT SomeException IO ()
 prog = do
   -- wczytywanie danych
-  mlpInput :: Tensor Double <- Matrix.fromCSV "tj" mlp_input ';'
-  mlpExp :: Tensor Double <- Matrix.fromCSV "tj" mlp_expected ';'
-  mlpClas :: Tensor Double <- Matrix.fromCSV "tj" mlp_classify ';'
-  hopInput :: Tensor Int <- Matrix.fromCSV "tj" hopfield_input ';'
-  hopClas :: Tensor Int <- Matrix.fromCSV "tj" hopfield_classify ';'
+  mlpInput <- Matrix.fromCSV "tj" mlp_input ';'
+  mlpExp   <- Matrix.fromCSV "tj" mlp_expected ';'
+  mlpClas  <- Matrix.fromCSV "tj" mlp_classify ';'
+  hopInput <- Matrix.fromCSV "tj" hopfield_input ';'
+  hopClas  <- Matrix.fromCSV "tj" hopfield_classify ';'
   let mx t = Multilinear.transpose $ mlpInput $$| ("t",[t])
   let me t = Multilinear.transpose $ mlpExp $$| ("t",[t])
   let mc t = Multilinear.transpose $ mlpClas $$| ("t",[t])

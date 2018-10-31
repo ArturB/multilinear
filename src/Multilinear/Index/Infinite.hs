@@ -11,8 +11,6 @@ Infinite-dimensional tensor index.
 
 -}
 
-{-# LANGUAGE DeriveGeneric #-}
-
 module Multilinear.Index.Infinite (
     Index(..)
 ) where

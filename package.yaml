@@ -23,6 +23,11 @@ dependencies:
 ghc-options:
 - -O2
 - -Wall
+default-extensions:
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
+- MultiParamTypeClasses
 
 library:
   source-dirs: src
