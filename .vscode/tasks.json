@@ -1,0 +1,52 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "echo",
+            "type": "shell",
+            "command": "echo Hello",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "stack-install",
+            "type": "shell",
+            "command": "stack install",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "silent"
+            }
+        },
+        {
+            "label": "stack-build",
+            "type": "shell",
+            "command": "stack build",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "silent",
+            }
+        },
+        {
+            "label": "stack-test",
+            "type": "shell",
+            "command": "stack test",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "silent",
+            }
+        },
+        {
+            "label": "stack-bench",
+            "type": "shell",
+            "command": "stack bench",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "silent"
+            }
+        }
+    ]
+}
