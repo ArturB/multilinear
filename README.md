@@ -8,7 +8,7 @@
 ## Summary
 Multilinear is general - purpose linear algebra and multi-dimensional array library for Haskell. It provides generic and efficient implementation of linear algebra operations on vectors, linear functionals, matrices and its higher - rank analoges: tensors. It can also be used as simply a miltidimensional arrays for everyone. 
 
-### AS FOR NOW, THE LIBRARY IS IN PRODUCTION PHASE  - DO NOT USE IT FOR PRODUCTION!!
+### AS FOR NOW, THE LIBRARY IS IN BETA PHASE  - DO NOT USE IT FOR PRODUCTION!!
 
 ## Scripting
 
