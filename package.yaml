@@ -1,5 +1,5 @@
 name:                multilinear
-version:             0.2.0
+version:             0.2.1
 github:              "ArturB/multilinear"
 license:             BSD3
 author:              "Artur M. Brodzki"
@@ -10,13 +10,13 @@ extra-source-files:
 - README.md
 
 # Metadata used when publishing your package
-synopsis:            Efficient (multi)linear algebra implementation
+synopsis:            Comprehensive and efficient (multi)linear algebra implementation. 
 category:            Machine learning
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/ArturB/multilinear#readme>
+description:         "Comprehensive and efficient (multi)linear algebra implementation, based on generic tensor formalism and concise Ricci-Curbastro index syntax. More information available on GitHub: <https://github.com/ArturB/multilinear#readme>"
 
 dependencies:
 - base >= 4.7 && < 5
