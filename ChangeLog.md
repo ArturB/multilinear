@@ -3,4 +3,4 @@
 - ported to LTS-12.16 resolver
 
 # 0.2.1, 2018-10-31
-- initial release
+Initial release
