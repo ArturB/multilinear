@@ -50,8 +50,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N  
     dependencies:
-    - criterion   >= 1.2
-    - deepseq     >= 1.4
+    - criterion   >= 1.5
     - multilinear
 
 benchmarks:
@@ -63,6 +62,5 @@ benchmarks:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - criterion   >= 1.2
-    - deepseq     >= 1.4
+    - criterion   >= 1.5
     - multilinear
