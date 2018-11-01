@@ -18,15 +18,7 @@ Multilinear is optimized to being used from GHCi. It uses easy and concise notat
 
 Multi-dimensional algebra is especially useful to quickly write machine learning algorithms (eg. neural networks) from scratch. When library will be stable, some examples will be available. 
 
-### Installation
-
-Installation using Stack. Invoke this command in library folder:
-
-```
-stack build
-```
-
-### Contribution guideline
+### Contribution
 
 If you want to contribute to this library, contact with me. 
 
