@@ -1,7 +1,7 @@
 # README
 
 ## Build status
-- Travis (Linux, OSX): [![Build Status](https://travis-ci.org/ArturB/multilinear.svg?branch=master)](https://travis-ci.org/ArturB/multilinear)
+- Travis (Linux, macOS): [![Build Status](https://travis-ci.org/ArturB/multilinear.svg?branch=master)](https://travis-ci.org/ArturB/multilinear)
 - AppVeyor (Windows): [![Tests status](https://ci.appveyor.com/api/projects/status/github/ArturB/multilinear
 )](https://ci.appveyor.com/api/projects/status/github/ArturB/multilinear)
 
