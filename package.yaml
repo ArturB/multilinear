@@ -24,8 +24,7 @@ dependencies:
 ghc-options:
 - -O2
 - -Wall
-- -fllvm
-- -optlo-O3
+
 default-extensions:
 - DeriveGeneric
 - FlexibleContexts
