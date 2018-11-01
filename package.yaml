@@ -8,6 +8,7 @@ copyright:           "2018 Artur M. Brodzki"
 
 extra-source-files:
 - README.md
+- ChangeLog.md
 
 # Metadata used when publishing your package
 synopsis:            Comprehensive and efficient (multi)linear algebra implementation. 
@@ -23,6 +24,8 @@ dependencies:
 ghc-options:
 - -O2
 - -Wall
+- -fllvm
+- -optlo-O3
 default-extensions:
 - DeriveGeneric
 - FlexibleContexts
@@ -32,12 +35,12 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
-  - containers
-  - deepseq
-  - mwc-random
-  - primitive
-  - statistics
-  - vector
+  - containers >= 0.5
+  - deepseq    >= 1.4
+  - mwc-random >= 0.13
+  - primitive  >= 0.6
+  - statistics >= 0.14
+  - vector     >= 0.12
 
 tests:
   multilinear-test:
@@ -48,8 +51,8 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N  
     dependencies:
-    - criterion
-    - deepseq
+    - criterion   >= 1.2
+    - deepseq     >= 1.4
     - multilinear
 
 benchmarks:
@@ -61,6 +64,6 @@ benchmarks:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - criterion
-    - deepseq
+    - criterion   >= 1.2
+    - deepseq     >= 1.4
     - multilinear

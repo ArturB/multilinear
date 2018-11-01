@@ -22,7 +22,6 @@ import           Data.Bits
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
-import           Data.Monoid
 import qualified Data.Vector                as Boxed
 import           GHC.Generics
 import           Multilinear.Class          as Multilinear
@@ -36,9 +35,6 @@ incompatibleTypes = "Incompatible tensor types!"
 
 scalarIndices :: String
 scalarIndices = "Scalar has no indices!"
-
-differentIndices :: String
-differentIndices = "Tensors have different indices!"
 
 infiniteIndex :: String
 infiniteIndex = "Index is infinitely-dimensional!"
@@ -269,35 +265,6 @@ instance (
     FiniteTensor _ _ <= InfiniteTensor _ _       = True
     InfiniteTensor _ _ <= SimpleFinite _ _       = False
     SimpleFinite _ _ <= InfiniteTensor _ _       = True
-
--- Tensors concatenation makes them a monoid
-instance (
-    Num a
-    ) => Monoid (Tensor a) where
-
-    {-| Neutral element is a scalar as it has no indices and concatenation is by common inidces -}
-    {-# INLINE mempty #-}
-    mempty = Scalar 0
-
-    {-| Tensor concatenation -}
-    {-# INLINE mappend #-}
-    mappend t1 t2 = 
-        -- To preserve tensor structure, indices must be the same
-        if indices t1 == indices t2 
-        then case (t1,t2) of
-            -- Concatenation with scalar does nothing - Scalar is a neutral element
-            (Scalar _, _) -> t2
-            (_, Scalar _) -> t1
-            -- Concatenation of two SimpleFiniteTensors
-            (SimpleFinite i1 ts1, SimpleFinite _ ts2) -> 
-                SimpleFinite i1 $ ts1 <> ts2
-            -- Concatenation of two FiniteTensors
-            (FiniteTensor i1 ts1, FiniteTensor _ ts2) ->
-                FiniteTensor i1 $ ts1 <> ts2
-            -- Concatenation of other tensors (especially infinite ones) is impossible
-            _ -> Err differentIndices
-        -- If tensor indices are different, concatenation is impossible
-        else Err differentIndices
 
 {-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
 {-# INLINE mergeScalars #-}
@@ -929,13 +896,6 @@ instance Num a => Multilinear Tensor a where
         SimpleFinite (Finite.Indifferent count name) ts
 
     transpose (Err msg) = Err msg
-
-    {-| Concatenation of two tensor with given index or by creating a new one -}
-    {-# INLINE augment #-}
-    augment t1 t2 ind =
-        let t1' = t1 <<<| ind
-            t2' = t2 <<<| ind
-        in  t1' <> t2'
 
     {-| Shift tensor index right -}
     {-| Moves given index one level deeper in recursion -}

@@ -154,7 +154,6 @@ import           Multilinear.Index
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
   Num (t a),     -- Tensors may be added, subtracted and multiplicated
-  Monoid (t a),  -- Tensors are monoids with concatenation as monoid operation
   Functor t      -- Tensor should be a Functor for convenience
   ) => Multilinear t a where
 
@@ -301,10 +300,6 @@ class (
     infixl 9 <<<|
     (<<<|) :: t a -> String -> t a
     t <<<| n = shiftLeftmost t n
-
-    {-| Concatenation of two tensors by common index -}
-    {-| Tensors must be equivalent: 'equiv' t1 t2 == True -}
-    augment ::  t a -> t a -> String -> t a
 
     {-| Simple mapping -}
     {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
