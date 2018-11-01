@@ -34,12 +34,12 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
-  - containers >= 0.5
-  - deepseq    >= 1.4
-  - mwc-random >= 0.13
-  - primitive  >= 0.6
-  - statistics >= 0.14
-  - vector     >= 0.12
+  - containers
+  - deepseq
+  - mwc-random
+  - primitive
+  - statistics
+  - vector
 
 tests:
   multilinear-test:
@@ -50,7 +50,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N  
     dependencies:
-    - criterion   >= 1.5
+    - criterion
     - multilinear
 
 benchmarks:
@@ -62,5 +62,5 @@ benchmarks:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - criterion   >= 1.5
+    - criterion
     - multilinear
