@@ -1,7 +1,11 @@
 # README
 
-[![Build Status](https://travis-ci.org/ArturB/Multilinear.svg?branch=master)](https://travis-ci.org/ArturB/Multilinear)
+## Build status
+- Travis (Linux, macOS): [![Build Status](https://travis-ci.org/ArturB/multilinear.svg?branch=master)](https://travis-ci.org/ArturB/multilinear)
+- AppVeyor (Windows): [![Tests status](https://ci.appveyor.com/api/projects/status/github/ArturB/multilinear
+)](https://ci.appveyor.com/api/projects/status/github/ArturB/multilinear)
 
+## Summary
 Multilinear is general - purpose linear algebra and multi-dimensional array library for Haskell. It provides generic and efficient implementation of linear algebra operations on vectors, linear functionals, matrices and its higher - rank analoges: tensors. It can also be used as simply a miltidimensional arrays for everyone. 
 
 ### AS FOR NOW, THE LIBRARY IS IN PRODUCTION PHASE  - DO NOT USE IT FOR PRODUCTION!!
