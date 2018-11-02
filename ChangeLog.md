@@ -1,4 +1,4 @@
-# 0.2.2.2, 2018-11-02
+# 0.2.3, 2018-11-02
 - fixed conflicting dependencies
 - added criterion benchmarks
 
