@@ -13,8 +13,5 @@ module Main (
     main
 ) where
 
-import           Criterion.Main
-import qualified Multilinear.Matrix                  as Matrix
-
 main :: IO ()
 main = putStrLn "Test to do..."
