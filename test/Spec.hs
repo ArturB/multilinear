@@ -1,5 +1,5 @@
 {-|
-Module      : Bench
+Module      : Main
 Description : Test of Multilinear library
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
@@ -16,15 +16,5 @@ module Main (
 import           Criterion.Main
 import qualified Multilinear.Matrix                  as Matrix
 
-gen :: Int -> Int -> Double
-gen j k = sin (fromIntegral j) + cos (fromIntegral k)
-
-sizedMatrixBench :: Int -> Benchmark
-sizedMatrixBench s = 
-    bench ((show s) ++ "x" ++ (show s)) $ 
-        nf ((Matrix.fromIndices "ij" s s gen) *) (Matrix.fromIndices "jk" s s gen)
-
 main :: IO ()
-main = defaultMain [
-    bgroup "matrix multiplication" $ sizedMatrixBench <$> [10, 20, 50, 80, 160, 320]
-    ]
+main = putStrLn "Test to do..."
