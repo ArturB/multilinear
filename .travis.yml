@@ -55,7 +55,7 @@ matrix:
     compiler: ": #stack nightly osx"
     os: osx
     
-  # The Cabal builds on Linux
+  # The Cabal builds on Linux. 
   - env: BUILD=cabal GHCVER=head  CABALVER=head HAPPYVER=1.19.5 ALEXVER=3.1.7
     compiler: ": #GHC HEAD"
     addons: {apt: {packages: [cabal-install-head,ghc-head,happy-1.19.5,alex-3.1.7], sources: [hvr-ghc]}}
@@ -71,8 +71,9 @@ matrix:
   # Nightly and Cabal builds are allowed to fail. 
   allow_failures:
   - env: BUILD=stack ARGS="--resolver nightly"
-  - env: BUILD=cabal
-  
+  - env: BUILD=cabal GHCVER=head  CABALVER=head HAPPYVER=1.19.5 ALEXVER=3.1.7
+  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0 HAPPYVER=1.19.5 ALEXVER=3.1.7
+  - env: BUILD=cabal GHCVER=8.4.3 CABALVER=2.2 HAPPYVER=1.19.5 ALEXVER=3.1.7
 
 before_install:
 # Using compiler above sets CC to an invalid value, so unset it
