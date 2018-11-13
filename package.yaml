@@ -1,5 +1,5 @@
 name:                multilinear
-version:             0.2.1
+version:             0.2.3.0
 github:              "ArturB/multilinear"
 license:             BSD3
 author:              "Artur M. Brodzki"
@@ -8,6 +8,7 @@ copyright:           "2018 Artur M. Brodzki"
 
 extra-source-files:
 - README.md
+- ChangeLog.md
 
 # Metadata used when publishing your package
 synopsis:            Comprehensive and efficient (multi)linear algebra implementation. 
@@ -23,6 +24,7 @@ dependencies:
 ghc-options:
 - -O2
 - -Wall
+
 default-extensions:
 - DeriveGeneric
 - FlexibleContexts
@@ -49,7 +51,6 @@ tests:
     - -with-rtsopts=-N  
     dependencies:
     - criterion
-    - deepseq
     - multilinear
 
 benchmarks:
@@ -62,5 +63,4 @@ benchmarks:
     - -with-rtsopts=-N
     dependencies:
     - criterion
-    - deepseq
     - multilinear

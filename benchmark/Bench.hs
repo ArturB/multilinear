@@ -13,23 +13,18 @@ module Main (
     main
 ) where
 
-import           Control.DeepSeq
 import           Criterion.Main
-import           Criterion.Measurement               as Meas
-import           Criterion.Types
-import           Multilinear.Generic
 import qualified Multilinear.Matrix                  as Matrix
 
-m1 :: Tensor Double
-m1 = Matrix.fromIndices "ij" 1000 1000 $ \i j -> fromIntegral (2*i) - exp (fromIntegral j)
+gen :: Int -> Int -> Double
+gen j k = sin (fromIntegral j) + cos (fromIntegral k)
 
-m2 :: Tensor Double
-m2 = Matrix.fromIndices "jk" 1000 1000 $ \i j -> sin (fromIntegral i) + cos (fromIntegral j)
+sizedMatrixBench :: Int -> Benchmark
+sizedMatrixBench s = 
+    bench ((show s) ++ "x" ++ (show s)) $ 
+        nf ((Matrix.fromIndices "ij" s s gen) *) (Matrix.fromIndices "jk" s s gen)
 
 main :: IO ()
-main = do
-    putStrLn "Two matrices 1000x1000 multiplying..."
-    (meas,_)  <- Meas.measure ( nfIO $ (m1 * m2) `deepseq` putStrLn "End!" ) 1
-    putStrLn $ "Measured time: " ++ show (measCpuTime meas) ++ " s."
-    return ()
-
+main = defaultMain [
+    bgroup "matrix multiplication" $ sizedMatrixBench <$> [10, 20, 50, 80, 160, 320]
+    ]
