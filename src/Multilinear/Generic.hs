@@ -190,6 +190,15 @@ instance (
     FiniteTensor _ _ <= SimpleFinite _ _         = False
     SimpleFinite _ _ <= FiniteTensor _ _         = True
 
+{-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
+{-# INLINE mergeScalars #-}
+mergeScalars :: Unboxed.Unbox a => Tensor a -> Tensor a
+mergeScalars x = case x of
+    (FiniteTensor index1 ts1) -> case ts1 Boxed.! 0 of
+        Scalar _ -> SimpleFinite index1 $ Unboxed.generate (Boxed.length ts1) (\i -> scalarVal (ts1 Boxed.! i))
+        _        -> FiniteTensor index1 $ mergeScalars <$> ts1
+    _ -> x
+
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
 _elemByElem' :: Num a 
@@ -206,17 +215,17 @@ _elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.map` t
 -- @Tensor t[i] + Scalar x = Tensor r[i] | r[i] = t[i] + x@
 _elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.map` t
 
+-- Two simple tensors case
+_elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
+    | Index.indexName index1 == Index.indexName index2 = op t1 t2
+    | otherwise = FiniteTensor index1 $ (\x -> f x <$> t2) <$> v1
+
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | Index.indexName index1 `Data.List.elem` indicesNames t2 =
         FiniteTensor index2 $ (\x -> _elemByElem' t1 x f op) <$> v2
     | otherwise = FiniteTensor index1 $ (\x -> _elemByElem' x t2 f op) <$> v1
-
--- Two simple tensors case
-_elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
-    | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index1 $ (\x -> f x <$> t2) <$> v1
 
 -- Simple and finite tensor case
 _elemByElem' t1@(SimpleFinite index1 _) t2@(FiniteTensor index2 v2) f op
@@ -240,7 +249,7 @@ _elemByElem t1 t2 f op =
     let commonIndices = filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
-    in _elemByElem' t1' t2' f op
+    in _mergeScalars $ _elemByElem' t1' t2' f op
 
 -- Zipping two tensors with a combinator, assuming they have the same indices
 {-# INLINE zipT #-}
