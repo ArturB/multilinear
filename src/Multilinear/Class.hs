@@ -159,39 +159,39 @@ class (
   ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
-    infixl 7 +.
+    infixl 4 +.
     (+.) :: a -> t a -> t a
 
     {-| Subtract each element of tensor @t@ from scalar scalar left -}
-    infixl 7 -.
+    infixl 4 -.
     (-.) :: a -> t a -> t a
 
     {-| Multiply scalar @a@ by each element of tensor @t@ -}
-    infixl 8 *.
+    infixl 5 *.
     (*.) :: a -> t a -> t a
 
     {-| Add each element of tensor @t@ to scalar @a@ -}
-    infixl 7 .+
+    infixl 4 .+
     (.+) :: t a -> a -> t a
 
     {-| Subtract scalar @a@ from each element of tensor @t@ -}
-    infixl 7 .-
+    infixl 4 .-
     (.-) :: t a -> a -> t a
 
     {-| Multiply each element of tensor @t@ by scalar @a@ -}
-    infixl 8 .*
+    infixl 5 .*
     (.*) :: t a -> a -> t a
 
     {-| Tensor adding - functionally equal to Num (+) but more efficient -}
-    infixl 7 .+.
+    infixl 4 .+.
     (.+.) :: t a -> t a -> t a
 
     {-| Tensor subtracting - functionally equal to Num (-) but more efficient -}
-    infixl 7 .-.
+    infixl 4 .-.
     (.-.) :: t a -> t a -> t a
 
     {-| Tensor multiplication - functionally equal to Num (*) but more efficient -}
-    infixl 7 .*.
+    infixl 5 .*.
     (.*.) :: t a -> t a -> t a
 
     {-| List of all tensor indices -}
@@ -218,7 +218,7 @@ class (
     t1 |==| t2 = equiv t1 t2
 
     {-| @t $| "ij" "kl"@ renames upper indices of tensor @t@ to @ij@ and lower indices to @kl@ -}
-    infix 8 $|
+    infix 9 $|
     ($|) :: t a -> (String,String) -> t a
 
     {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
@@ -226,7 +226,7 @@ class (
     raise t i = t /\ i
 
     {-| Infix equivalent of 'raise' -}
-    infixl 7 /\
+    infixl 8 /\
     (/\) :: t a -> String -> t a
     t /\ i = raise t i
 
@@ -235,7 +235,7 @@ class (
     lower t i = t \/ i
 
     {-| Infix equivalent of 'lower' -}
-    infixl 7 \/
+    infixl 8 \/
     (\/) :: t a -> String -> t a
     t \/ i = lower t i
 
@@ -257,7 +257,7 @@ class (
 
     {-| Infix equivalent of 'shiftRight' -}
     {-| @t |>> "i"@ moves index @i@ of tensor @t@ one level depeer in recursion -}
-    infixl 9 |>>
+    infixl 6 |>>
     (|>>) :: t a -> String -> t a
     t |>> n = shiftRight t n
 
@@ -269,7 +269,7 @@ class (
 
     {-| Infix equivalent of 'shiftRightmost' -}
     {-| @t |>>> "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion -}
-    infixl 9 |>>>
+    infixl 6 |>>>
     (|>>>) :: t a -> String -> t a
     t |>>> n = shiftRightmost t n
 
@@ -287,7 +287,7 @@ class (
 
     {-| Infix equivalent to 'shiftLeft' -}
     {-| @t <<| "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
-    infixl 9 <<|
+    infixl 6 <<|
     (<<|) :: t a -> String -> t a
     t <<| n = shiftLeft t n
 
@@ -298,7 +298,7 @@ class (
 
     {-| Infix equivalent of 'shiftLeftmost' -}
     {-| @t <<<| "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
-    infixl 9 <<<|
+    infixl 6 <<<|
     (<<<|) :: t a -> String -> t a
     t <<<| n = shiftLeftmost t n
 
@@ -323,7 +323,7 @@ class Multilinear t a => Accessible t a where
     el :: t a -> (String,[Int]) -> t a
 
     {-| Infix equivalent for el -}
-    infixl 9 $$|
+    infixl 7 $$|
     ($$|) :: t a -> (String,[Int]) -> t a
     t $$| is = el t is
 
