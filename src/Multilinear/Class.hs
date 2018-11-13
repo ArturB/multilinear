@@ -323,8 +323,3 @@ class Multilinear t a => Accessible t a where
     infixl 7 $$|
     ($$|) :: t a -> (String,[Int]) -> t a
     t $$| is = el t is
-
-    {-| Mapping with indices - mapping function takes not only a tensor element value but also its indices in tensor -}
-    {-| @iMap f t@ return tensor @t2@ in which @t2[i1,i2,...] = f [i1,i2,...] t[i1,i2,...]@ -}
-    iMap :: ([Int] -> a -> b) -> t a -> t b
-    -- // TODO
