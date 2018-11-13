@@ -192,8 +192,8 @@ instance (
 
 {-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
 {-# INLINE mergeScalars #-}
-mergeScalars :: Unboxed.Unbox a => Tensor a -> Tensor a
-mergeScalars x = case x of
+_mergeScalars :: Unboxed.Unbox a => Tensor a -> Tensor a
+_mergeScalars x = case x of
     (FiniteTensor index1 ts1) -> case ts1 Boxed.! 0 of
         Scalar _ -> SimpleFinite index1 $ Unboxed.generate (Boxed.length ts1) (\i -> scalarVal (ts1 Boxed.! i))
         _        -> FiniteTensor index1 $ mergeScalars <$> ts1
@@ -204,7 +204,7 @@ mergeScalars x = case x of
 _elemByElem' :: Num a 
              => Tensor a                            -- ^ First argument of operator
              -> Tensor a                            -- ^ Second argument of operator
-             -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
+             -> (a -> a -> a)                       -- ^ Function on tensor elements if indices are different
              -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
              -> Tensor a                            -- ^ Result tensor
 
@@ -218,7 +218,7 @@ _elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.map` t
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index1 $ (\x -> f x <$> t2) <$> v1
+    | otherwise = FiniteTensor index1 $ Boxed.generate (Boxed.length v1) (\i -> (\x -> f x <$> t2) <$> v1
 
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
@@ -253,7 +253,7 @@ _elemByElem t1 t2 f op =
 
 -- Zipping two tensors with a combinator, assuming they have the same indices
 {-# INLINE zipT #-}
-zipT :: (Num a, Unboxed.Unbox a)
+zipT :: Num a
       => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
       -> (Tensor a -> a -> Tensor a)          -- ^ Tensor and scalar combinator
       -> (a -> Tensor a -> Tensor a)          -- ^ Scalar and tensor combinator
@@ -264,18 +264,36 @@ zipT :: (Num a, Unboxed.Unbox a)
 
 -- Two simple tensors case
 zipT _ _ _ f (SimpleFinite index1 v1) (SimpleFinite index2 v2) = 
-    if index1 == index2 then SimpleFinite index1 $ Unboxed.zipWith f v1 v2 else error incompatibleTypes
+    if index1 == index2 then 
+        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
+    else error incompatibleTypes
 
 --Two finite tensors case
-zipT f _ _ _ (FiniteTensor index1 v1) (FiniteTensor index2 v2)     = 
-    if index1 == index2 then FiniteTensor index1 $ Boxed.zipWith f v1 v2 else error incompatibleTypes
+zipT f _ _ _ (FiniteTensor index1 v1) (FiniteTensor index2 v2) = 
+    if index1 == index2 then 
+        FiniteTensor index1 $ Boxed.zipWith f v1 v2 
+    else error incompatibleTypes
 
--- Zipping simple with complex tensor or any tensor with scalar is impossible
+-- Finite and simple tensor case
+zipT _ f _ _ (FiniteTensor index1 v1) (SimpleFinite index2 v2) = 
+    if index1 == index2 then 
+        FiniteTensor index1 $ 
+            Boxed.generate (Boxed.length v1) (\i -> f (v1 Boxed.! i) (v2 Unboxed.! i)) 
+    else error incompatibleTypes
+
+-- Simple and finite tensor case
+zipT _ _ f _ (SimpleFinite index1 v1) (FiniteTensor index2 v2) = 
+    if index1 == index2 then 
+        FiniteTensor index1 $ 
+            Boxed.generate (Boxed.length v1) (\i -> f (v1 Unboxed.! i) (v2 Boxed.! i)) 
+    else error incompatibleTypes
+
+-- Zipping something with scalar is impossible
 zipT _ _ _ _ _ _ = error scalarIndices
 
 -- dot product of two tensors
 {-# INLINE dot #-}
-dot :: Num a
+dot :: (Num a, Unboxed.Unbox a)
       => Tensor a  -- ^ First dot product argument
       -> Tensor a  -- ^ Second dot product argument
       -> Tensor a  -- ^ Resulting dot product
