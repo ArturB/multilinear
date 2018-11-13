@@ -149,10 +149,12 @@ module Multilinear.Class (
 
 import           Data.Maybe
 import           Data.Set
+import qualified Data.Vector.Unboxed as Unboxed
 import           Multilinear.Index
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
+  Unboxed.Unbox a,
   Num (t a),     -- Tensors may be added, subtracted and multiplicated
   Functor t      -- Tensor should be a Functor for convenience
   ) => Multilinear t a where

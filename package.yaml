@@ -30,6 +30,8 @@ default-extensions:
 - FlexibleContexts
 - FlexibleInstances
 - MultiParamTypeClasses
+- StandaloneDeriving
+- GADTs
 
 library:
   source-dirs: src
