@@ -23,7 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 ghc-options:
 - -O2
-- -Wall
+- -W
 
 default-extensions:
 - DeriveGeneric
