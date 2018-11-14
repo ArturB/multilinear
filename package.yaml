@@ -29,10 +29,10 @@ default-extensions:
 - DeriveGeneric
 - FlexibleContexts
 - FlexibleInstances
+- GADTs
 - MultiParamTypeClasses
 - ScopedTypeVariables
 - StandaloneDeriving
-- GADTs
 
 library:
   source-dirs: src
@@ -45,7 +45,7 @@ library:
   - vector
 
 tests:
-  multilinear-test:
+  all:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -57,7 +57,7 @@ tests:
     - deepseq
 
 benchmarks:
-  multilinear-time-bench:
+  time:
     main:                Bench.hs
     source-dirs:         benchmark/time
     ghc-options:
@@ -67,7 +67,7 @@ benchmarks:
     dependencies:
     - criterion
     - multilinear
-  multilinear-memory-bench:
+  memory:
     main:                Bench.hs
     source-dirs:         benchmark/memory
     ghc-options:
@@ -75,6 +75,5 @@ benchmarks:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - criterion
     - multilinear
     - weigh
