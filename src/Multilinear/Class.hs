@@ -198,6 +198,7 @@ class (
     indices :: t a -> [TIndex]
 
     {-| List of tensor indices names -}
+    {-# INLINE indicesNames #-}
     indicesNames :: t a -> [String]
     indicesNames t = indexName <$> indices t
 
@@ -209,10 +210,12 @@ class (
     size :: t a -> String -> Int
 
     {-| Check if tensors are equivalent (have same indices but in different order) -}
+    {-# INLINE equiv #-}
     equiv :: t a -> t a -> Bool
     equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
 
     {-| Infix equivalent of 'equiv'. Has low priority equal to 1. |-}
+    {-# INLINE (|==|) #-}
     infixl 1 |==|
     (|==|) :: t a -> t a -> Bool
     t1 |==| t2 = equiv t1 t2
@@ -222,19 +225,23 @@ class (
     ($|) :: t a -> (String,String) -> t a
 
     {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
+    {-# INLINE raise #-}
     raise :: t a -> String -> t a
     raise t i = t /\ i
 
     {-| Infix equivalent of 'raise' -}
+    {-# INLINE (/\) #-}
     infixl 8 /\
     (/\) :: t a -> String -> t a
     t /\ i = raise t i
 
     {-| @lower t "i"@ lowers an index @i@ of tensor @t@ -}
+    {-# INLINE lower #-}
     lower :: t a -> String -> t a
     lower t i = t \/ i
 
     {-| Infix equivalent of 'lower' -}
+    {-# INLINE (\/) #-}
     infixl 8 \/
     (\/) :: t a -> String -> t a
     t \/ i = lower t i
@@ -245,6 +252,7 @@ class (
     {-| Shift tensor index right -}
     {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion.
         Elements of tensor as indexed with indices names becomes unchanged. -}
+    {-# INLINE shiftRight #-}
     shiftRight :: t a -> String -> t a
     -- ^ Right shift of an index is equivalent to left shift of its successor in recursion @s@, if only @s@ exists, so:
     -- Given a tensor @t[i1,i2,i3,...]@: @shiftRight t "i2" == t[i1,i3,i2,...] == shiftLeft t "i3"@
@@ -257,6 +265,7 @@ class (
 
     {-| Infix equivalent of 'shiftRight' -}
     {-| @t |>> "i"@ moves index @i@ of tensor @t@ one level depeer in recursion -}
+    {-# INLINE (|>>) #-}
     infixl 6 |>>
     (|>>) :: t a -> String -> t a
     t |>> n = shiftRight t n
@@ -264,17 +273,20 @@ class (
     {-| Shift tensor index rightmost -}
     {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion.
         Elements of tensor as indexed with indices names becomes unchanged.  -}
+    {-# INLINE shiftRightmost #-}
     shiftRightmost :: t a -> String -> t a
     shiftRightmost t n = until (\x -> n == last (indicesNames x)) (|>> n) t
 
     {-| Infix equivalent of 'shiftRightmost' -}
     {-| @t |>>> "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion -}
+    {-# INLINE (|>>>) #-}
     infixl 6 |>>>
     (|>>>) :: t a -> String -> t a
     t |>>> n = shiftRightmost t n
 
     {-| Shift tensor index left. Elements of tensor as indexed with indices names becomes unchanged. -}
     {-| @shiftLeft t "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
+    {-# INLINE shiftLeft #-}
     shiftLeft :: t a -> String -> t a
     -- ^ Left shift of an index is equivalent to right shift of its predecessor in recursion @p@, if only @p@ exists, so:
     -- Given a tensor t[i1,i2,i3,...]: @shiftLeft t "i3" == t[i1,i3,i2,...] == shiftRight t "i2"@
@@ -287,17 +299,20 @@ class (
 
     {-| Infix equivalent to 'shiftLeft' -}
     {-| @t <<| "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
+    {-# INLINE (<<|) #-}
     infixl 6 <<|
     (<<|) :: t a -> String -> t a
     t <<| n = shiftLeft t n
 
     {-| Shift tensor index leftmost. Elements of tensor as indexed with indices names becomes unchanged. -}
     {-| @shiftLeftmost t "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
+    {-# INLINE shiftLeftmost #-}
     shiftLeftmost :: t a -> String -> t a
     shiftLeftmost t n = until (\x -> n == head (indicesNames x)) (<<| n) t
 
     {-| Infix equivalent of 'shiftLeftmost' -}
     {-| @t <<<| "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
+    {-# INLINE (<<<|) #-}
     infixl 6 <<<|
     (<<<|) :: t a -> String -> t a
     t <<<| n = shiftLeftmost t n
@@ -318,6 +333,7 @@ class Multilinear t a => Accessible t a where
     el :: t a -> (String,[Int]) -> t a
 
     {-| Infix equivalent for el -}
+    {-# INLINE ($$|) #-}
     infixl 7 $$|
     ($$|) :: t a -> (String,[Int]) -> t a
     t $$| is = el t is

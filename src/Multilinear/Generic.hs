@@ -562,6 +562,7 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
         -- there is only one index and therefore it cannot be shifted
         | otherwise = t1
     
+    {-| Map function, as in Functor typeclass -}
     {-# INLINE map #-}
     map f x = case x of
         -- Mapping scalar simply maps its value
