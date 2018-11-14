@@ -49,5 +49,7 @@ main = do
     print m_ik
     putStr "m_ik * v^k = "
     print $ m_ik * v_k
+    putStr "m_ik |>>> i = "
+    print $ m_ik |>>> "i"
     putStr "m_ji * m_ik"
     print $ m * m_ik
