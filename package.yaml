@@ -52,7 +52,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N  
     dependencies:
-    - criterion
     - multilinear
 
 benchmarks:

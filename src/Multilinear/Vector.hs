@@ -23,6 +23,7 @@ module Multilinear.Vector (
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed        as Unboxed
 import           Multilinear.Generic
 import           Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
@@ -33,26 +34,26 @@ invalidIndices = "Indices and its sizes not compatible with structure of vector!
 {-| Generate vector as function of indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String        -- ^ Index name (one character)
     -> Int           -- ^ Number of elements
     -> (Int -> a)    -- ^ Generator function - returns a vector component at index @i@
     -> Tensor a      -- ^ Generated vector
 
 fromIndices [i] s f = Tensor.fromIndices ([i],[s]) ([],[]) $ \[x] [] -> f x
-fromIndices _ _ _ = Err invalidIndices
+fromIndices _ _ _ = error invalidIndices
 
 {-| Generate vector with all components equal to some @v@ -}
 {-# INLINE Multilinear.Vector.const #-}
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String      -- ^ Index name (one character)
     -> Int         -- ^ Number of elements
     -> a           -- ^ Value of each element
     -> Tensor a    -- ^ Generated vector
 
 const [i] s = Tensor.const ([i],[s]) ([],[])
-const _ _ = \_ -> Err invalidIndices
+const _ _ = \_ -> error invalidIndices
 
 {-| Generate vector with random real components with given probability distribution.
 The vector is wrapped in the IO monad. -}
@@ -76,7 +77,7 @@ randomDouble :: (
     -> IO (Tensor Double)  -- ^ Generated vector
 
 randomDouble [i] s = Tensor.randomDouble ([i],[s]) ([],[])
-randomDouble _ _ = \_ -> return $ Err invalidIndices
+randomDouble _ _ = \_ -> return $ error invalidIndices
 
 {-| Generate vector with random integer components with given probability distribution.
 The vector is wrapped in the IO monad. -}
@@ -94,7 +95,7 @@ randomInt :: (
     -> IO (Tensor Int)  -- ^ Generated vector
 
 randomInt [i] s = Tensor.randomInt ([i],[s]) ([],[])
-randomInt _ _ = \_ -> return $ Err invalidIndices
+randomInt _ _ = \_ -> return $ error invalidIndices
 
 {-| Generate vector with random real components with given probability distribution and given seed.
 The vector is wrapped in a monad. -}
@@ -119,7 +120,7 @@ randomDoubleSeed :: (
     -> m (Tensor Double)  -- ^ Generated vector
 
 randomDoubleSeed [i] s = Tensor.randomDoubleSeed ([i],[s]) ([],[])
-randomDoubleSeed _ _ = \_ _ -> return $ Err invalidIndices
+randomDoubleSeed _ _ = \_ _ -> return $ error invalidIndices
 
 {-| Generate vector with random integer components with given probability distribution and given seed.
 The vector is wrapped in a monad. -}
@@ -138,5 +139,5 @@ randomIntSeed :: (
     -> m (Tensor Int)  -- ^ Generated vector
 
 randomIntSeed [i] s = Tensor.randomIntSeed ([i],[s]) ([],[])
-randomIntSeed _ _ = \_ _ -> return $ Err invalidIndices
+randomIntSeed _ _ = \_ _ -> return $ error invalidIndices
 

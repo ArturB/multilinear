@@ -155,8 +155,7 @@ import           Multilinear.Index
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
   Unboxed.Unbox a,
-  Num (t a),     -- Tensors may be added, subtracted and multiplicated
-  Functor t      -- Tensor should be a Functor for convenience
+  Num (t a)     -- Tensors may be added, subtracted and multiplicated
   ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
@@ -305,8 +304,7 @@ class (
 
     {-| Simple mapping -}
     {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
-    map :: (a -> b) -> t a -> t b
-    map = fmap
+    map :: Unboxed.Unbox b => (a -> b) -> t a -> t b
 
 
 {-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}

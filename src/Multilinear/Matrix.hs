@@ -23,6 +23,7 @@ module Multilinear.Matrix (
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed        as Unboxed
 import           Multilinear.Generic
 import qualified Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
@@ -33,7 +34,7 @@ invalidIndices = "Indices and its sizes not compatible with structure of matrix!
 {-| Generate matrix as function of its indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String               -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
     -> Int                  -- ^ Number of matrix rows
     -> Int                  -- ^ Number of matrix columns
@@ -41,12 +42,12 @@ fromIndices :: (
     -> Tensor a             -- ^ Generated matrix
 
 fromIndices [u,d] us ds f = Tensor.fromIndices ([u],[us]) ([d],[ds]) $ \[ui] [di] -> f ui di
-fromIndices _ _ _ _ = Err invalidIndices
+fromIndices _ _ _ _ = error invalidIndices
 
 {-| Generate matrix with all components equal to @v@ -}
 {-# INLINE Multilinear.Matrix.const #-}
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one character per index, first character: rows index, second character: columns index)
     -> Int       -- ^ Number of matrix rows
     -> Int       -- ^ Number of matrix columns
@@ -54,7 +55,7 @@ const :: (
     -> Tensor a  -- ^ Generated matrix
 
 const [u,d] us ds = Tensor.const ([u],[us]) ([d],[ds])
-const _ _ _ = \_ -> Err invalidIndices
+const _ _ _ = \_ -> error invalidIndices
 
 {-| Generate matrix with random real components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
@@ -79,7 +80,7 @@ randomDouble :: (
     -> IO (Tensor Double)  -- ^ Generated matrix
 
 randomDouble [u,d] us ds = Tensor.randomDouble ([u],[us]) ([d],[ds])
-randomDouble _ _ _ = \_ -> return $ Err invalidIndices
+randomDouble _ _ _ = \_ -> return $ error invalidIndices
 
 {-| Generate matrix with random integer components with given probability distribution.
 The matrix is wrapped in the IO monad. -}
@@ -98,7 +99,7 @@ randomInt :: (
     -> IO (Tensor Int)  -- ^ Generated matrix
 
 randomInt [u,d] us ds = Tensor.randomInt ([u],[us]) ([d],[ds])
-randomInt _ _ _ = \_ -> return $ Err invalidIndices
+randomInt _ _ _ = \_ -> return $ error invalidIndices
 
 {-| Generate matrix with random real components with given probability distribution and given seed.
 The matrix is wrapped in the a monad. -}
@@ -124,7 +125,7 @@ randomDoubleSeed :: (
     -> m (Tensor Double)   -- ^ Generated matrix
 
 randomDoubleSeed [u,d] us ds = Tensor.randomDoubleSeed ([u],[us]) ([d],[ds])
-randomDoubleSeed _ _ _ = \_ _ -> return $ Err invalidIndices
+randomDoubleSeed _ _ _ = \_ _ -> return $ error invalidIndices
 
 {-| Generate matrix with random integer components with given probability distribution. and given seed.
 The matrix is wrapped in a monad. -}
@@ -144,4 +145,4 @@ randomIntSeed :: (
     -> m (Tensor Int)      -- ^ Generated matrix
 
 randomIntSeed [u,d] us ds = Tensor.randomIntSeed ([u],[us]) ([d],[ds])
-randomIntSeed _ _ _ = \_ _ -> return $ Err invalidIndices
+randomIntSeed _ _ _ = \_ _ -> return $ error invalidIndices

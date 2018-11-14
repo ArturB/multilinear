@@ -25,6 +25,7 @@ module Multilinear.Tensor (
 
 import           Control.Monad.Primitive
 import qualified Data.Vector                as Boxed
+import qualified Data.Vector.Unboxed        as Unboxed
 import           Multilinear.Generic
 import           Multilinear.Index.Finite   as Finite
 import           Statistics.Distribution
@@ -36,7 +37,7 @@ invalidIndices us ds = "Indices and its sizes incompatible, upper indices: " ++ 
 {-| Generate tensor as functions of its indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
     ) => (String,[Int])          -- ^ Upper indices names (one character per index) and its sizes
       -> (String,[Int])          -- ^ Lower indices names (one character per index) and its sizes
       -> ([Int] -> [Int] -> a)   -- ^ Generator function (f [u1,u2,...] [d1,d2,...] returns a tensor element at t [u1,u2,...] [d1,d2,...])
@@ -44,11 +45,11 @@ fromIndices :: (
 
 -- If only one upper index is given, generate a SimpleFinite tensor with upper index
 fromIndices ([u],[s]) ([],[]) f = 
-  SimpleFinite (Contravariant s [u]) $ Boxed.generate s $ \x -> f [x] []
+  SimpleFinite (Contravariant s [u]) $ Unboxed.generate s $ \x -> f [x] []
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 fromIndices ([],[]) ([d],[s]) f = 
-  SimpleFinite (Covariant s [d]) $ Boxed.generate s $ \x -> f [] [x]
+  SimpleFinite (Covariant s [d]) $ Unboxed.generate s $ \x -> f [] [x]
 
 -- If many indices are given, first generate upper indices recursively from indices list
 fromIndices (u:us,s:size) d f =
@@ -59,12 +60,12 @@ fromIndices u (d:ds,s:size) f =
     FiniteTensor (Covariant s [d]) $ Boxed.generate s (\x -> fromIndices u (ds,size) (\uss dss -> f uss (x:dss)) )
 
 -- If there are indices without size or sizes without names, throw an error
-fromIndices us ds _ = Err $ invalidIndices us ds
+fromIndices us ds _ = error $ invalidIndices us ds
 
 {-| Generate tensor composed of other tensors -}
 {-# INLINE generate #-}
 generate :: (
-    Num a
+    Num a, Unboxed.Unbox a
     ) => (String,[Int])                 -- ^ Upper indices names (one character per index) and its sizes
       -> (String,[Int])                 -- ^ Lower indices names (one character per index) and its sizes
       -> ([Int] -> [Int] -> Tensor a)   -- ^ Generator function (f [u1,u2,...] [d1,d2,...] returns a tensor element at t [u1,u2,...] [d1,d2,...])
@@ -82,12 +83,12 @@ generate u (d:ds,s:size) f =
     FiniteTensor (Covariant s [d]) $ Boxed.generate s (\x -> generate u (ds,size) (\uss dss -> f uss (x:dss)) )
 
 -- If there are indices without size or sizes without names, throw an error
-generate us ds _ = Err $ invalidIndices us ds
+generate us ds _ = error $ invalidIndices us ds
 
 {-| Generate tensor with all components equal to @v@ -}
 {-# INLINE Multilinear.Tensor.const #-}
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
     ) => (String,[Int]) -- ^ Upper indices names (one character per index) and its sizes
       -> (String,[Int]) -- ^ Lower indices names (one character per index) and its sizes
       -> a              -- ^ Tensor elements value
@@ -95,11 +96,11 @@ const :: (
 
 -- If only one upper index is given, generate a SimpleFinite tensor with upper index
 const ([u],[s]) ([],[]) v =
-  SimpleFinite (Contravariant s [u]) $ Boxed.replicate s v
+  SimpleFinite (Contravariant s [u]) $ Unboxed.replicate s v
 
 -- If only ine lower index is given, generate a SimpleFinite tensor with lower index
 const ([],[]) ([d],[s]) v =
-  SimpleFinite (Covariant s [d]) $ Boxed.replicate s v
+  SimpleFinite (Covariant s [d]) $ Unboxed.replicate s v
 
 -- If many indices are given, first generate upper indices recursively from indices list
 const (u:us,s:size) d v =
@@ -110,7 +111,7 @@ const u (d:ds,s:size) v =
     FiniteTensor (Covariant s [d]) $ Boxed.replicate (fromIntegral s) $ Multilinear.Tensor.const u (ds,size) v
 
 -- If there are indices without size or sizes without names, throw an error
-const us ds _ = Err $ invalidIndices us ds
+const us ds _ = error $ invalidIndices us ds
 
 {-| Generate tensor with random real components with given probability distribution.
 The tensor is wrapped in the IO monad. -}
@@ -137,13 +138,15 @@ randomDouble :: (
 -- If only one upper index is given, generate a SimpleFinite tensor with upper index
 randomDouble ([u],[s]) ([],[]) distr = do
     gen <- MWC.createSystemRandom
-    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Contravariant s [u]) component
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 randomDouble ([],[]) ([d],[s]) distr = do
     gen <- MWC.createSystemRandom
-    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Covariant s [d]) component
 
 -- If many indices are given, first generate upper indices recursively from indices list
@@ -157,7 +160,7 @@ randomDouble u (d:ds,s:size) distr = do
   return $ FiniteTensor (Covariant s [d]) tensors
 
 -- If there are indices without size or sizes without names, throw an error
-randomDouble us ds _ = return $ Err $ invalidIndices us ds
+randomDouble us ds _ = return $ error $ invalidIndices us ds
 
 {-| Generate tensor with random integer components with given probability distribution.
 The tensor is wrapped in the IO monad. -}
@@ -177,13 +180,15 @@ randomInt :: (
 -- If only one upper index is given, generate a SimpleFinite tensor with upper index
 randomInt ([u],[s]) ([],[]) distr = do
     gen <- MWC.createSystemRandom
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Contravariant s [u]) component
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 randomInt ([],[]) ([d],[s]) distr = do
     gen <- MWC.createSystemRandom
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Covariant s [d]) component
 
 -- If many indices are given, first generate upper indices recursively from indices list
@@ -197,7 +202,7 @@ randomInt u (d:ds,s:size) distr = do
   return $ FiniteTensor (Covariant s [d]) tensors
 
 -- If there are indices without size or sizes without names, throw an error
-randomInt us ds _ = return $ Err $ invalidIndices us ds
+randomInt us ds _ = return $ error $ invalidIndices us ds
 
 {-| Generate tensor with random real components with given probability distribution and given seed.
 The tensor is wrapped in a monad. -}
@@ -225,13 +230,15 @@ randomDoubleSeed :: (
 -- If only one upper index is given, generate a SimpleFinite tensor with upper index
 randomDoubleSeed ([u],[s]) ([],[]) distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Contravariant s [u]) component
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 randomDoubleSeed ([],[]) ([d],[s]) distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genContVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Covariant s [d]) component
 
 -- If many indices are given, first generate upper indices recursively from indices list
@@ -245,7 +252,7 @@ randomDoubleSeed u (d:ds,s:size) distr seed = do
   return $ FiniteTensor (Covariant s [d]) tensors
 
 -- If there are indices without size or sizes without names, throw an error
-randomDoubleSeed us ds _ _ = return $ Err $ invalidIndices us ds
+randomDoubleSeed us ds _ _ = return $ error $ invalidIndices us ds
 
 {-| Generate tensor with random integer components with given probability distribution and given seed.
 The tensor is wrapped in a monad. -}
@@ -266,13 +273,15 @@ randomIntSeed :: (
 -- If only one upper index is given, generate a SimpleFinite tensor with upper index
 randomIntSeed ([u],[s]) ([],[]) distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Contravariant s [u]) component
 
 -- If only one lower index is given, generate a SimpleFinite tensor with lower index
 randomIntSeed ([],[]) ([d],[s]) distr seed = do
     gen <- MWC.initialize (Boxed.singleton $ fromIntegral seed)
-    component <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    component' <- sequence $ Boxed.generate s $ \_ -> genDiscreteVar distr gen
+    let component = Unboxed.generate s $ \i -> component' Boxed.! i
     return $ SimpleFinite (Covariant s [d]) component
 
 -- If many indices are given, first generate upper indices recursively from indices list
@@ -286,4 +295,4 @@ randomIntSeed u (d:ds,s:size) distr seed = do
   return $ FiniteTensor (Covariant s [d]) tensors
 
 -- If there are indices without size or sizes without names, throw an error
-randomIntSeed us ds _ _ = return $ Err $ invalidIndices us ds
+randomIntSeed us ds _ _ = return $ error $ invalidIndices us ds

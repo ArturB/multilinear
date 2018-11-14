@@ -26,6 +26,7 @@ module Multilinear.NForm (
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed      as Unboxed
 import           Multilinear.Generic
 import qualified Multilinear.Tensor       as Tensor
 import           Statistics.Distribution
@@ -39,7 +40,7 @@ invalidCrossProductIndices = "Indices and its sizes incompatible with cross prod
 {-| Generate N-form as function of its indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String        -- ^ Indices names (one characted per index)
     -> [Int]         -- ^ Indices sizes
     -> ([Int] -> a)  -- ^ Generator function
@@ -50,7 +51,7 @@ fromIndices d ds f = Tensor.fromIndices ([],[]) (d,ds) $ \[] -> f
 {-| Generate N-form with all components equal to @v@ -}
 {-# INLINE Multilinear.NForm.const #-}
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> [Int]     -- ^ Indices sizes
     -> a         -- ^ N-form elements value
@@ -145,19 +146,19 @@ randomIntSeed d ds = Tensor.randomIntSeed ([],[]) (d,ds)
 {-| 2-form representing a dot product -}
 {-# INLINE dot #-}
 dot :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> Int       -- ^ Size of tensor (dot product is a square tensor)
     -> Tensor a  -- ^ Generated dot product
 
 dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
-dot _ _ = Err invalidIndices
+dot _ _ = error invalidIndices
 
 {-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
 -- // TODO
 {-# INLINE cross #-}
 cross :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> Int       -- ^ Size of tensor (dot product is a square tensor)
     -> Tensor a  -- ^ Generated dot product
@@ -165,4 +166,4 @@ cross :: (
 cross [i,j,k] size =
   Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
     (\[_] [_,_] -> 0)
-cross _ _ = Err invalidCrossProductIndices
+cross _ _ = error invalidCrossProductIndices

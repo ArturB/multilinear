@@ -13,12 +13,11 @@ Portability : Windows/POSIX
 
 module Multilinear.Generic (
     Tensor(..), (!),
-    isScalar, isSimple, isFiniteTensor, isInfiniteTensor,
+    isScalar, isSimple, isFiniteTensor,
     dot, _elemByElem, contractionErr, tensorIndex, _standardize
 ) where
 
 import           Control.DeepSeq
-import           Data.Bits
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
@@ -28,7 +27,6 @@ import           GHC.Generics
 import           Multilinear.Class          as Multilinear
 import qualified Multilinear.Index          as Index
 import qualified Multilinear.Index.Finite   as Finite
-import qualified Multilinear.Index.Infinite as Infinite
 
 {-| ERROR MESSAGES -}
 incompatibleTypes :: String
@@ -36,12 +34,6 @@ incompatibleTypes = "Incompatible tensor types!"
 
 scalarIndices :: String
 scalarIndices = "Scalar has no indices!"
-
-infiniteIndex :: String
-infiniteIndex = "Index is infinitely-dimensional!"
-
-infiniteTensor :: String
-infiniteTensor = "This tensor is infinitely-dimensional and cannot be printed!"
 
 indexNotFound :: String
 indexNotFound = "This tensor has not such index!"
@@ -141,7 +133,7 @@ t ! i = case t of
 instance NFData a => NFData (Tensor a)
 
 -- move contravariant indices to lower recursion level
-_standardize :: Num a => Tensor a -> Tensor a
+_standardize :: (Num a, Unboxed.Unbox a) => Tensor a -> Tensor a
 _standardize tens = foldr' f tens $ indices tens
     where 
         f i t = if Index.isContravariant i then 
@@ -191,17 +183,17 @@ instance (
     SimpleFinite _ _ <= FiniteTensor _ _         = True
 
 {-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
-{-# INLINE mergeScalars #-}
+{-# INLINE _mergeScalars #-}
 _mergeScalars :: Unboxed.Unbox a => Tensor a -> Tensor a
 _mergeScalars x = case x of
     (FiniteTensor index1 ts1) -> case ts1 Boxed.! 0 of
         Scalar _ -> SimpleFinite index1 $ Unboxed.generate (Boxed.length ts1) (\i -> scalarVal (ts1 Boxed.! i))
-        _        -> FiniteTensor index1 $ mergeScalars <$> ts1
+        _        -> FiniteTensor index1 $ _mergeScalars <$> ts1
     _ -> x
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
-_elemByElem' :: Num a 
+_elemByElem' :: (Num a, Unboxed.Unbox a)
              => Tensor a                            -- ^ First argument of operator
              -> Tensor a                            -- ^ Second argument of operator
              -> (a -> a -> a)                       -- ^ Function on tensor elements if indices are different
@@ -218,7 +210,9 @@ _elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.map` t
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index1 $ Boxed.generate (Boxed.length v1) (\i -> (\x -> f x <$> t2) <$> v1
+    | otherwise = FiniteTensor index1 $ 
+        Boxed.generate (Unboxed.length v1) 
+            (\i -> (\x -> f x `Multilinear.map` t2) (v1 Unboxed.! i))
 
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
@@ -253,7 +247,7 @@ _elemByElem t1 t2 f op =
 
 -- Zipping two tensors with a combinator, assuming they have the same indices
 {-# INLINE zipT #-}
-zipT :: Num a
+zipT :: (Num a, Unboxed.Unbox a)
       => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
       -> (Tensor a -> a -> Tensor a)          -- ^ Tensor and scalar combinator
       -> (a -> Tensor a -> Tensor a)          -- ^ Scalar and tensor combinator
@@ -285,7 +279,7 @@ zipT _ f _ _ (FiniteTensor index1 v1) (SimpleFinite index2 v2) =
 zipT _ _ f _ (SimpleFinite index1 v1) (FiniteTensor index2 v2) = 
     if index1 == index2 then 
         FiniteTensor index1 $ 
-            Boxed.generate (Boxed.length v1) (\i -> f (v1 Unboxed.! i) (v2 Boxed.! i)) 
+            Boxed.generate (Unboxed.length v1) (\i -> f (v1 Unboxed.! i) (v2 Boxed.! i)) 
     else error incompatibleTypes
 
 -- Zipping something with scalar is impossible
@@ -426,31 +420,31 @@ instance (Unboxed.Unbox a, Floating a) => Floating (Tensor a) where
     atanh t = atanh `Multilinear.map` t
 
 -- Multilinear operations
-instance Num a => Multilinear Tensor a where
+instance (Unboxed.Unbox a, Num a) => Multilinear Tensor a where
 
     -- Add scalar right
     {-# INLINE (.+) #-}
-    t .+ x = (+x) <$> t
+    t .+ x = (+x) `Multilinear.map` t
 
     -- Subtract scalar right
     {-# INLINE (.-) #-}
-    t .- x = (\p -> p - x) <$> t
+    t .- x = (\p -> p - x) `Multilinear.map` t
 
     -- Multiplicate by scalar right
     {-# INLINE (.*) #-}
-    t .* x = (*x) <$> t
+    t .* x = (*x) `Multilinear.map` t
 
     -- Add scalar left
     {-# INLINE (+.) #-}
-    x +. t = (x+) <$> t
+    x +. t = (x+) `Multilinear.map` t
 
     -- Subtract scalar left
     {-# INLINE (-.) #-}
-    x -. t = (x-) <$> t
+    x -. t = (x-) `Multilinear.map` t
 
     -- Multiplicate by scalar left
     {-# INLINE (*.) #-}
-    x *. t = (x*) <$> t
+    x *. t = (x*) `Multilinear.map` t
 
     -- Two tensors sum
     {-# INLINE (.+.) #-}
@@ -571,7 +565,7 @@ instance Num a => Multilinear Tensor a where
             let index2 = tensorFiniteIndex (ts1 Boxed.! 0)
                 -- Elements to transpose
                 dane = if isSimple (ts1 Boxed.! 0)
-                       then (Scalar <$>) <$> (tensorScalars <$> ts1)
+                       then (\un -> Boxed.generate (Unboxed.length un) (\i -> Scalar $ un Unboxed.! i)) <$> (tensorScalars <$> ts1)
                        else tensorsFinite <$> ts1
                 -- Convert to list
                 daneList = Boxed.toList <$> Boxed.toList dane
@@ -581,6 +575,7 @@ instance Num a => Multilinear Tensor a where
                 transposed = Boxed.fromList <$> Boxed.fromList transposedList
             -- and reconstruct tensor with transposed elements
             in  FiniteTensor index2 $ FiniteTensor index1 <$> transposed
+        -- there is only one index and therefore it cannot be shifted
         | otherwise = t1
     
     {-# INLINE map #-}
@@ -589,8 +584,7 @@ instance Num a => Multilinear Tensor a where
         Scalar v                -> Scalar $ f v
         -- Mapping complex tensor does mapping element by element
         SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
-        FiniteTensor index ts   -> FiniteTensor index $ Multilinear.map (fmap f) ts
-        -- Mapping errors changes nothing
+        FiniteTensor index ts   -> FiniteTensor index $ Multilinear.map f <$> ts
 
 {-| List allows for random access to tensor elements -}
 instance (Unboxed.Unbox a, Num a) => Accessible Tensor a where
