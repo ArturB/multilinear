@@ -35,7 +35,7 @@ invalidIndices :: (String, [Int]) -> (String, [Int]) -> String
 invalidIndices us ds = "Indices and its sizes incompatible, upper indices: " ++ show us ++", lower indices: " ++ show ds
 
 {-| Generate tensor as functions of its indices -}
-{-# INLINE fromIndices #-}
+
 fromIndices :: (
     Num a, Unboxed.Unbox a
     ) => (String,[Int])          -- ^ Upper indices names (one character per index) and its sizes
@@ -63,7 +63,7 @@ fromIndices u (d:ds,s:size) f =
 fromIndices us ds _ = error $ invalidIndices us ds
 
 {-| Generate tensor composed of other tensors -}
-{-# INLINE generate #-}
+
 generate :: (
     Num a, Unboxed.Unbox a
     ) => (String,[Int])                 -- ^ Upper indices names (one character per index) and its sizes
@@ -86,7 +86,7 @@ generate u (d:ds,s:size) f =
 generate us ds _ = error $ invalidIndices us ds
 
 {-| Generate tensor with all components equal to @v@ -}
-{-# INLINE Multilinear.Tensor.const #-}
+
 const :: (
     Num a, Unboxed.Unbox a
     ) => (String,[Int]) -- ^ Upper indices names (one character per index) and its sizes
@@ -127,7 +127,7 @@ The tensor is wrapped in the IO monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDouble #-}
+
 randomDouble :: (
     ContGen d
   ) => (String,[Int])      -- ^ Upper indices names (one character per index) and its sizes
@@ -169,7 +169,7 @@ The tensor is wrapped in the IO monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomInt #-}
+
 randomInt :: (
     DiscreteGen d
   ) => (String,[Int])    -- ^ Upper indices names (one character per index) and its sizes
@@ -218,7 +218,7 @@ The tensor is wrapped in a monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDoubleSeed #-}
+
 randomDoubleSeed :: (
     ContGen d, PrimMonad m
   ) => (String,[Int])    -- ^ Upper indices names (one character per index) and its sizes
@@ -261,7 +261,7 @@ The tensor is wrapped in a monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomIntSeed #-}
+
 randomIntSeed :: (
     DiscreteGen d, PrimMonad m
   ) => (String,[Int])    -- ^ Index name (one character)

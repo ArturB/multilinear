@@ -26,5 +26,5 @@ sizedMatrixBench s =
 
 main :: IO ()
 main = defaultMain [
-    bgroup "matrix multiplication" $ sizedMatrixBench <$> [40, 80, 160, 320, 640]
+    bgroup "matrix multiplication" $ sizedMatrixBench <$> [64, 128, 256, 512]
     ]

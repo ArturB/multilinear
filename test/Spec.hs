@@ -13,6 +13,7 @@ module Main (
     main
 ) where
 
+import           Control.DeepSeq
 import           Multilinear.Generic
 import           Multilinear.Class
 import qualified Multilinear.Matrix as Matrix

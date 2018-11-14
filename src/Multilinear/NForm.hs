@@ -38,7 +38,7 @@ invalidCrossProductIndices :: String
 invalidCrossProductIndices = "Indices and its sizes incompatible with cross product structure!"
 
 {-| Generate N-form as function of its indices -}
-{-# INLINE fromIndices #-}
+
 fromIndices :: (
     Num a, Unboxed.Unbox a
   ) => String        -- ^ Indices names (one characted per index)
@@ -49,7 +49,7 @@ fromIndices :: (
 fromIndices d ds f = Tensor.fromIndices ([],[]) (d,ds) $ \[] -> f
 
 {-| Generate N-form with all components equal to @v@ -}
-{-# INLINE Multilinear.NForm.const #-}
+
 const :: (
     Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
@@ -73,7 +73,7 @@ The n-vector is wrapped in the IO monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDouble #-}
+
 randomDouble :: (
     ContGen d
   ) => String              -- ^ Indices names (one character per index)
@@ -90,7 +90,7 @@ The n-vector is wrapped in the IO monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomInt #-}
+
 randomInt :: (
     DiscreteGen d
   ) => String              -- ^ Indices names (one character per index)
@@ -114,7 +114,7 @@ The form is wrapped in a monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDoubleSeed #-}
+
 randomDoubleSeed :: (
     ContGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
@@ -132,7 +132,7 @@ The form is wrapped in a monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomIntSeed #-}
+
 randomIntSeed :: (
     DiscreteGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
@@ -144,7 +144,7 @@ randomIntSeed :: (
 randomIntSeed d ds = Tensor.randomIntSeed ([],[]) (d,ds)
 
 {-| 2-form representing a dot product -}
-{-# INLINE dot #-}
+
 dot :: (
     Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
@@ -156,7 +156,7 @@ dot _ _ = error invalidIndices
 
 {-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
 -- // TODO
-{-# INLINE cross #-}
+
 cross :: (
     Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)

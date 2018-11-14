@@ -89,22 +89,6 @@ tensorIndex x = case x of
     SimpleFinite i _   -> Index.toTIndex i
     FiniteTensor i _   -> Index.toTIndex i
 
-{-| Return True if tensor has no elements -}
-{-# INLINE isEmptyTensor #-}
-isEmptyTensor :: Unboxed.Unbox a => Tensor a -> Bool
-isEmptyTensor x = case x of
-    Scalar _            -> False
-    SimpleFinite _ ts   -> Unboxed.null ts
-    FiniteTensor _ ts   -> Boxed.null ts
-
-{-| Returns sample element of the tensor. Used to determine some features common for all elements, like bit-qualities. -}
-{-# INLINE firstElem #-}
-firstElem :: Unboxed.Unbox a => Tensor a -> a
-firstElem x = case x of
-    Scalar val          -> val
-    SimpleFinite _ ts   -> Unboxed.head ts
-    FiniteTensor _ ts   -> firstElem $ Boxed.head ts
-
 {-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
 {-# INLINE firstTensor #-}
 firstTensor :: Unboxed.Unbox a => Tensor a -> Tensor a

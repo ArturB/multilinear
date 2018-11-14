@@ -32,7 +32,7 @@ invalidIndices :: String
 invalidIndices = "Indices and its sizes not compatible with structure of vector!"
 
 {-| Generate vector as function of indices -}
-{-# INLINE fromIndices #-}
+
 fromIndices :: (
     Num a, Unboxed.Unbox a
   ) => String        -- ^ Index name (one character)
@@ -44,7 +44,7 @@ fromIndices [i] s f = Tensor.fromIndices ([i],[s]) ([],[]) $ \[x] [] -> f x
 fromIndices _ _ _ = error invalidIndices
 
 {-| Generate vector with all components equal to some @v@ -}
-{-# INLINE Multilinear.Vector.const #-}
+
 const :: (
     Num a, Unboxed.Unbox a
   ) => String      -- ^ Index name (one character)
@@ -68,7 +68,7 @@ The vector is wrapped in the IO monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDouble #-}
+
 randomDouble :: (
     ContGen d
   ) => String              -- ^ Index name (one character)
@@ -86,7 +86,7 @@ The vector is wrapped in the IO monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomInt #-}
+
 randomInt :: (
     DiscreteGen d
   ) => String           -- ^ Index name (one character)
@@ -110,7 +110,7 @@ The vector is wrapped in a monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDoubleSeed #-}
+
 randomDoubleSeed :: (
     ContGen d, PrimMonad m
   ) => String             -- ^ Index name (one character)
@@ -129,7 +129,7 @@ The vector is wrapped in a monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomIntSeed #-}
+
 randomIntSeed :: (
     DiscreteGen d, PrimMonad m
   ) => String          -- ^ Index name (one character)
