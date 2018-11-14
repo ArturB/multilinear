@@ -117,7 +117,7 @@ t ! i = case t of
 instance NFData a => NFData (Tensor a)
 
 -- move contravariant indices to lower recursion level
-_standardize :: (Num a, Unboxed.Unbox a) => Tensor a -> Tensor a
+_standardize :: (Num a, Unboxed.Unbox a, NFData a) => Tensor a -> Tensor a
 _standardize tens = foldr' f tens $ indices tens
     where 
         f i t = if Index.isContravariant i then 
@@ -126,7 +126,7 @@ _standardize tens = foldr' f tens $ indices tens
 
 -- Print tensor
 instance (
-    Unboxed.Unbox a, Show a, Num a
+    Unboxed.Unbox a, Show a, Num a, NFData a
     ) => Show (Tensor a) where
 
     -- merge errors first and then print whole tensor
@@ -177,7 +177,7 @@ _mergeScalars x = case x of
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
-_elemByElem' :: (Num a, Unboxed.Unbox a)
+_elemByElem' :: (Num a, Unboxed.Unbox a, NFData a)
              => Tensor a                            -- ^ First argument of operator
              -> Tensor a                            -- ^ Second argument of operator
              -> (a -> a -> a)                       -- ^ Function on tensor elements if indices are different
@@ -217,7 +217,7 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 
 {-| Apply a tensor operator elem by elem -}
 {-# INLINE _elemByElem #-}
-_elemByElem :: (Num a, Unboxed.Unbox a)
+_elemByElem :: (Num a, Unboxed.Unbox a, NFData a)
             => Tensor a                             -- ^ First argument of operator
             -> Tensor a                             -- ^ Second argument of operator
             -> (a -> a -> a)                        -- ^ Operator on tensor elements if indices are different
@@ -227,11 +227,11 @@ _elemByElem t1 t2 f op =
     let commonIndices = filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
-    in _mergeScalars $ _elemByElem' t1' t2' f op
+    in t1' `deepseq` t2' `deepseq` _mergeScalars $ _elemByElem' t1' t2' f op
 
 -- Zipping two tensors with a combinator, assuming they have the same indices
 {-# INLINE zipT #-}
-zipT :: (Num a, Unboxed.Unbox a)
+zipT :: (Num a, Unboxed.Unbox a, NFData a)
       => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
       -> (Tensor a -> a -> Tensor a)          -- ^ Tensor and scalar combinator
       -> (a -> Tensor a -> Tensor a)          -- ^ Scalar and tensor combinator
@@ -271,7 +271,7 @@ zipT _ _ _ _ _ _ = error scalarIndices
 
 -- dot product of two tensors
 {-# INLINE dot #-}
-dot :: (Num a, Unboxed.Unbox a)
+dot :: (Num a, Unboxed.Unbox a, NFData a)
       => Tensor a  -- ^ First dot product argument
       -> Tensor a  -- ^ Second dot product argument
       -> Tensor a  -- ^ Resulting dot product
@@ -291,7 +291,7 @@ dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.
 dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
 
 -- contraction error
-{-# INLINE contractionErr #-}
+--{-# INLINE contractionErr #-}
 contractionErr :: Index.TIndex   -- ^ Index of first dot product parameter
                -> Index.TIndex   -- ^ Index of second dot product parameter
                -> Tensor a       -- ^ Erorr message
@@ -302,7 +302,7 @@ contractionErr i1' i2' = error $
     " and index2 is " ++ show i2'
 
 -- Tensors can be added, subtracted and multiplicated
-instance (Unboxed.Unbox a, Num a) => Num (Tensor a) where
+instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
 
     -- Adding - element by element
     {-# INLINE (+) #-}
@@ -330,7 +330,7 @@ instance (Unboxed.Unbox a, Num a) => Num (Tensor a) where
     fromInteger x = Scalar $ fromInteger x
 
 -- Tensors can be divided by each other
-instance (Unboxed.Unbox a, Fractional a) => Fractional (Tensor a) where
+instance (Unboxed.Unbox a, Fractional a, NFData a) => Fractional (Tensor a) where
 
     {-# INLINE (/) #-}
     -- Scalar division return result of division of its values
@@ -349,7 +349,7 @@ instance (Unboxed.Unbox a, Fractional a) => Fractional (Tensor a) where
 -- Real-number functions on tensors.
 -- Function of tensor is tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (Unboxed.Unbox a, Floating a) => Floating (Tensor a) where
+instance (Unboxed.Unbox a, Floating a, NFData a) => Floating (Tensor a) where
 
     {-| PI number -}
     {-# INLINE pi #-}
@@ -404,7 +404,7 @@ instance (Unboxed.Unbox a, Floating a) => Floating (Tensor a) where
     atanh t = atanh `Multilinear.map` t
 
 -- Multilinear operations
-instance (Unboxed.Unbox a, Num a) => Multilinear Tensor a where
+instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
 
     -- Add scalar right
     {-# INLINE (.+) #-}
@@ -533,7 +533,7 @@ instance (Unboxed.Unbox a, Num a) => Multilinear Tensor a where
 
     {-| Shift tensor index right -}
     {-| Moves given index one level deeper in recursion -}
-    {-# INLINE shiftRight #-}
+    --{-# INLINE shiftRight #-}
     -- Scalar has no indices to shift
     Scalar x `shiftRight` _ = Scalar x
     -- Simple tensor has only one index which cannot be shifted
@@ -571,7 +571,7 @@ instance (Unboxed.Unbox a, Num a) => Multilinear Tensor a where
         FiniteTensor index ts   -> FiniteTensor index $ Multilinear.map f <$> ts
 
 {-| List allows for random access to tensor elements -}
-instance (Unboxed.Unbox a, Num a) => Accessible Tensor a where
+instance (Unboxed.Unbox a, Num a, NFData a) => Accessible Tensor a where
 
     {-| Accessing tensor elements -}
     {-# INLINE el #-}

@@ -19,12 +19,18 @@ import qualified Multilinear.Matrix                  as Matrix
 gen :: Int -> Int -> Double
 gen j k = sin (fromIntegral j) + cos (fromIntegral k)
 
-sizedMatrixBench :: Int -> Benchmark
-sizedMatrixBench s = 
+sizedMatrixMultBench :: Int -> Benchmark
+sizedMatrixMultBench s = 
     bench ((show s) ++ "x" ++ (show s)) $ 
         nf ((Matrix.fromIndices "ij" s s gen) *) (Matrix.fromIndices "jk" s s gen)
 
+sizedMatrixAddBench :: Int -> Benchmark
+sizedMatrixAddBench s = 
+    bench ((show s) ++ "x" ++ (show s)) $ 
+        nf ((Matrix.fromIndices "ij" s s gen) +) (Matrix.fromIndices "ij" s s gen)
+
 main :: IO ()
 main = defaultMain [
-    bgroup "matrix multiplication" $ sizedMatrixBench <$> [64, 128, 256, 512]
+    bgroup "matrix multiplication" $ sizedMatrixMultBench <$> [64, 128, 256, 512],
+    bgroup "matrix addition" $ sizedMatrixAddBench <$> [64, 128, 256, 512]
     ]
