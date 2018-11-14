@@ -20,15 +20,12 @@ module Multilinear.Form (
   Multilinear.Form.randomDouble,
    Multilinear.Form.randomDoubleSeed,
   Multilinear.Form.randomInt, 
-  Multilinear.Form.randomIntSeed,
-  -- ** Infinite functionals
-  Multilinear.Form.fromIndices', 
-  Multilinear.Form.const'
+  Multilinear.Form.randomIntSeed
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed        as Unboxed
 import           Multilinear.Generic
-import           Multilinear.Index.Infinite as Infinite
 import           Multilinear.Tensor         as Tensor
 import           Statistics.Distribution
 
@@ -40,26 +37,26 @@ invalidIndices = "Indices and its sizes not compatible with structure of linear 
 {-| Generate linear functional as function of indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String        -- ^ Index name (one character)
     -> Int           -- ^ Number of elements
     -> (Int -> a)    -- ^ Generator function - returns a linear functional component at index @i@
     -> Tensor a      -- ^ Generated linear functional
 
 fromIndices [i] s f = Tensor.fromIndices ([],[]) ([i],[s]) $ \[] [x] -> f x
-fromIndices _ _ _ = Err invalidIndices
+fromIndices _ _ _ = error invalidIndices
 
 {-| Generate linear functional with all components equal to some @v@ -}
 {-# INLINE Multilinear.Form.const #-}
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String      -- ^ Index name (one character)
     -> Int         -- ^ Number of elements
     -> a           -- ^ Value of each element
     -> Tensor a    -- ^ Generated linear functional
 
 const [i] s = Tensor.const ([],[]) ([i],[s])
-const _ _ = \_ -> Err invalidIndices
+const _ _ = \_ -> error invalidIndices
 
 {-| Generate linear functional with random real components with given probability distribution.
 The functional is wrapped in the IO monad. -}
@@ -83,7 +80,7 @@ randomDouble :: (
     -> IO (Tensor Double)  -- ^ Generated linear functional
 
 randomDouble [i] s = Tensor.randomDouble ([],[]) ([i],[s])
-randomDouble _ _ = \_ -> return $ Err invalidIndices
+randomDouble _ _ = \_ -> return $ error invalidIndices
 
 {-| Generate linear functional with random integer components with given probability distribution.
 The functional is wrapped in the IO monad. -}
@@ -101,7 +98,7 @@ randomInt :: (
     -> IO (Tensor Int)    -- ^ Generated linear functional
 
 randomInt [i] s = Tensor.randomInt ([],[]) ([i],[s])
-randomInt _ _ = \_ -> return $ Err invalidIndices
+randomInt _ _ = \_ -> return $ error invalidIndices
 
 {-| Generate linear functional with random real components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
@@ -126,7 +123,7 @@ randomDoubleSeed :: (
     -> m (Tensor Double)      -- ^ Generated linear functional
 
 randomDoubleSeed [i] s = Tensor.randomDoubleSeed ([],[]) ([i],[s])
-randomDoubleSeed _ _ = \_ _ -> return $ Err invalidIndices
+randomDoubleSeed _ _ = \_ _ -> return $ error invalidIndices
 
 {-| Generate linear functional with random integer components with given probability distribution and given seed.
 The functional is wrapped in a monad. -}
@@ -145,29 +142,5 @@ randomIntSeed :: (
     -> m (Tensor Int)        -- ^ Generated linear functional
 
 randomIntSeed [i] s = Tensor.randomIntSeed ([],[]) ([i],[s])
-randomIntSeed _ _ = \_ _ -> return $ Err invalidIndices
-
-{-| Generate linear functional as function of indices -}
-{-# INLINE fromIndices' #-}
-fromIndices' :: (
-    Num a
-  ) => String        -- ^ Index name (one character)
-    -> (Int -> a)    -- ^ Generator function - returns a linear functional component at index @i@
-    -> Tensor a      -- ^ Generated linear functional
-
-fromIndices' i = case i of
-    [d] -> \f -> InfiniteTensor (Infinite.Covariant [d]) $ (Scalar . f) <$> [0..]
-    _   -> \_ -> Err invalidIndices
-
-{-| Generate linear functional with all components equal to some @v@ -}
-{-# INLINE Multilinear.Form.const' #-}
-const' :: (
-    Num a
-  ) => String      -- ^ Index name (one character)
-    -> a           -- ^ Value of each element
-    -> Tensor a    -- ^ Generated linear functional
-
-const' i = case i of
-    [d] -> \v -> InfiniteTensor (Infinite.Covariant [d]) $ (\_ -> Scalar v) <$> ([0..] :: [Int])
-    _   -> \_ -> Err invalidIndices
+randomIntSeed _ _ = \_ _ -> return $ error invalidIndices
 

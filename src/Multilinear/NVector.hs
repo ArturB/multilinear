@@ -23,6 +23,7 @@ module Multilinear.NVector (
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed         as Unboxed
 import           Multilinear.Generic
 import           Multilinear.Tensor          as Tensor
 import           Statistics.Distribution
@@ -30,7 +31,7 @@ import           Statistics.Distribution
 {-| Generate n-vector as function of its indices -}
 {-# INLINE fromIndices #-}
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String        -- ^ Indices names (one characted per index)
     -> [Int]         -- ^ Indices sizes
     -> ([Int] -> a)  -- ^ Generator function
@@ -41,7 +42,7 @@ fromIndices u us f = Tensor.fromIndices (u,us) ([],[]) $ \uis [] -> f uis
 {-| Generate n-vector with all components equal to @v@ -}
 {-# INLINE Multilinear.NForm.const #-}
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> [Int]     -- ^ Indices sizes
     -> a         -- ^ n-vector elements value
