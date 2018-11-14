@@ -574,7 +574,7 @@ instance (Unboxed.Unbox a, Num a) => Multilinear Tensor a where
                 -- then reconvert to vector again
                 transposed = Boxed.fromList <$> Boxed.fromList transposedList
             -- and reconstruct tensor with transposed elements
-            in  FiniteTensor index2 $ FiniteTensor index1 <$> transposed
+            in  _mergeScalars$ FiniteTensor index2 $ FiniteTensor index1 <$> transposed
         -- there is only one index and therefore it cannot be shifted
         | otherwise = t1
     
