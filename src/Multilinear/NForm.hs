@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.NForm
 Description : N-Forms, dot and cross product and determinant
-Copyright   : (c) Artur M. Brodzki, 2017
+Copyright   : (c) Artur M. Brodzki, 2018
 License     : GLP-3
-Maintainer  : artur.brodzki@gmail.com
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -26,6 +26,7 @@ module Multilinear.NForm (
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed      as Unboxed
 import           Multilinear.Generic
 import qualified Multilinear.Tensor       as Tensor
 import           Statistics.Distribution
@@ -37,9 +38,9 @@ invalidCrossProductIndices :: String
 invalidCrossProductIndices = "Indices and its sizes incompatible with cross product structure!"
 
 {-| Generate N-form as function of its indices -}
-{-# INLINE fromIndices #-}
+
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String        -- ^ Indices names (one characted per index)
     -> [Int]         -- ^ Indices sizes
     -> ([Int] -> a)  -- ^ Generator function
@@ -48,9 +49,9 @@ fromIndices :: (
 fromIndices d ds f = Tensor.fromIndices ([],[]) (d,ds) $ \[] -> f
 
 {-| Generate N-form with all components equal to @v@ -}
-{-# INLINE Multilinear.NForm.const #-}
+
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> [Int]     -- ^ Indices sizes
     -> a         -- ^ N-form elements value
@@ -72,7 +73,7 @@ The n-vector is wrapped in the IO monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDouble #-}
+
 randomDouble :: (
     ContGen d
   ) => String              -- ^ Indices names (one character per index)
@@ -89,7 +90,7 @@ The n-vector is wrapped in the IO monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomInt #-}
+
 randomInt :: (
     DiscreteGen d
   ) => String              -- ^ Indices names (one character per index)
@@ -113,7 +114,7 @@ The form is wrapped in a monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDoubleSeed #-}
+
 randomDoubleSeed :: (
     ContGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
@@ -131,7 +132,7 @@ The form is wrapped in a monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomIntSeed #-}
+
 randomIntSeed :: (
     DiscreteGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
@@ -143,21 +144,21 @@ randomIntSeed :: (
 randomIntSeed d ds = Tensor.randomIntSeed ([],[]) (d,ds)
 
 {-| 2-form representing a dot product -}
-{-# INLINE dot #-}
+
 dot :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> Int       -- ^ Size of tensor (dot product is a square tensor)
     -> Tensor a  -- ^ Generated dot product
 
 dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
-dot _ _ = Err invalidIndices
+dot _ _ = error invalidIndices
 
 {-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
 -- // TODO
-{-# INLINE cross #-}
+
 cross :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> Int       -- ^ Size of tensor (dot product is a square tensor)
     -> Tensor a  -- ^ Generated dot product
@@ -165,4 +166,4 @@ cross :: (
 cross [i,j,k] size =
   Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
     (\[_] [_,_] -> 0)
-cross _ _ = Err invalidCrossProductIndices
+cross _ _ = error invalidCrossProductIndices

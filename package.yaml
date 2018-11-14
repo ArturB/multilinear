@@ -1,0 +1,80 @@
+name:                multilinear
+version:             0.3.0.0
+github:              "ArturB/multilinear"
+license:             BSD3
+author:              "Artur M. Brodzki"
+maintainer:          "artur@brodzki.org"
+copyright:           "2018 Artur M. Brodzki"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Comprehensive and efficient (multi)linear algebra implementation. 
+category:            Machine learning
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         "Comprehensive and efficient (multi)linear algebra implementation, based on generic tensor formalism and concise Ricci-Curbastro index syntax. More information available on GitHub: <https://github.com/ArturB/multilinear#readme>"
+
+dependencies:
+- base >= 4.7 && < 5
+ghc-options:
+- -O2
+- -W
+
+default-extensions:
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
+- MultiParamTypeClasses
+- ScopedTypeVariables
+- StandaloneDeriving
+- GADTs
+
+library:
+  source-dirs: src
+  dependencies:
+  - containers
+  - deepseq
+  - mwc-random
+  - primitive
+  - statistics
+  - vector
+
+tests:
+  multilinear-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N  
+    dependencies:
+    - multilinear
+    - deepseq
+
+benchmarks:
+  multilinear-time-bench:
+    main:                Bench.hs
+    source-dirs:         benchmark/time
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - criterion
+    - multilinear
+  multilinear-memory-bench:
+    main:                Bench.hs
+    source-dirs:         benchmark/memory
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - criterion
+    - multilinear
+    - weigh

@@ -1,9 +1,9 @@
 {-|
 Module      : Multilinear.NVector
 Description : N-Vectors constructors (finitely- or infinitely-dimensional)
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -23,14 +23,15 @@ module Multilinear.NVector (
 ) where
 
 import           Control.Monad.Primitive
+import qualified Data.Vector.Unboxed         as Unboxed
 import           Multilinear.Generic
 import           Multilinear.Tensor          as Tensor
 import           Statistics.Distribution
 
 {-| Generate n-vector as function of its indices -}
-{-# INLINE fromIndices #-}
+
 fromIndices :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String        -- ^ Indices names (one characted per index)
     -> [Int]         -- ^ Indices sizes
     -> ([Int] -> a)  -- ^ Generator function
@@ -39,9 +40,9 @@ fromIndices :: (
 fromIndices u us f = Tensor.fromIndices (u,us) ([],[]) $ \uis [] -> f uis
 
 {-| Generate n-vector with all components equal to @v@ -}
-{-# INLINE Multilinear.NForm.const #-}
+
 const :: (
-    Num a
+    Num a, Unboxed.Unbox a
   ) => String    -- ^ Indices names (one characted per index)
     -> [Int]     -- ^ Indices sizes
     -> a         -- ^ n-vector elements value
@@ -63,7 +64,7 @@ The n-vector is wrapped in the IO monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDouble #-}
+
 randomDouble :: (
     ContGen d
   ) => String              -- ^ Indices names (one character per index)
@@ -80,7 +81,7 @@ The n-vector is wrapped in the IO monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomInt #-}
+
 randomInt :: (
     DiscreteGen d
   ) => String              -- ^ Indices names (one character per index)
@@ -104,7 +105,7 @@ The form is wrapped in a monad. -}
 {-| - Uniform : "Statistics.Distribution.Uniform" -}
 {-| - F : "Statistics.Distribution.FDistribution" -}
 {-| - Laplace : "Statistics.Distribution.Laplace" -}
-{-# INLINE randomDoubleSeed #-}
+
 randomDoubleSeed :: (
     ContGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)
@@ -122,7 +123,7 @@ The form is wrapped in a monad. -}
 {-| - Poisson : "Statistics.Distribution.Poisson" -}
 {-| - Geometric : "Statistics.Distribution.Geometric" -}
 {-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-{-# INLINE randomIntSeed #-}
+
 randomIntSeed :: (
     DiscreteGen d, PrimMonad m
   ) => String            -- ^ Index name (one character)

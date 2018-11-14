@@ -98,6 +98,7 @@ If you want to do a matrix multiplication, a lower index of first matrix must ha
    | [k:4] [3,4,5,6]
    | [k:4] [4,5,6,7]
 >>> m1 * m2
+
 \<i:3\>
    | [k:4] [30,40,50,60]
    | [k:4] [40,50,60,70]
@@ -141,49 +142,182 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 
 -}
 
-module Multilinear (
-    {-module Form,
-    module Generic,
-    module Index,
-    module Index.Finite,
-    module Index.Infinite,
-    module Matrix,
-    module NForm,
-    module Tensor,
-    module Vector,
-    module X-}
+module Multilinear.Class (
+    Multilinear(..),
+    Accessible(..)
 ) where
 
--- Re-export other library modules
-{-import           Multilinear.Class                       as Multilinear
-import qualified Multilinear.Form                        as Form
-import           Multilinear.Generic                     as Generic
-import qualified Multilinear.Index                       as Index
-import qualified Multilinear.Index.Finite                as Index.Finite
-import qualified Multilinear.Index.Infinite              as Index.Infinite
-import qualified Multilinear.Matrix                      as Matrix
-import qualified Multilinear.NForm                       as NForm
-import qualified Multilinear.NVector                     as NVector
-import qualified Multilinear.Tensor                      as Tensor
-import qualified Multilinear.Vector                      as Vector
+import           Data.Maybe
+import           Data.Set
+import qualified Data.Vector.Unboxed as Unboxed
+import           Multilinear.Index
 
-import           Statistics.Distribution                 as X
-import           Statistics.Distribution.Beta            as X
-import           Statistics.Distribution.Binomial        as X
-import           Statistics.Distribution.CauchyLorentz   as X
-import           Statistics.Distribution.ChiSquared      as X
-import           Statistics.Distribution.Exponential     as X
-import           Statistics.Distribution.FDistribution   as X
-import           Statistics.Distribution.Gamma           as X
-import           Statistics.Distribution.Geometric       as X
-import           Statistics.Distribution.Hypergeometric  as X
-import           Statistics.Distribution.Laplace         as X
-import           Statistics.Distribution.Normal          as X
-import           Statistics.Distribution.StudentT        as X
-import           Statistics.Distribution.Uniform         as X
+{-| Multidimensional array treated as multilinear map - tensor -}
+class (
+  Unboxed.Unbox a,
+  Num (t a)     -- Tensors may be added, subtracted and multiplicated
+  ) => Multilinear t a where
 
-import           System.IO.Unsafe                        as X
-import           Control.Monad.Trans.Class               as X
-import           Control.Monad.Trans.Either              as X
-import           Control.Exception.Base                  as X
--}
+    {-| Add scalar @a@ to each element of tensor @t@ -}
+    infixl 4 +.
+    (+.) :: a -> t a -> t a
+
+    {-| Subtract each element of tensor @t@ from scalar scalar left -}
+    infixl 4 -.
+    (-.) :: a -> t a -> t a
+
+    {-| Multiply scalar @a@ by each element of tensor @t@ -}
+    infixl 5 *.
+    (*.) :: a -> t a -> t a
+
+    {-| Add each element of tensor @t@ to scalar @a@ -}
+    infixl 4 .+
+    (.+) :: t a -> a -> t a
+
+    {-| Subtract scalar @a@ from each element of tensor @t@ -}
+    infixl 4 .-
+    (.-) :: t a -> a -> t a
+
+    {-| Multiply each element of tensor @t@ by scalar @a@ -}
+    infixl 5 .*
+    (.*) :: t a -> a -> t a
+
+    {-| Tensor adding - functionally equal to Num (+) but more efficient -}
+    infixl 4 .+.
+    (.+.) :: t a -> t a -> t a
+
+    {-| Tensor subtracting - functionally equal to Num (-) but more efficient -}
+    infixl 4 .-.
+    (.-.) :: t a -> t a -> t a
+
+    {-| Tensor multiplication - functionally equal to Num (*) but more efficient -}
+    infixl 5 .*.
+    (.*.) :: t a -> t a -> t a
+
+    {-| List of all tensor indices -}
+    indices :: t a -> [TIndex]
+
+    {-| List of tensor indices names -}
+    indicesNames :: t a -> [String]
+    indicesNames t = indexName <$> indices t
+
+    {-| Tensor order - number of covariant and contravariant indices -}
+    {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
+    order :: t a -> (Int,Int)
+
+    {-| Return size of index with given name -}
+    size :: t a -> String -> Int
+
+    {-| Check if tensors are equivalent (have same indices but in different order) -}
+    equiv :: t a -> t a -> Bool
+    equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
+
+    {-| Infix equivalent of 'equiv'. Has low priority equal to 1. |-}
+    infixl 1 |==|
+    (|==|) :: t a -> t a -> Bool
+    t1 |==| t2 = equiv t1 t2
+
+    {-| @t $| "ij" "kl"@ renames upper indices of tensor @t@ to @ij@ and lower indices to @kl@ -}
+    infix 9 $|
+    ($|) :: t a -> (String,String) -> t a
+
+    {-| @raise t "i"@ raises an index @i@ of tensor @t@ -}
+    raise :: t a -> String -> t a
+    raise t i = t /\ i
+
+    {-| Infix equivalent of 'raise' -}
+    infixl 8 /\
+    (/\) :: t a -> String -> t a
+    t /\ i = raise t i
+
+    {-| @lower t "i"@ lowers an index @i@ of tensor @t@ -}
+    lower :: t a -> String -> t a
+    lower t i = t \/ i
+
+    {-| Infix equivalent of 'lower' -}
+    infixl 8 \/
+    (\/) :: t a -> String -> t a
+    t \/ i = lower t i
+
+    {-| Switch all indices of tensor @t@ - upper indices becomes lower and vice versa -}
+    transpose :: t a -> t a
+
+    {-| Shift tensor index right -}
+    {-| @shiftRight t "i"@ moves index @i@ of tensor @t@ one level depeer in recursion.
+        Elements of tensor as indexed with indices names becomes unchanged. -}
+    shiftRight :: t a -> String -> t a
+    -- ^ Right shift of an index is equivalent to left shift of its successor in recursion @s@, if only @s@ exists, so:
+    -- Given a tensor @t[i1,i2,i3,...]@: @shiftRight t "i2" == t[i1,i3,i2,...] == shiftLeft t "i3"@
+    shiftRight t n
+        | isJust $ successor n (indicesNames t) = shiftLeft t (fromJust $ successor n (indicesNames t))
+        | otherwise = t
+        where
+        successor x (a1:a2:as) = if x == a1 then Just a2 else successor x (a2:as)
+        successor _ _ = Nothing
+
+    {-| Infix equivalent of 'shiftRight' -}
+    {-| @t |>> "i"@ moves index @i@ of tensor @t@ one level depeer in recursion -}
+    infixl 6 |>>
+    (|>>) :: t a -> String -> t a
+    t |>> n = shiftRight t n
+
+    {-| Shift tensor index rightmost -}
+    {-| @shiftRightmost t "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion.
+        Elements of tensor as indexed with indices names becomes unchanged.  -}
+    shiftRightmost :: t a -> String -> t a
+    shiftRightmost t n = until (\x -> n == last (indicesNames x)) (|>> n) t
+
+    {-| Infix equivalent of 'shiftRightmost' -}
+    {-| @t |>>> "i"@ moves index @i@ of tensor @t@ to the deepest level in recursion -}
+    infixl 6 |>>>
+    (|>>>) :: t a -> String -> t a
+    t |>>> n = shiftRightmost t n
+
+    {-| Shift tensor index left. Elements of tensor as indexed with indices names becomes unchanged. -}
+    {-| @shiftLeft t "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
+    shiftLeft :: t a -> String -> t a
+    -- ^ Left shift of an index is equivalent to right shift of its predecessor in recursion @p@, if only @p@ exists, so:
+    -- Given a tensor t[i1,i2,i3,...]: @shiftLeft t "i3" == t[i1,i3,i2,...] == shiftRight t "i2"@
+    shiftLeft t n
+        | isJust (predecessor n (indicesNames t)) = shiftRight t (fromJust $ predecessor n (indicesNames t))
+        | otherwise = t
+        where
+        predecessor x (a1:a2:as) = if x == a2 then Just a1 else predecessor x (a2:as)
+        predecessor _ _ = Nothing
+
+    {-| Infix equivalent to 'shiftLeft' -}
+    {-| @t <<| "i"@ moves index @i@ of tensor @t@ one level up in recursion -}
+    infixl 6 <<|
+    (<<|) :: t a -> String -> t a
+    t <<| n = shiftLeft t n
+
+    {-| Shift tensor index leftmost. Elements of tensor as indexed with indices names becomes unchanged. -}
+    {-| @shiftLeftmost t "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
+    shiftLeftmost :: t a -> String -> t a
+    shiftLeftmost t n = until (\x -> n == head (indicesNames x)) (<<| n) t
+
+    {-| Infix equivalent of 'shiftLeftmost' -}
+    {-| @t <<<| "i"@ moves index @i@ of tensor @t@ to the first level in recursion -}
+    infixl 6 <<<|
+    (<<<|) :: t a -> String -> t a
+    t <<<| n = shiftLeftmost t n
+
+    {-| Simple mapping -}
+    {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
+    map :: Unboxed.Unbox b => (a -> b) -> t a -> t b
+
+
+{-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
+class Multilinear t a => Accessible t a where
+
+    {-| Accessing tensor elements -}
+    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5.
+        Values of other indices are insignificant -}
+    {-| If given index value is out of range, then modulo operation is performed:
+        el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
+    el :: t a -> (String,[Int]) -> t a
+
+    {-| Infix equivalent for el -}
+    infixl 7 $$|
+    ($$|) :: t a -> (String,[Int]) -> t a
+    t $$| is = el t is

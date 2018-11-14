@@ -1,9 +1,9 @@
 {-|
 Module      : Index
 Description : Implements tensor index.
-Copyright   : (c) Artur M. Brodzki, 2017
-License     : GPL-3
-Maintainer  : artur.brodzki@gmail.com
+Copyright   : (c) Artur M. Brodzki, 2018
+License     : BSD3
+Maintainer  : artur@brodzki.org
 Stability   : experimental
 Portability : Windows/POSIX
 
@@ -11,19 +11,10 @@ Generic tensor index which may be finitely- or infinitely-dimensional.
 
 -}
 
-{-# LANGUAGE DeriveGeneric #-}
-
 module Multilinear.Index (
     Index(..),
     TIndex(..)
 ) where
-
---import           Control.Lens
-import           Control.DeepSeq
-import           Data.Aeson
-import           Data.Hashable
-import           Data.Serialize
-import           GHC.Generics
 
 {-| Tensor index class which may be lower (covariant), upper (contravariant) or indifferent. -}
 class Index i where
@@ -65,7 +56,7 @@ data TIndex =
         indexSize  :: Maybe Int,
         tIndexName :: String
     }
-    deriving (Eq, Generic)
+    deriving Eq
 
 {-| Show tensor index -}
 instance Show TIndex where
@@ -106,22 +97,9 @@ instance Index TIndex where
     {-| TIndex must not be converted to TIndex -}
     toTIndex = id
 
-{-| Binary serialization and deserialization |-}
-instance Serialize TIndex
-
-{-| Serialization to and from JSON |-}
-instance FromJSON TIndex
-instance   ToJSON TIndex
-
-{-| NFData instance -}
-instance NFData TIndex
-
 {-| Indices can be compared by its size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
 instance Ord TIndex where
     ind1 <= ind2 = indexSize ind1 <= indexSize ind2
 
-{-| Indices can be hashed by hash functions |-}
-{-| Used to allow to put tensors to typical unordered containers |-}
-instance Hashable TIndex
 

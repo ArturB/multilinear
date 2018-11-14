@@ -1,4 +1,7 @@
-# Add any directories, files, or patterns you don't want to be tracked by version control
-.stack-work/
-.vscode/
-LoC/
+# Untracked directories
+*.stack-work*
+*.vscode*
+
+# Untracked files extensions
+*.cabal
+*.html*
