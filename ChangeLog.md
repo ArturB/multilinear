@@ -1,3 +1,10 @@
+# 0.3.0.0, 2018-11-14
+- moved to Vector.Unboxed, to improve performance
+- simplified error handling - removed separate Err Tensor value
+- temporarily removed Infinite tensors constructors and Generic
+- added memory benchmark
+- added simple unit tests
+
 # 0.2.3, 2018-11-02
 - fixed conflicting dependencies
 - added criterion benchmarks
