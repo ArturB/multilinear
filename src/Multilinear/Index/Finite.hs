@@ -76,10 +76,12 @@ instance TIndex.Index Index where
     toTIndex (Contravariant size name) = TIndex.Contravariant (Just size) name
     toTIndex (Indifferent size name)   = TIndex.Indifferent (Just size) name
 
-{-| Indices can be compared by its size |-}
+{-| Indices can be compared by its name and size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
 instance Ord Index where
-    ind1 <= ind2 = indexSize ind1 <= indexSize ind2
+    ind1 <= ind2 = 
+        indexName' ind1 <= indexName' ind2 || 
+        (indexName' ind1 == indexName' ind2 && indexSize ind1 <= indexSize ind2)
 
 -- NFData instance
 instance NFData Index

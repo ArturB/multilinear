@@ -148,24 +148,6 @@ instance (
                 -- If index is covariant or indifferent, show tensor compoments horizontally
                 _                        -> "["  ++ tail (Boxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
 
--- Tensors can be compared lexigographically
--- Allowes to put tensors in typical ordered containers
-instance (
-    Ord a, Unboxed.Unbox a
-    ) => Ord (Tensor a) where
-
-    {-# INLINE (<=) #-}
-    -- Scalar is smaller than any complex tensor
-    -- Two scalars are compared by they values
-    Scalar x1 <= Scalar x2 = x1 <= x2
-    Scalar _ <= _ = True
-    _ <= Scalar _ = False
-    -- Complex tensors are compared lexigographically
-    SimpleFinite _ ts1 <= SimpleFinite _ ts2     = ts1 <= ts2
-    FiniteTensor _ ts1 <= FiniteTensor _ ts2     = ts1 <= ts2
-    FiniteTensor _ _ <= SimpleFinite _ _         = False
-    SimpleFinite _ _ <= FiniteTensor _ _         = True
-
 {-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
 {-# INLINE _mergeScalars #-}
 _mergeScalars :: Unboxed.Unbox a => Tensor a -> Tensor a
@@ -293,7 +275,7 @@ dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Fin
     | count1 == count2 = 
         Scalar $ Unboxed.sum $ Unboxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
---dot t1@(SimpleFinite _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
+dot t1@(SimpleFinite _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
 
 -- Two finite tensors product
 dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
@@ -302,7 +284,7 @@ dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.
 dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
---dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) (.*) (*.) (*) t1 t2
+dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) (.*) (*.) (*) t1 t2
 
 -- Simple tensor and finite tensor product
 dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
@@ -311,7 +293,7 @@ dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.
 dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Unboxed.! i) *. (ts2' Boxed.! i))
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
---dot t1@(SimpleFinite _ _) t2@(FiniteTensor _ _) = zipT (*) (.*) (*.) (*) t1 t2
+dot t1@(SimpleFinite _ _) t2@(FiniteTensor _ _) = zipT (*) (.*) (*.) (*) t1 t2
 
 -- Finite tensor and simple tensor product
 dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
@@ -320,7 +302,7 @@ dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.
 dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Boxed.! i) .* (ts2' Unboxed.! i))
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
---dot t1@(FiniteTensor _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
+dot t1@(FiniteTensor _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
 
 -- Other cases cannot happen!
 dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')

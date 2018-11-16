@@ -99,9 +99,11 @@ instance Index TIndex where
     {-| TIndex must not be converted to TIndex -}
     toTIndex = id
 
-{-| Indices can be compared by its size |-}
+{-| Indices can be compared by its name and size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
 instance Ord TIndex where
-    ind1 <= ind2 = indexSize ind1 <= indexSize ind2
+    ind1 <= ind2 = 
+        tIndexName ind1 <= tIndexName ind2 || 
+        (tIndexName ind1 == tIndexName ind2 && indexSize ind1 <= indexSize ind2)
 
 
