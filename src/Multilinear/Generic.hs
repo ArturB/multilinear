@@ -180,7 +180,7 @@ _mergeScalars x = case x of
 _elemByElem' :: (Num a, Unboxed.Unbox a, NFData a)
              => Tensor a                            -- ^ First argument of operator
              -> Tensor a                            -- ^ Second argument of operator
-             -> (a -> a -> a)                       -- ^ Function on tensor elements if indices are different
+             -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
              -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
              -> Tensor a                            -- ^ Result tensor
 
@@ -194,9 +194,8 @@ _elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.map` t
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index1 $ 
-        Boxed.generate (Unboxed.length v1) 
-            (\i -> (\x -> f x `Multilinear.map` t2) (v1 Unboxed.! i))
+    | otherwise = FiniteTensor index1 $ Boxed.generate (Unboxed.length v1) 
+        (\i -> (\x -> f x `Multilinear.map` t2) (v1 Unboxed.! i))
 
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
@@ -215,7 +214,7 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | otherwise = FiniteTensor index1 $ (\x -> _elemByElem' x t2 f op) <$> v1
 
-{-| Apply a tensor operator elem by elem -}
+{-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
 _elemByElem :: (Num a, Unboxed.Unbox a, NFData a)
             => Tensor a                             -- ^ First argument of operator
@@ -227,11 +226,11 @@ _elemByElem t1 t2 f op =
     let commonIndices = filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
-    in t1' `deepseq` t2' `deepseq` _mergeScalars $ _elemByElem' t1' t2' f op
+    in _mergeScalars $ _elemByElem' t1' t2' f op
 
--- Zipping two tensors with a combinator, assuming they have the same indices
+-- Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
-zipT :: (Num a, Unboxed.Unbox a, NFData a)
+zipT :: (Num a, Unboxed.Unbox a)
       => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
       -> (Tensor a -> a -> Tensor a)          -- ^ Tensor and scalar combinator
       -> (a -> Tensor a -> Tensor a)          -- ^ Scalar and tensor combinator
@@ -244,30 +243,39 @@ zipT :: (Num a, Unboxed.Unbox a, NFData a)
 zipT _ _ _ f (SimpleFinite index1 v1) (SimpleFinite index2 v2) = 
     if index1 == index2 then 
         SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
-    else error incompatibleTypes
+    else zipErr (Index.toTIndex index1) (Index.toTIndex index2)
 
 --Two finite tensors case
-zipT f _ _ _ (FiniteTensor index1 v1) (FiniteTensor index2 v2) = 
+zipT f _ _ _ (FiniteTensor index1 v1) (FiniteTensor index2 v2)     = 
     if index1 == index2 then 
         FiniteTensor index1 $ Boxed.zipWith f v1 v2 
-    else error incompatibleTypes
+    else zipErr (Index.toTIndex index1) (Index.toTIndex index2)
 
 -- Finite and simple tensor case
-zipT _ f _ _ (FiniteTensor index1 v1) (SimpleFinite index2 v2) = 
+zipT _ f _ _ (FiniteTensor index1 v1) (SimpleFinite index2 v2)     = 
     if index1 == index2 then 
-        FiniteTensor index1 $ 
-            Boxed.generate (Boxed.length v1) (\i -> f (v1 Boxed.! i) (v2 Unboxed.! i)) 
-    else error incompatibleTypes
+        FiniteTensor index1 $ Boxed.generate (Finite.indexSize index1) (\i -> f (v1 Boxed.! i) (v2 Unboxed.! i)) 
+    else zipErr (Index.toTIndex index1) (Index.toTIndex index2)
 
 -- Simple and finite tensor case
-zipT _ _ f _ (SimpleFinite index1 v1) (FiniteTensor index2 v2) = 
+zipT _ _ f _ (SimpleFinite index1 v1) (FiniteTensor index2 v2)     = 
     if index1 == index2 then 
-        FiniteTensor index1 $ 
-            Boxed.generate (Unboxed.length v1) (\i -> f (v1 Unboxed.! i) (v2 Boxed.! i)) 
-    else error incompatibleTypes
+        FiniteTensor index1 $ Boxed.generate (Finite.indexSize index1) (\i -> f (v1 Unboxed.! i) (v2 Boxed.! i))
+    else zipErr (Index.toTIndex index1) (Index.toTIndex index2)
 
 -- Zipping something with scalar is impossible
-zipT _ _ _ _ _ _ = error scalarIndices
+zipT _ _ _ _ _ _ = error $ "zipT: " ++ scalarIndices
+
+-- zipT error
+{-# INLINE zipErr #-}
+zipErr :: Index.TIndex   -- ^ Index of first dot product parameter
+       -> Index.TIndex   -- ^ Index of second dot product parameter
+       -> Tensor a       -- ^ Erorr message
+zipErr i1' i2' = error $
+    "zipT: " ++ incompatibleTypes ++
+    " - index1 is " ++ show i1' ++
+    " and index2 is " ++ show i2'
+
 
 -- dot product of two tensors
 {-# INLINE dot #-}
@@ -281,17 +289,44 @@ dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.
     | count1 == count2 = 
         Scalar $ Unboxed.sum $ Unboxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = 
+        Scalar $ Unboxed.sum $ Unboxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+--dot t1@(SimpleFinite _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
 
 -- Two finite tensors product
 dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+--dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) (.*) (*.) (*) t1 t2
 
---  Other cases cannot happen!
+-- Simple tensor and finite tensor product
+dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Unboxed.! i) *. (ts2' Boxed.! i))
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Unboxed.! i) *. (ts2' Boxed.! i))
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+--dot t1@(SimpleFinite _ _) t2@(FiniteTensor _ _) = zipT (*) (.*) (*.) (*) t1 t2
+
+-- Finite tensor and simple tensor product
+dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Boxed.! i) .* (ts2' Unboxed.! i))
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
+    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Boxed.! i) .* (ts2' Unboxed.! i))
+    | otherwise = contractionErr (Index.toTIndex i1) (Index.toTIndex i2)
+--dot t1@(FiniteTensor _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
+
+-- Other cases cannot happen!
 dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
 
 -- contraction error
---{-# INLINE contractionErr #-}
+{-# INLINE contractionErr #-}
 contractionErr :: Index.TIndex   -- ^ Index of first dot product parameter
                -> Index.TIndex   -- ^ Index of second dot product parameter
                -> Tensor a       -- ^ Erorr message
@@ -300,6 +335,14 @@ contractionErr i1' i2' = error $
     "Tensor product: " ++ incompatibleTypes ++
     " - index1 is " ++ show i1' ++
     " and index2 is " ++ show i2'
+
+{-| Transpose Vector of Vectors, analogous to Data.List.transpose function. It is assumed, that all vectors on deeper recursion level have the same length.  -}
+_transpose :: Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
+           -> Boxed.Vector (Boxed.Vector a)
+_transpose v = 
+    let outerS = Boxed.length v
+        innerS = Boxed.length $ v Boxed.! 0
+    in  Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
 
 -- Tensors can be added, subtracted and multiplicated
 instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
@@ -430,18 +473,6 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
     {-# INLINE (*.) #-}
     x *. t = (x*) `Multilinear.map` t
 
-    -- Two tensors sum
-    {-# INLINE (.+.) #-}
-    t1 .+. t2 = _elemByElem t1 t2 (+) $ zipT (+) (.+) (+.) (+)
-
-    -- Two tensors difference
-    {-# INLINE (.-.) #-}
-    t1 .-. t2 = _elemByElem t1 t2 (-) $ zipT (+) (.+) (+.) (+)
-
-    -- Tensor product
-    {-# INLINE (.*.) #-}
-    t1 .*. t2 = _elemByElem t1 t2 (+) dot
-
     -- List of all tensor indices
     {-# INLINE indices #-}
     indices x = case x of
@@ -533,7 +564,6 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
 
     {-| Shift tensor index right -}
     {-| Moves given index one level deeper in recursion -}
-    --{-# INLINE shiftRight #-}
     -- Scalar has no indices to shift
     Scalar x `shiftRight` _ = Scalar x
     -- Simple tensor has only one index which cannot be shifted
@@ -549,16 +579,11 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
             let index2 = tensorFiniteIndex (ts1 Boxed.! 0)
                 -- Elements to transpose
                 dane = if isSimple (ts1 Boxed.! 0)
-                       then (\un -> Boxed.generate (Unboxed.length un) (\i -> Scalar $ un Unboxed.! i)) <$> (tensorScalars <$> ts1)
+                       then (\un -> Boxed.generate (Unboxed.length un) (\i -> Scalar $ un Unboxed.! i)) <$> 
+                            (tensorScalars <$> ts1)
                        else tensorsFinite <$> ts1
-                -- Convert to list
-                daneList = Boxed.toList <$> Boxed.toList dane
-                -- and transpose tensor data (standard function available only for list)
-                transposedList = Data.List.transpose daneList
-                -- then reconvert to vector again
-                transposed = Boxed.fromList <$> Boxed.fromList transposedList
-            -- and reconstruct tensor with transposed elements
-            in  _mergeScalars$ FiniteTensor index2 $ FiniteTensor index1 <$> transposed
+            -- reconstruct tensor with transposed elements
+            in  _mergeScalars $ FiniteTensor index2 $ FiniteTensor index1 <$> (_transpose dane)
         -- there is only one index and therefore it cannot be shifted
         | otherwise = t1
     

@@ -182,18 +182,6 @@ class (
     infixl 5 .*
     (.*) :: t a -> a -> t a
 
-    {-| Tensor adding - functionally equal to Num (+) but more efficient -}
-    infixl 4 .+.
-    (.+.) :: t a -> t a -> t a
-
-    {-| Tensor subtracting - functionally equal to Num (-) but more efficient -}
-    infixl 4 .-.
-    (.-.) :: t a -> t a -> t a
-
-    {-| Tensor multiplication - functionally equal to Num (*) but more efficient -}
-    infixl 5 .*.
-    (.*.) :: t a -> t a -> t a
-
     {-| List of all tensor indices -}
     indices :: t a -> [TIndex]
 

@@ -16,6 +16,8 @@ module Multilinear.Index (
     TIndex(..)
 ) where
 
+import GHC.Generics
+
 {-| Tensor index class which may be lower (covariant), upper (contravariant) or indifferent. -}
 class Index i where
 
@@ -56,7 +58,7 @@ data TIndex =
         indexSize  :: Maybe Int,
         tIndexName :: String
     }
-    deriving Eq
+    deriving (Eq, Generic)
 
 {-| Show tensor index -}
 instance Show TIndex where
