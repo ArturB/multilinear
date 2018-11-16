@@ -28,13 +28,15 @@ import           Multilinear.Class          as Multilinear
 import qualified Multilinear.Index          as Index
 import qualified Multilinear.Index.Finite   as Finite
 
-{-| ERROR MESSAGES -}
+{-| ERROR MESSAGE -}
 incompatibleTypes :: String
 incompatibleTypes = "Incompatible tensor types!"
 
+{-| ERROR MESSAGE -}
 scalarIndices :: String
 scalarIndices = "Scalar has no indices!"
 
+{-| ERROR MESSAGE -}
 indexNotFound :: String
 indexNotFound = "This tensor has not such index!"
 
@@ -113,10 +115,10 @@ t ! i = case t of
             error ("Index + " ++ show ind ++ " out of bonds!") 
         else ts Boxed.! i
 
--- NFData instance
+-- | NFData instance
 instance NFData a => NFData (Tensor a)
 
--- move contravariant indices to lower recursion level
+-- | move contravariant indices to lower recursion level
 _standardize :: (Num a, Unboxed.Unbox a, NFData a) => Tensor a -> Tensor a
 _standardize tens = foldr' f tens $ indices tens
     where 
@@ -124,7 +126,7 @@ _standardize tens = foldr' f tens $ indices tens
             t <<<| Index.indexName i 
         else t
 
--- Print tensor
+-- | Print tensor
 instance (
     Unboxed.Unbox a, Show a, Num a, NFData a
     ) => Show (Tensor a) where
@@ -210,7 +212,7 @@ _elemByElem t1 t2 f op =
         t2' = foldl' (|>>>) t2 commonIndices
     in _mergeScalars $ _elemByElem' t1' t2' f op
 
--- Zipping two tensors with a combinator, assuming they have the same indices. 
+-- | Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
 zipT :: (Num a, Unboxed.Unbox a)
       => (Tensor a -> Tensor a -> Tensor a)   -- ^ Two tensors combinator
@@ -248,7 +250,7 @@ zipT _ _ f _ (SimpleFinite index1 v1) (FiniteTensor index2 v2)     =
 -- Zipping something with scalar is impossible
 zipT _ _ _ _ _ _ = error $ "zipT: " ++ scalarIndices
 
--- zipT error
+-- | zipT error
 {-# INLINE zipErr #-}
 zipErr :: Index.TIndex   -- ^ Index of first dot product parameter
        -> Index.TIndex   -- ^ Index of second dot product parameter
@@ -259,7 +261,7 @@ zipErr i1' i2' = error $
     " and index2 is " ++ show i2'
 
 
--- dot product of two tensors
+-- | dot product of two tensors
 {-# INLINE dot #-}
 dot :: (Num a, Unboxed.Unbox a, NFData a)
       => Tensor a  -- ^ First dot product argument
@@ -307,7 +309,7 @@ dot t1@(FiniteTensor _ _) t2@(SimpleFinite _ _) = zipT (*) (.*) (*.) (*) t1 t2
 -- Other cases cannot happen!
 dot t1' t2' = contractionErr (tensorIndex t1') (tensorIndex t2')
 
--- contraction error
+-- | contraction error
 {-# INLINE contractionErr #-}
 contractionErr :: Index.TIndex   -- ^ Index of first dot product parameter
                -> Index.TIndex   -- ^ Index of second dot product parameter
@@ -326,7 +328,7 @@ _transpose v =
         innerS = Boxed.length $ v Boxed.! 0
     in  Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
 
--- Tensors can be added, subtracted and multiplicated
+-- | Tensors can be added, subtracted and multiplicated
 instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
 
     -- Adding - element by element
@@ -354,7 +356,7 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
     {-# INLINE fromInteger #-}
     fromInteger x = Scalar $ fromInteger x
 
--- Tensors can be divided by each other
+-- | Tensors can be divided by each other
 instance (Unboxed.Unbox a, Fractional a, NFData a) => Fractional (Tensor a) where
 
     {-# INLINE (/) #-}
