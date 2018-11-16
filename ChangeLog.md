@@ -1,3 +1,7 @@
+# 0.3.1.0, 2018-11-17
+- added more complex QuickCheck tests
+- and therefore, some error fixes
+
 # 0.3.0.0, 2018-11-14
 - moved to Vector.Unboxed, to improve performance
 - simplified error handling - removed separate Err Tensor value
