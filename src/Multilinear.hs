@@ -142,6 +142,7 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 -}
 
 module Multilinear (
+    module Multilinear.Class
     {-module Form,
     module Generic,
     module Index,
@@ -155,8 +156,8 @@ module Multilinear (
 ) where
 
 -- Re-export other library modules
-{-import           Multilinear.Class                       as Multilinear
-import qualified Multilinear.Form                        as Form
+import           Multilinear.Class
+{-import qualified Multilinear.Form                        as Form
 import           Multilinear.Generic                     as Generic
 import qualified Multilinear.Index                       as Index
 import qualified Multilinear.Index.Finite                as Index.Finite

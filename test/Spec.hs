@@ -14,7 +14,7 @@ module Main (
 ) where
 
 import qualified Data.Set                 as Set
-import           Multilinear.Class
+import           Multilinear
 import           Multilinear.Generic
 import qualified Multilinear.Index        as Index
 import           System.IO
@@ -35,7 +35,7 @@ quickCheckN n = quickCheckWith (Args
     True    -- ^ Whether to print anything? yes. 
     0)      -- ^ Maximum number of shrinks to before giving up. Turn shrinking off.
 
--- Print property test result
+-- | Print property test result
 printPropertyTest :: (
     Testable prop 
     ) => String -- ^ Tested property name
@@ -173,6 +173,17 @@ raiseLowerTest t =
         isLowered = (\(i,tl) -> i `elem` (Index.indexName <$> (Index.isCovariant     `filter` indices tl))) <$> lowered
         isRaised  = (\(i,tr) -> i `elem` (Index.indexName <$> (Index.isContravariant `filter` indices tr))) <$> raised
     in  False `notElem` isLowered ++ isRaised
+
+filterLGTest :: 
+    Int
+ -> Tensor Double
+ -> Bool
+filterLGTest n t = 
+    let tLess = (< n) `Multilinear.filter` t
+        tGreat = (> n) `Multilinear.filter` t
+    in  
+
+
 
 -- | ENTRY POINT
 main :: IO ()

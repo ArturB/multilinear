@@ -40,6 +40,10 @@ scalarIndices = "Scalar has no indices!"
 indexNotFound :: String
 indexNotFound = "This tensor has not such index!"
 
+{-| ERROR MESSAGE -}
+tensorOfScalars :: String
+tensorOfScalars = "Tensor construction error! Vector of scalars"
+
 {-| Tensor defined recursively as scalar or list of other tensors -}
 {-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
 data Tensor a where
@@ -207,7 +211,7 @@ _elemByElem :: (Num a, Unboxed.Unbox a, NFData a)
             -> (Tensor a -> Tensor a -> Tensor a)   -- ^ Tensor operator called if indices are the same
             -> Tensor a                             -- ^ Result tensor
 _elemByElem t1 t2 f op = 
-    let commonIndices = filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
+    let commonIndices = Data.List.filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
     in _mergeScalars $ _elemByElem' t1' t2' f op
@@ -579,6 +583,25 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
         -- Mapping complex tensor does mapping element by element
         SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
         FiniteTensor index ts   -> FiniteTensor index $ Multilinear.map f <$> ts
+
+    {-| Filter functions -}
+    filter _ (Scalar x) = Scalar x
+
+    filter f (SimpleFinite index ts) = 
+        let iname = Finite.indexName' index
+            ts' = (\i _ -> f iname i) `Unboxed.ifilter` ts
+        in  SimpleFinite index { Finite.indexSize = Unboxed.length ts' } ts'
+
+    filter f (FiniteTensor index ts) = 
+        let iname = Finite.indexName' index
+            ts' = Multilinear.filter f <$> ts
+            ts'' = 
+                (\t -> case t of 
+                    (SimpleFinite _ ts) -> not $ Unboxed.null ts
+                    (FiniteTensor _ ts) -> not $ Boxed.null ts
+                    _ -> error $ "Filter: " ++ tensorOfScalars
+                ) `Boxed.filter` ts'
+        in  FiniteTensor index { Finite.indexSize = Boxed.length ts'' } ts''
 
 {-| List allows for random access to tensor elements -}
 instance (Unboxed.Unbox a, Num a, NFData a) => Accessible Tensor a where
