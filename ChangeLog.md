@@ -1,3 +1,6 @@
+# 0.3.2.0, 2018-11-18
+- added filter and zipWith functions
+
 # 0.3.1.0, 2018-11-17
 - added more complex QuickCheck tests
 - and therefore, some error fixes
