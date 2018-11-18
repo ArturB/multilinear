@@ -594,7 +594,7 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
 
     filter f (FiniteTensor index ts) = 
         let iname = Finite.indexName' index
-            ts' = Multilinear.filter f <$> ts
+            ts' = Multilinear.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
             ts'' = 
                 (\t -> case t of 
                     (SimpleFinite _ ts) -> not $ Unboxed.null ts

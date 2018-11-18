@@ -13,10 +13,12 @@ module Main (
     main
 ) where
 
+import           Data.Maybe
 import qualified Data.Set                 as Set
 import           Multilinear
 import           Multilinear.Generic
 import qualified Multilinear.Index        as Index
+import           System.Exit
 import           System.IO
 import           Test.QuickCheck
 import           Test.QuickCheck.Multilinear()
@@ -25,9 +27,15 @@ import           Test.QuickCheck.Multilinear()
 defTestN :: Int
 defTestN = 1000
 
+
+------------------------------
+-- AUXILIARY TEST FUNCTIONS --
+------------------------------
+
+
 -- quickCheck with parametrizable tests number
-quickCheckN :: Testable prop => Int -> prop -> IO ()
-quickCheckN n = quickCheckWith (Args 
+quickCheckN :: Testable prop => Int -> prop -> IO Result
+quickCheckN n = quickCheckWithResult (Args 
     Nothing -- ^ Should we replay a previous test? No. 
     n       -- ^ Maximum number of successful tests before succeeding set to N. 
     1       -- ^ Maximum number of discarded tests per successful test before giving up - gave up after first failure. 
@@ -35,17 +43,27 @@ quickCheckN n = quickCheckWith (Args
     True    -- ^ Whether to print anything? yes. 
     0)      -- ^ Maximum number of shrinks to before giving up. Turn shrinking off.
 
--- | Print property test result
-printPropertyTest :: (
+-- | Execute property test and check result:
+-- | exit test suite with successs code if no errors occured
+-- | exit test suite with failure code if any error occured
+executePropertyTest :: (
     Testable prop 
     ) => String -- ^ Tested property name
       -> Int    -- ^ Number of tests to do
       -> prop   -- ^ Property to test
       -> IO ()
-printPropertyTest propName n f = do
+executePropertyTest propName n f = do
     putStr $ "  Checking " ++ propName ++ " "
-    quickCheckN n f
-    hFlush stdout
+    r <- quickCheckN n f
+    case r of
+        Success _ _ _  -> hFlush stdout
+        _ -> exitFailure
+
+
+------------------------------
+-- TESTED TENSOR PROPERTIES --
+------------------------------
+
 
 -- | Unary operator applied on any tensor,
 -- | must preserve tensor indices in the result. 
@@ -70,8 +88,8 @@ preserveIndicesBinary f t1 t2 =
         i2 = Set.fromList $ indices t2
     in  i1 /= i2 || i1 == Set.fromList (indices $ f t1 t2)
 
--- | Binary operator other than tensor product must merge common indices in result tensor
--- | it means, that in operators other than (*), the result tensor indices are set union of arguments indices
+-- | Binary operator other than tensor product cannot contract (or consume) any index
+-- | it means, that in operators other than (*), the indices of result tensor are set union of arguments indices
 mergeCommonIndices :: 
    (Tensor Double -> 
     Tensor Double -> 
@@ -106,11 +124,11 @@ consumeContractedIndices t1 t2 =
     let inames1 = Set.fromList $ Index.indexName <$> indices t1
         inames2 = Set.fromList $ Index.indexName <$> indices t2
 
-        iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `filter` indices t1)
-        iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `filter` indices t1)
+        iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
+        iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
 
-        iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `filter` indices t2)
-        iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `filter` indices t2)
+        iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
+        iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
 
         contractedIndices = 
             -- contracted are indices covariant in the first tensor and contravariant in the second
@@ -124,19 +142,15 @@ consumeContractedIndices t1 t2 =
     in  expectedIndices == resultIndices
 
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
-orderIndices :: 
-    Tensor Double
- -> Bool
+orderIndices :: Tensor Double -> Bool
 orderIndices t = 
     let (conv, cov) = order t 
-        iConv = Set.fromList $ Index.isContravariant `filter` indices t
-        iCov  = Set.fromList $ Index.isCovariant `filter` indices t
+        iConv = Set.fromList $ Index.isContravariant `Prelude.filter` indices t
+        iCov  = Set.fromList $ Index.isCovariant `Prelude.filter` indices t
     in  conv == Set.size iConv && cov == Set.size iCov
 
 -- | Tensor must be equivalent in terms of its indices after any index shift
-shiftEquiv :: 
-    Tensor Double
- -> Bool
+shiftEquiv :: Tensor Double -> Bool
 shiftEquiv t = 
     let inames = indicesNames t
         rShiftedTs = (\i -> t |>> i) <$> inames
@@ -145,93 +159,98 @@ shiftEquiv t =
         ltShiftedTs = (\i -> t <<<| i) <$> inames
         allShiftedTs = rShiftedTs ++ lShiftedTs ++ rtShiftedTs ++ ltShiftedTs ++ [t]
         allPairs = pure (,) <*> allShiftedTs <*> allShiftedTs
-        allEquivs = uncurry (|==|) <$> allPairs
-    in False `notElem` allEquivs
+    in all (uncurry (|==|)) allPairs
 
--- | After rename, index must hold a new name
--- | This property assumes, tensor have max 5 indices of each type
-renameTest ::
-    Tensor Double
- -> Bool
+{-| After rename, index must hold a new name
+   This property assumes, tensor have max 5 indices of each type -}
+renameTest :: Tensor Double -> Bool
 renameTest t = 
     let (conv, cov) = order t
         convNs = take conv ['m' .. ]
         covNs  = take cov  ['s' .. ]
         renamedT = t $| (convNs, covNs)
         inamesAfter = concat $ indicesNames renamedT
-        inamesValid = (\i -> elem i convNs || elem i covNs) <$> inamesAfter
-    in  False `notElem` inamesValid
+    in  all (\i -> elem i convNs || elem i covNs) inamesAfter
 
--- | After any raising or lowering index, it must be a valid type
-raiseLowerTest ::
-    Tensor Double
- -> Bool
+-- | After any raising or lowering index, it must be a valid type. 
+raiseLowerTest :: Tensor Double -> Bool
 raiseLowerTest t = 
     let inames = indicesNames t
         lowered = inames `zip` ((t \/) <$> inames)
         raised = inames `zip` ((t /\) <$> inames)
-        isLowered = (\(i,tl) -> i `elem` (Index.indexName <$> (Index.isCovariant     `filter` indices tl))) <$> lowered
-        isRaised  = (\(i,tr) -> i `elem` (Index.indexName <$> (Index.isContravariant `filter` indices tr))) <$> raised
-    in  False `notElem` isLowered ++ isRaised
+        isLowered (i,tl) = i `elem` (Index.indexName <$> (Index.isCovariant     `Prelude.filter` indices tl))
+        isRaised  (i,tr) = i `elem` (Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tr))
+    in  all isLowered lowered && all isRaised raised
 
-filterLGTest :: 
-    Int
- -> Tensor Double
- -> Bool
-filterLGTest n t = 
-    let tLess = (< n) `Multilinear.filter` t
-        tGreat = (> n) `Multilinear.filter` t
-    in  
-
+-- | Filter second half of elements for each tensor index and check if they disappeared
+filterIndexTest :: 
+    Tensor Double -> Bool
+filterIndexTest s@(Scalar _) = s == filterIndex "c" (const True) s
+filterIndexTest t = 
+    let indsT = indices t
+        -- filter second half of an index
+        filteredHalf i = filterIndex (Index.indexName i) (< (fromJust (Index.indexSize i) `div` 2)) t
+        fts = indsT `zip` (filteredHalf <$> indsT) -- tensors with filtered indices, paired with respective transformed indices
+    in  all (\(i,ft) -> 
+                size ft (Index.indexName i) == (fromJust (Index.indexSize i) `div` 2)
+            ) fts
 
 
 -- | ENTRY POINT
 main :: IO ()
 main = do
+
+    -- PRINT PROBABILITY DISTRIBUTION OF TESTED TENSORS ORDER
+    executePropertyTest "probability distribution of order of tested tensors" 5000 $ 
+        \(t :: Tensor Double) -> collect (order t) $ preserveIndicesUnary abs
+
+    putStrLn "\nTesting multilinear library...\n"
+
     ---------------------------
     -- CHECKING NUM INSTANCE --
     ---------------------------
 
-    printPropertyTest "preserveIndicesBinary for (+)"   defTestN $ preserveIndicesBinary (+)
-    printPropertyTest "preserveIndicesBinary for (-)"   defTestN $ preserveIndicesBinary (-)
-    printPropertyTest "preserveIndicesBinary for (*)"   defTestN $ preserveIndicesBinary (*)
-    printPropertyTest "preserveIndicesUnary for abs"    defTestN $ preserveIndicesUnary abs
-    printPropertyTest "preserveIndicesUnary for signum" defTestN $ preserveIndicesUnary signum
+    executePropertyTest "preserveIndicesBinary for (+)"   defTestN $ preserveIndicesBinary (+)
+    executePropertyTest "preserveIndicesBinary for (-)"   defTestN $ preserveIndicesBinary (-)
+    executePropertyTest "preserveIndicesBinary for (*)"   defTestN $ preserveIndicesBinary (*)
+    executePropertyTest "preserveIndicesUnary for abs"    defTestN $ preserveIndicesUnary abs
+    executePropertyTest "preserveIndicesUnary for signum" defTestN $ preserveIndicesUnary signum
 
-    printPropertyTest "mergeCommonIndices for (+)"      defTestN $ mergeCommonIndices (+)
-    printPropertyTest "mergeCommonIndices for (-)"      defTestN $ mergeCommonIndices (-)
-    printPropertyTest "consumeContractedIndices"        defTestN consumeContractedIndices
+    executePropertyTest "mergeCommonIndices for (+)"      defTestN $ mergeCommonIndices (+)
+    executePropertyTest "mergeCommonIndices for (-)"      defTestN $ mergeCommonIndices (-)
+    executePropertyTest "consumeContractedIndices"        defTestN consumeContractedIndices
     
     --------------------------------
     -- CHECKING FLOATING INSTANCE --
     --------------------------------
 
-    printPropertyTest "preserveIndicesUnary for exp"   defTestN $ preserveIndicesUnary exp
-    printPropertyTest "preserveIndicesUnary for log"   defTestN $ preserveIndicesUnary log
-    printPropertyTest "preserveIndicesUnary for sin"   defTestN $ preserveIndicesUnary sin
-    printPropertyTest "preserveIndicesUnary for cos"   defTestN $ preserveIndicesUnary cos
-    printPropertyTest "preserveIndicesUnary for asin"  defTestN $ preserveIndicesUnary asin
-    printPropertyTest "preserveIndicesUnary for acos"  defTestN $ preserveIndicesUnary acos
-    printPropertyTest "preserveIndicesUnary for atan"  defTestN $ preserveIndicesUnary atan
-    printPropertyTest "preserveIndicesUnary for sinh"  defTestN $ preserveIndicesUnary sinh
-    printPropertyTest "preserveIndicesUnary for cosh"  defTestN $ preserveIndicesUnary cosh
-    printPropertyTest "preserveIndicesUnary for asinh" defTestN $ preserveIndicesUnary asinh
-    printPropertyTest "preserveIndicesUnary for acosh" defTestN $ preserveIndicesUnary acosh
-    printPropertyTest "preserveIndicesUnary for atanh" defTestN $ preserveIndicesUnary atanh
+    executePropertyTest "preserveIndicesUnary for exp"   defTestN $ preserveIndicesUnary exp
+    executePropertyTest "preserveIndicesUnary for log"   defTestN $ preserveIndicesUnary log
+    executePropertyTest "preserveIndicesUnary for sin"   defTestN $ preserveIndicesUnary sin
+    executePropertyTest "preserveIndicesUnary for cos"   defTestN $ preserveIndicesUnary cos
+    executePropertyTest "preserveIndicesUnary for asin"  defTestN $ preserveIndicesUnary asin
+    executePropertyTest "preserveIndicesUnary for acos"  defTestN $ preserveIndicesUnary acos
+    executePropertyTest "preserveIndicesUnary for atan"  defTestN $ preserveIndicesUnary atan
+    executePropertyTest "preserveIndicesUnary for sinh"  defTestN $ preserveIndicesUnary sinh
+    executePropertyTest "preserveIndicesUnary for cosh"  defTestN $ preserveIndicesUnary cosh
+    executePropertyTest "preserveIndicesUnary for asinh" defTestN $ preserveIndicesUnary asinh
+    executePropertyTest "preserveIndicesUnary for acosh" defTestN $ preserveIndicesUnary acosh
+    executePropertyTest "preserveIndicesUnary for atanh" defTestN $ preserveIndicesUnary atanh
 
     -----------------------------------
     -- CHECKING MULTILINEAR INSTANCE --
     -----------------------------------
 
-    printPropertyTest "preserveIndicesUnary for (+.)"   defTestN $ preserveIndicesUnary (5 +.)
-    printPropertyTest "preserveIndicesUnary for (.+)"   defTestN $ preserveIndicesUnary (.+ 5)
-    printPropertyTest "preserveIndicesUnary for (-.)"   defTestN $ preserveIndicesUnary (5 -.)
-    printPropertyTest "preserveIndicesUnary for (.-)"   defTestN $ preserveIndicesUnary (.- 5)
-    printPropertyTest "preserveIndicesUnary for (*.)"   defTestN $ preserveIndicesUnary (5 *.)
-    printPropertyTest "preserveIndicesUnary for (.*)"   defTestN $ preserveIndicesUnary (.* 5)
+    executePropertyTest "preserveIndicesUnary for (+.)"   defTestN $ preserveIndicesUnary (5 +.)
+    executePropertyTest "preserveIndicesUnary for (.+)"   defTestN $ preserveIndicesUnary (.+ 5)
+    executePropertyTest "preserveIndicesUnary for (-.)"   defTestN $ preserveIndicesUnary (5 -.)
+    executePropertyTest "preserveIndicesUnary for (.-)"   defTestN $ preserveIndicesUnary (.- 5)
+    executePropertyTest "preserveIndicesUnary for (*.)"   defTestN $ preserveIndicesUnary (5 *.)
+    executePropertyTest "preserveIndicesUnary for (.*)"   defTestN $ preserveIndicesUnary (.* 5)
 
-    printPropertyTest "orderIndices" defTestN orderIndices
-    printPropertyTest "shiftEquiv" defTestN shiftEquiv
-    printPropertyTest "renamedTest" defTestN renameTest
-    printPropertyTest "raiseLowerTest" defTestN raiseLowerTest
+    executePropertyTest "orderIndices" defTestN orderIndices
+    executePropertyTest "shiftEquiv" defTestN shiftEquiv
+    executePropertyTest "renamedTest" defTestN renameTest
+    executePropertyTest "raiseLowerTest" defTestN raiseLowerTest
+    executePropertyTest "filterIndexTest" defTestN filterIndexTest
 
