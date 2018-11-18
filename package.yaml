@@ -1,5 +1,5 @@
 name:                multilinear
-version:             0.3.1.0
+version:             0.3.2.0
 github:              "ArturB/multilinear"
 license:             BSD3
 author:              "Artur M. Brodzki"
@@ -30,6 +30,7 @@ default-extensions:
 - FlexibleContexts
 - FlexibleInstances
 - GADTs
+- LambdaCase
 - MultiParamTypeClasses
 - ScopedTypeVariables
 - StandaloneDeriving

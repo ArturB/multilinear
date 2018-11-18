@@ -332,6 +332,13 @@ class (
      -> t a
     filterIndex iname f = Multilinear.Class.filter (\i n -> i /= iname || f n)
 
+    {-| Zip tensors with binary combinator -}
+    zipWith :: (
+        Unboxed.Unbox b, Unboxed.Unbox c
+        ) => (a -> b -> c)
+          -> t a
+          -> t b
+          -> t c
 
 {-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
 class Multilinear t a => Accessible t a where

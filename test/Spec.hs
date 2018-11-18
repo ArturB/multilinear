@@ -182,6 +182,7 @@ raiseLowerTest t =
         isRaised  (i,tr) = i `elem` (Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tr))
     in  all isLowered lowered && all isRaised raised
 
+
 -- | Filter second half of elements for each tensor index and check if they disappeared
 filterIndexTest :: 
     Tensor Double -> Bool
@@ -194,7 +195,6 @@ filterIndexTest t =
     in  all (\(i,ft) -> 
                 size ft (Index.indexName i) == (fromJust (Index.indexSize i) `div` 2)
             ) fts
-
 
 -- | ENTRY POINT
 main :: IO ()
@@ -253,4 +253,5 @@ main = do
     executePropertyTest "renamedTest" defTestN renameTest
     executePropertyTest "raiseLowerTest" defTestN raiseLowerTest
     executePropertyTest "filterIndexTest" defTestN filterIndexTest
+    executePropertyTest "zipWithIndicesTest" defTestN $ preserveIndicesUnary (\t -> Multilinear.zipWith (+) t t)
 
