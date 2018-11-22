@@ -1,5 +1,5 @@
 {-|
-Module      : Multilinear.Generic.Parallel
+Module      : Multilinear.Generic.MultiCore
 Description : Generic array tensor, evaluated using cores/threads parallelism
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
@@ -9,7 +9,7 @@ Portability : Windows/POSIX
 
 -}
 
-module Multilinear.Generic.Parallel (
+module Multilinear.Generic.MultiCore (
     Tensor(..), (!),
     isScalar, isSimple, isFiniteTensor,
     dot, _elemByElem, contractionErr, tensorIndex, _standardize

@@ -154,8 +154,7 @@ import           Multilinear.Index
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
-  Unboxed.Unbox a,
-  Num (t a)     -- Tensors may be added, subtracted and multiplicated
+  Unboxed.Unbox a
   ) => Multilinear t a where
 
     {-| Add scalar @a@ to each element of tensor @t@ -}
@@ -361,7 +360,7 @@ class (
           -> t c
 
 {-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
-class Multilinear t a => Accessible t a where
+class Accessible t a where
 
     {-| Accessing tensor elements -}
     {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5.
