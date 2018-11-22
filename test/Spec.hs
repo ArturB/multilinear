@@ -17,6 +17,11 @@ import           Data.Maybe
 import qualified Data.Set                 as Set
 import           Multilinear
 import qualified Multilinear.Index        as Index
+import qualified Multilinear.Form         as Form
+import qualified Multilinear.Matrix       as Matrix
+import qualified Multilinear.Vector       as Vector
+import qualified Multilinear.NForm        as NForm
+import qualified Multilinear.NVector      as NVector
 import           System.Exit
 import           System.IO
 import           Test.QuickCheck
@@ -140,7 +145,51 @@ consumeContractedIndices t1 t2 =
 
     in  expectedIndices == resultIndices
 
+-- | Test generic vector constructor
+vectorConstructor :: Char -> Positive (Small Int) -> Bool
+vectorConstructor c s = 
+    let size = getSmall $ getPositive s
+        v :: Tensor Double = Vector.fromIndices [c] size fromIntegral
+        vConst :: Tensor Double = Vector.const [c] size (fromIntegral size)
+    in  v `Multilinear.size` [c] == size && vConst `Multilinear.size` [c] == size
 
+-- | Test generic form constructor
+formConstructor :: Char -> Positive (Small Int) -> Bool
+formConstructor c s = 
+    let size = getSmall $ getPositive s
+        f :: Tensor Double = Form.fromIndices [c] size fromIntegral
+        fConst :: Tensor Double = Form.const [c] size (fromIntegral size)
+    in  f `Multilinear.size` [c] == size && fConst `Multilinear.size` [c] == size
+
+-- | Test generic matrix constructor
+matrixConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
+matrixConstructor c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = Matrix.fromIndices [c1,c2] size1 size2 (\x y -> fromIntegral x + fromIntegral y)
+        vConst :: Tensor Double = Matrix.const [c1,c2] size1 size2 (fromIntegral size1)
+    in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2 
+              && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
+
+-- | Test generic NVector constructor
+nVectorConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
+nVectorConstructor c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = NVector.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+        vConst :: Tensor Double = NVector.const [c1,c2] [size1,size2] (fromIntegral size1)
+    in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
+              && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
+
+-- | Test generic NForm constructor
+nFormConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
+nFormConstructor c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = NForm.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+        vConst :: Tensor Double = NForm.const [c1,c2] [size1,size2] (fromIntegral size1)
+    in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
+              && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
 
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
 orderIndices :: Tensor Double -> Bool
@@ -256,3 +305,12 @@ main = do
     executePropertyTest "filterIndexTest" defTestN filterIndexTest
     executePropertyTest "zipWithIndicesTest" defTestN $ preserveIndicesUnary (\t -> Multilinear.zipWith (+) t t)
 
+    -----------------------------------
+    -- CHECKING SPECIAL CONSTRUCTORS --
+    -----------------------------------
+
+    executePropertyTest "vectorConstructor"  defTestN vectorConstructor
+    executePropertyTest "formConstructor"    defTestN formConstructor
+    executePropertyTest "matrixConstructor"  defTestN matrixConstructor
+    executePropertyTest "nFormConstructor"   defTestN nFormConstructor
+    executePropertyTest "nVectorConstructor" defTestN nVectorConstructor
