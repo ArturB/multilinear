@@ -1,6 +1,6 @@
 {-|
 Module      : Multilinear.Generic
-Description : Generic array tensor
+Description : Re-exports default tensor implementation
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
