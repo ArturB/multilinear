@@ -14,6 +14,7 @@ module Main (
 ) where
 
 import           Criterion.Main
+import           Multilinear
 import qualified Multilinear.Matrix                  as Matrix
 
 -- | Simple generator function for bencharking matrices
@@ -25,16 +26,16 @@ sizedMatrixMultBench ::
     Int -- ^ size of square matrix to multiplicate
  -> Benchmark
 sizedMatrixMultBench s = 
-    bench ((show s) ++ "x" ++ (show s)) $ 
-        nf ((Matrix.fromIndices "ij" s s gen) *) (Matrix.fromIndices "jk" s s gen)
+    bench (show s ++ "x" ++ show s) $ 
+        nf ((Matrix.fromIndices "ij" s s gen :: Tensor Double) *) (Matrix.fromIndices "jk" s s gen :: Tensor Double)
 
 -- | Generate benchmark of matrix addition
 sizedMatrixAddBench :: 
     Int -- ^ size of square matrix to add
  -> Benchmark
 sizedMatrixAddBench s = 
-    bench ((show s) ++ "x" ++ (show s)) $ 
-        nf ((Matrix.fromIndices "ij" s s gen) +) (Matrix.fromIndices "ij" s s gen)
+    bench (show s ++ "x" ++ show s) $ 
+        nf ((Matrix.fromIndices "ij" s s gen :: Tensor Double) +) (Matrix.fromIndices "ij" s s gen :: Tensor Double)
 
 -- | ENTRY POINT
 main :: IO ()
