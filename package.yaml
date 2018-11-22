@@ -40,9 +40,6 @@ library:
   dependencies:
   - containers
   - deepseq
-  - mwc-random
-  - primitive
-  - statistics
   - vector
 
 tests:

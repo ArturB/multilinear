@@ -182,6 +182,26 @@ class (
     infixl 5 .*
     (.*) :: t a -> a -> t a
 
+    {-| Generic tensor constructor, using combinator function on its indices -}
+    fromIndices ::
+         String                  -- ^ Upper indices names (one character per index)
+      -> String                  -- ^ Lower indices names (one character per index)
+      -> [Int]                   -- ^ Upper indices sizes
+      -> [Int]                   -- ^ Lower indices sizes
+      -> ([Int] -> [Int] -> a)   -- ^ Combinator function (f [u1,u2,...] [d1,d2,...] returns a tensor element at t [u1,u2,...] [d1,d2,...])
+      -> t a                -- ^ Generated tensor
+
+    {-| Tensor constructor, that returns tensor with all elments equal to v. -}
+    {-# INLINE const #-}
+    const ::
+         String -- ^ Upper indices names (one character per index)
+      -> String -- ^ Lower indices names (one character per index)
+      -> [Int]  -- ^ Upper indices sizes
+      -> [Int]  -- ^ Lower indices sizes
+      -> a      -- Value of tensor elements
+      -> t a    -- ^ Generated tensor
+    const u d usize dsize v = fromIndices u d usize dsize (\_ _ -> v)
+
     {-| List of all tensor indices -}
     indices :: t a -> [TIndex]
 

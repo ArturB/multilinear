@@ -16,7 +16,6 @@ module Main (
 import           Data.Maybe
 import qualified Data.Set                 as Set
 import           Multilinear
-import           Multilinear.Generic
 import qualified Multilinear.Index        as Index
 import           System.Exit
 import           System.IO
@@ -141,6 +140,8 @@ consumeContractedIndices t1 t2 =
 
     in  expectedIndices == resultIndices
 
+
+
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
 orderIndices :: Tensor Double -> Bool
 orderIndices t = 
@@ -186,7 +187,7 @@ raiseLowerTest t =
 -- | Filter second half of elements for each tensor index and check if they disappeared
 filterIndexTest :: 
     Tensor Double -> Bool
-filterIndexTest s@(Scalar _) = s == filterIndex "c" (const True) s
+filterIndexTest s@(Scalar _) = s == filterIndex "c" (Prelude.const True) s
 filterIndexTest t = 
     let indsT = indices t
         -- filter second half of an index

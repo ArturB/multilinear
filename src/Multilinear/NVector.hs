@@ -15,121 +15,26 @@ Portability : Windows/POSIX
 module Multilinear.NVector (
   -- * Generators
   Multilinear.NVector.fromIndices, 
-  Multilinear.NVector.const,
-  Multilinear.NVector.randomDouble, 
-  Multilinear.NVector.randomDoubleSeed,
-  Multilinear.NVector.randomInt, 
-  Multilinear.NVector.randomIntSeed,
+  Multilinear.NVector.const
 ) where
 
-import           Control.Monad.Primitive
 import qualified Data.Vector.Unboxed         as Unboxed
-import           Multilinear.Generic
-import           Multilinear.Tensor          as Tensor
-import           Statistics.Distribution
+import           Multilinear
 
 {-| Generate n-vector as function of its indices -}
-
 fromIndices :: (
-    Num a, Unboxed.Unbox a
-  ) => String        -- ^ Indices names (one characted per index)
-    -> [Int]         -- ^ Indices sizes
-    -> ([Int] -> a)  -- ^ Generator function
-    -> Tensor a      -- ^ Generated n-vector
-
-fromIndices u us f = Tensor.fromIndices (u,us) ([],[]) $ \uis [] -> f uis
+    Num a, Unboxed.Unbox a, Multilinear t a
+  ) => String       -- ^ Indices names (one characted per index)
+    -> [Int]        -- ^ Indices sizes
+    -> ([Int] -> a) -- ^ Generator function
+    -> t a          -- ^ Generated n-vector
+fromIndices u usize f = Multilinear.fromIndices u [] usize [] $ \uis [] -> f uis
 
 {-| Generate n-vector with all components equal to @v@ -}
-
 const :: (
-    Num a, Unboxed.Unbox a
-  ) => String    -- ^ Indices names (one characted per index)
-    -> [Int]     -- ^ Indices sizes
-    -> a         -- ^ n-vector elements value
-    -> Tensor a  -- ^ Generated n-vector
-
-const u us = Tensor.const (u,us) ([],[])
-
-{-| Generate n-vector with random real components with given probability distribution.
-The n-vector is wrapped in the IO monad. -}
-{-| Available probability distributions: -}
-{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
-{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
-{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
-{-| - Exponential : "Statistics.Distribution.Exponential" -}
-{-| - Gamma : "Statistics.Distribution.Gamma" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Normal : "Statistics.Distribution.Normal" -}
-{-| - StudentT : "Statistics.Distribution.StudentT" -}
-{-| - Uniform : "Statistics.Distribution.Uniform" -}
-{-| - F : "Statistics.Distribution.FDistribution" -}
-{-| - Laplace : "Statistics.Distribution.Laplace" -}
-
-randomDouble :: (
-    ContGen d
-  ) => String              -- ^ Indices names (one character per index)
-    -> [Int]               -- ^ Indices sizes
-    -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor Double)  -- ^ Generated linear functional
-
-randomDouble u us = Tensor.randomDouble (u,us) ([],[])
-
-{-| Generate n-vector with random integer components with given probability distribution.
-The n-vector is wrapped in the IO monad. -}
-{-| Available probability distributions: -}
-{-| - Binomial : "Statistics.Distribution.Binomial" -}
-{-| - Poisson : "Statistics.Distribution.Poisson" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-
-randomInt :: (
-    DiscreteGen d
-  ) => String              -- ^ Indices names (one character per index)
-    -> [Int]               -- ^ Indices sizes
-    -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor Int)     -- ^ Generated n-vector
-
-randomInt u us = Tensor.randomInt (u,us) ([],[])
-
-{-| Generate n-vector with random real components with given probability distribution and given seed.
-The form is wrapped in a monad. -}
-{-| Available probability distributions: -}
-{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
-{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
-{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
-{-| - Exponential : "Statistics.Distribution.Exponential" -}
-{-| - Gamma : "Statistics.Distribution.Gamma" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Normal : "Statistics.Distribution.Normal" -}
-{-| - StudentT : "Statistics.Distribution.StudentT" -}
-{-| - Uniform : "Statistics.Distribution.Uniform" -}
-{-| - F : "Statistics.Distribution.FDistribution" -}
-{-| - Laplace : "Statistics.Distribution.Laplace" -}
-
-randomDoubleSeed :: (
-    ContGen d, PrimMonad m
-  ) => String            -- ^ Index name (one character)
-    -> [Int]             -- ^ Number of elements
-    -> d                 -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> Int               -- ^ Randomness seed
-    -> m (Tensor Double) -- ^ Generated n-vector
-
-randomDoubleSeed u us = Tensor.randomDoubleSeed (u,us) ([],[])
-
-{-| Generate n-vector with random integer components with given probability distribution and given seed.
-The form is wrapped in a monad. -}
-{-| Available probability distributions: -}
-{-| - Binomial : "Statistics.Distribution.Binomial" -}
-{-| - Poisson : "Statistics.Distribution.Poisson" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-
-randomIntSeed :: (
-    DiscreteGen d, PrimMonad m
-  ) => String            -- ^ Index name (one character)
-    -> [Int]             -- ^ Number of elements
-    -> d                 -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> Int               -- ^ Randomness seed
-    -> m (Tensor Int)    -- ^ Generated n-vector
-
-randomIntSeed u us = Tensor.randomIntSeed (u,us) ([],[])
+    Num a, Unboxed.Unbox a, Multilinear t a
+  ) => String -- ^ Indices names (one characted per index)
+    -> [Int]  -- ^ Indices sizes
+    -> a      -- ^ n-vector elements value
+    -> t a    -- ^ Generated n-vector
+const u usize = Multilinear.const u [] usize []

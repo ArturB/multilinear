@@ -15,155 +15,26 @@ Portability : Windows/POSIX
 module Multilinear.NForm (
     -- * Generators
   Multilinear.NForm.fromIndices, 
-  Multilinear.NForm.const,
-  Multilinear.NForm.randomDouble, 
-  Multilinear.NForm.randomDoubleSeed,
-  Multilinear.NForm.randomInt, 
-  Multilinear.NForm.randomIntSeed,
-  -- * Common cases
-  Multilinear.NForm.dot, 
-  Multilinear.NForm.cross
+  Multilinear.NForm.const
 ) where
 
-import           Control.Monad.Primitive
 import qualified Data.Vector.Unboxed      as Unboxed
-import           Multilinear.Generic
-import qualified Multilinear.Tensor       as Tensor
-import           Statistics.Distribution
-
-invalidIndices :: String
-invalidIndices = "Indices and its sizes incompatible with n-form structure!"
-
-invalidCrossProductIndices :: String
-invalidCrossProductIndices = "Indices and its sizes incompatible with cross product structure!"
+import           Multilinear
 
 {-| Generate N-form as function of its indices -}
-
 fromIndices :: (
-    Num a, Unboxed.Unbox a
-  ) => String        -- ^ Indices names (one characted per index)
-    -> [Int]         -- ^ Indices sizes
-    -> ([Int] -> a)  -- ^ Generator function
-    -> Tensor a      -- ^ Generated N-form
-
-fromIndices d ds f = Tensor.fromIndices ([],[]) (d,ds) $ \[] -> f
+    Num a, Unboxed.Unbox a, Multilinear t a
+  ) => String       -- ^ Indices names (one characted per index)
+    -> [Int]        -- ^ Indices sizes
+    -> ([Int] -> a) -- ^ Generator function
+    -> t a          -- ^ Generated N-form
+fromIndices d ds f = Multilinear.fromIndices [] d [] ds $ \[] -> f
 
 {-| Generate N-form with all components equal to @v@ -}
-
 const :: (
-    Num a, Unboxed.Unbox a
-  ) => String    -- ^ Indices names (one characted per index)
-    -> [Int]     -- ^ Indices sizes
-    -> a         -- ^ N-form elements value
-    -> Tensor a  -- ^ Generated N-form
-
-const d ds = Tensor.const ([],[]) (d,ds)
-
-{-| Generate n-vector with random real components with given probability distribution.
-The n-vector is wrapped in the IO monad. -}
-{-| Available probability distributions: -}
-{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
-{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
-{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
-{-| - Exponential : "Statistics.Distribution.Exponential" -}
-{-| - Gamma : "Statistics.Distribution.Gamma" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Normal : "Statistics.Distribution.Normal" -}
-{-| - StudentT : "Statistics.Distribution.StudentT" -}
-{-| - Uniform : "Statistics.Distribution.Uniform" -}
-{-| - F : "Statistics.Distribution.FDistribution" -}
-{-| - Laplace : "Statistics.Distribution.Laplace" -}
-
-randomDouble :: (
-    ContGen d
-  ) => String              -- ^ Indices names (one character per index)
-    -> [Int]               -- ^ Indices sizes
-    -> d                   -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor Double)  -- ^ Generated linear functional
-
-randomDouble d ds = Tensor.randomDouble ([],[]) (d,ds)
-
-{-| Generate n-vector with random integer components with given probability distribution.
-The n-vector is wrapped in the IO monad. -}
-{-| Available probability distributions: -}
-{-| - Binomial : "Statistics.Distribution.Binomial" -}
-{-| - Poisson : "Statistics.Distribution.Poisson" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-
-randomInt :: (
-    DiscreteGen d
-  ) => String              -- ^ Indices names (one character per index)
-    -> [Int]               -- ^ Indices sizes
-    -> d                   -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> IO (Tensor Int)     -- ^ Generated n-vector
-
-randomInt d ds = Tensor.randomInt ([],[]) (d,ds)
-
-{-| Generate n-vector with random real components with given probability distribution and given seed.
-The form is wrapped in a monad. -}
-{-| Available probability distributions: -}
-{-| - Beta : "Statistics.Distribution.BetaDistribution" -}
-{-| - Cauchy : "Statistics.Distribution.CauchyLorentz" -}
-{-| - Chi-squared : "Statistics.Distribution.ChiSquared" -}
-{-| - Exponential : "Statistics.Distribution.Exponential" -}
-{-| - Gamma : "Statistics.Distribution.Gamma" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Normal : "Statistics.Distribution.Normal" -}
-{-| - StudentT : "Statistics.Distribution.StudentT" -}
-{-| - Uniform : "Statistics.Distribution.Uniform" -}
-{-| - F : "Statistics.Distribution.FDistribution" -}
-{-| - Laplace : "Statistics.Distribution.Laplace" -}
-
-randomDoubleSeed :: (
-    ContGen d, PrimMonad m
-  ) => String            -- ^ Index name (one character)
-    -> [Int]             -- ^ Number of elements
-    -> d                 -- ^ Continuous probability distribution (as from "Statistics.Distribution")
-    -> Int               -- ^ Randomness seed
-    -> m (Tensor Double) -- ^ Generated n-vector
-
-randomDoubleSeed d ds = Tensor.randomDoubleSeed ([],[]) (d,ds)
-
-{-| Generate n-vector with random integer components with given probability distribution and given seed.
-The form is wrapped in a monad. -}
-{-| Available probability distributions: -}
-{-| - Binomial : "Statistics.Distribution.Binomial" -}
-{-| - Poisson : "Statistics.Distribution.Poisson" -}
-{-| - Geometric : "Statistics.Distribution.Geometric" -}
-{-| - Hypergeometric: "Statistics.Distribution.Hypergeometric" -}
-
-randomIntSeed :: (
-    DiscreteGen d, PrimMonad m
-  ) => String            -- ^ Index name (one character)
-    -> [Int]             -- ^ Number of elements
-    -> d                 -- ^ Discrete probability distribution (as from "Statistics.Distribution")
-    -> Int               -- ^ Randomness seed
-    -> m (Tensor Int)    -- ^ Generated n-vector
-
-randomIntSeed d ds = Tensor.randomIntSeed ([],[]) (d,ds)
-
-{-| 2-form representing a dot product -}
-
-dot :: (
-    Num a, Unboxed.Unbox a
-  ) => String    -- ^ Indices names (one characted per index)
-    -> Int       -- ^ Size of tensor (dot product is a square tensor)
-    -> Tensor a  -- ^ Generated dot product
-
-dot [i1,i2] size = fromIndices [i1,i2] [size,size] (\[i,j] -> if i == j then 1 else 0)
-dot _ _ = error invalidIndices
-
-{-| Tensor representing a cross product (Levi - Civita symbol). It also allows to compute a determinant of square matrix - determinant of matrix @M@ is a equal to length of cross product of all columns of @M@ -}
--- // TODO
-
-cross :: (
-    Num a, Unboxed.Unbox a
-  ) => String    -- ^ Indices names (one characted per index)
-    -> Int       -- ^ Size of tensor (dot product is a square tensor)
-    -> Tensor a  -- ^ Generated dot product
-
-cross [i,j,k] size =
-  Tensor.fromIndices ([i],[size]) ([j,k],[size,size])
-    (\[_] [_,_] -> 0)
-cross _ _ = error invalidCrossProductIndices
+    Num a, Unboxed.Unbox a, Multilinear t a
+  ) => String -- ^ Indices names (one characted per index)
+    -> [Int]  -- ^ Indices sizes
+    -> a      -- ^ N-form elements value
+    -> t a    -- ^ Generated N-form
+const d = Multilinear.const [] d []
