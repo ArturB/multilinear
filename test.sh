@@ -5,4 +5,4 @@
 let "TODAY_SEC = $( date +%s ) % 86400"
 BUILD_ID="Build $( date +%y%j ).$TODAY_SEC"
 
-stack test --coverage && ( git add -A && git commit -m "$BUILD_ID" && git push ) > /dev/null
+stack test --coverage && git add -A > /dev/null && git commit -m "$BUILD_ID" > /dev/null && git push > /dev/null
