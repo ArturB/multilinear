@@ -1,4 +1,4 @@
-# Multilinear [![Hackage](https://img.shields.io/hackage/v/multilinear.svg)](https://hackage.haskell.org/package/multilinear) [![Build Status](https://travis-ci.org/ArturB/multilinear.svg?branch=master)](https://travis-ci.org/ArturB/multilinear) [![BuildStatus](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)]
+# Multilinear [![Hackage](https://img.shields.io/hackage/v/multilinear.svg)](https://hackage.haskell.org/package/multilinear) [![Build Status](https://travis-ci.org/ArturB/multilinear.svg?branch=master)](https://travis-ci.org/ArturB/multilinear) ![BuildStatus](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)
 
 
 ## Summary
