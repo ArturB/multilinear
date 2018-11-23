@@ -15,4 +15,3 @@ if stack test --coverage ; then
 else
     echo -e "\u001b[31mSome tests didn't pass!\u001b[0m"
 fi
- 
