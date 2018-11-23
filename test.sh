@@ -7,9 +7,9 @@ BUILD_ID="Build $( date +%y%j ).$TODAY_SEC"
 
 if stack test --coverage ; then
     echo -e "\u001b[32mAll tests passed!\u001b[0m"
-    echo -e "\u001b[33mPushing changes to git...\u001b[0m"
+    echo -e "Pushing changes to git..."
     git add -A > /dev/null && git commit -qm "$BUILD_ID" && git push -q
-    echo -e "\u001b[33mAll done!\u001b[0m"
+    echo -e "All done!"
 else
     echo -e "\u001b[31mSome tests didn't pass!\u001b[0m"
 fi
