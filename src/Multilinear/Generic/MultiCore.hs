@@ -257,6 +257,9 @@ _elemByElem t1 t2 f op =
     let commonIndices = Data.List.filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
+
+        
+
     in _mergeScalars $ _elemByElem' t1' t2' f op
 
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 

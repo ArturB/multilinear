@@ -177,6 +177,44 @@ nFormConstructor c1 c2 s1 s2 =
     in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
               && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
 
+-- | Test generic vector constructor indices error
+vectorConstructorError :: Char -> Positive (Small Int) -> Property
+vectorConstructorError c s = 
+    let size = getSmall $ getPositive s
+        v :: Tensor Double = Vector.fromIndices [c,'a'] size fromIntegral
+    in  expectFailure (total v)
+
+-- | Test generic form constructor indices error
+formConstructorError :: Char -> Positive (Small Int) -> Property
+formConstructorError c s = 
+    let size = getSmall $ getPositive s
+        f :: Tensor Double = Form.fromIndices [c,'a'] size fromIntegral
+    in  expectFailure (total f)
+
+-- | Test generic matrix constructor indices error
+matrixConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Property
+matrixConstructorError c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = Matrix.fromIndices [c1,c2,'a'] size1 size2 (\x y -> fromIntegral x + fromIntegral y)
+    in  expectFailure (total v)
+
+-- | Test generic NVector constructor indices error
+nVectorConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Property
+nVectorConstructorError c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = NVector.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+    in  expectFailure (total v)
+
+-- | Test generic NForm constructor indices error
+nFormConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Property
+nFormConstructorError c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = NForm.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+    in  expectFailure (total v)
+
 
 -- | Test generic vector constructor values
 vectorConstructorValues :: Char -> Positive (Small Int) -> Bool
@@ -393,6 +431,12 @@ main = do
     executePropertyTest "matrixConstructor"  defTestN matrixConstructor
     executePropertyTest "nFormConstructor"   defTestN nFormConstructor
     executePropertyTest "nVectorConstructor" defTestN nVectorConstructor
+
+    executePropertyTest "vectorConstructorError"  defTestN vectorConstructorError
+    executePropertyTest "formConstructorError"    defTestN formConstructorError
+    executePropertyTest "matrixConstructorError"  defTestN matrixConstructorError
+    executePropertyTest "nFormConstructorError"   defTestN nFormConstructorError
+    executePropertyTest "nVectorConstructorError" defTestN nVectorConstructorError
 
     executePropertyTest "vectorContructorValues"   100 vectorConstructorValues
     executePropertyTest "formContructorValues"     100 formConstructorValues
