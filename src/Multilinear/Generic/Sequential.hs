@@ -109,7 +109,7 @@ firstTensor x = case x of
     FiniteTensor _ ts   -> Boxed.head ts
     _                   -> x
 
-{-| Recursive indexing on list tensor
+{-| Recursive indexing on list tensor. If index is greater than index size, performs modulo indexing
     @t ! i = t[i]@ -}
 {-# INLINE (!) #-}
 (!) :: Unboxed.Unbox a => Tensor a      -- ^ tensor @t@
@@ -117,14 +117,8 @@ firstTensor x = case x of
     -> Tensor a      -- ^ tensor @t[i]@
 t ! i = case t of
     Scalar _            -> error scalarIndices
-    SimpleFinite ind ts -> 
-        if i >= Finite.indexSize ind then 
-            error ("Index + " ++ show ind ++ " out of bonds!") 
-        else Scalar $ ts Unboxed.! i
-    FiniteTensor ind ts -> 
-        if i >= Finite.indexSize ind then 
-            error ("Index + " ++ show ind ++ " out of bonds!") 
-        else ts Boxed.! i
+    SimpleFinite ind ts -> Scalar $ ts Unboxed.! (i `mod` Finite.indexSize ind)
+    FiniteTensor ind ts -> ts Boxed.! (i `mod` Finite.indexSize ind)
 
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
@@ -376,15 +370,8 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
 
 -- | Tensors can be divided by each other
 instance (Unboxed.Unbox a, Fractional a, NFData a) => Fractional (Tensor a) where
-
+    -- Tensor dividing: TODO
     {-# INLINE (/) #-}
-    -- Scalar division return result of division of its values
-    Scalar x1 / Scalar x2 = Scalar $ x1 / x2
-    -- Tensor and scalar are divided value by value
-    Scalar x1 / t2 = (x1 /) `Multilinear.Generic.Sequential.map` t2
-    t1 / Scalar x2 = (/ x2) `Multilinear.Generic.Sequential.map` t1
-    -- Two complex tensors cannot be (for now) simply divided
-    -- // TODO - tensor division and inversion
     _ / _ = error "TODO"
 
     -- A scalar can be generated from rational number

@@ -317,8 +317,8 @@ renameTest t =
 raiseLowerTest :: Tensor Double -> Bool
 raiseLowerTest t = 
     let inames = indicesNames t
-        lowered = inames `zip` ((t \/) <$> inames)
-        raised = inames `zip` ((t /\) <$> inames)
+        lowered = inames `zip` ((t `lower`) <$> inames)
+        raised = inames `zip` ((t `raise`) <$> inames)
         isLowered (i,tl) = i `elem` (Index.indexName <$> (Index.isCovariant     `Prelude.filter` indices tl))
         isRaised  (i,tr) = i `elem` (Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tr))
     in  all isLowered lowered && all isRaised raised
