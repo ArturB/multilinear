@@ -135,7 +135,7 @@ _standardize tens = foldl' (<<<|) tens $ Index.indexName <$> (Index.isContravari
 
 -- | Print tensor
 instance (
-    Unboxed.Unbox a, Show a, Num a, NFData a
+    Unboxed.Unbox a, Show a
     ) => Show (Tensor a) where
 
     -- merge errors first and then print whole tensor
