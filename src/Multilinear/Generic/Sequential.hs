@@ -87,6 +87,26 @@ _elemByElem t1 t2 f op =
     in _mergeScalars $ _elemByElem' t1' t2' f op
 
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
+{-# INLINE zipT' #-}
+zipT' :: (
+    Num a, NFData a, Unboxed.Unbox a
+    ) => (a -> a -> a)                        -- ^ The zipping combinator
+      -> Tensor a                             -- ^ First tensor to zip
+      -> Tensor a                             -- ^ Second tensor to zip
+      -> Tensor a                             -- ^ Result tensor
+-- Two simple tensors case
+zipT' f t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 v2) = 
+    if index1 == index2 then 
+        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
+    else dot t1 t2
+--Two finite tensors case
+zipT' f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     = 
+    if index1 == index2 then 
+        FiniteTensor index1 $ Boxed.zipWith (zipT f) v1 v2 
+    else dot t1 t2
+-- Zipping something with scalar is impossible
+zipT' _ _ _ = error $ "zipT: " ++ scalarIndices
+
 {-# INLINE zipT #-}
 zipT :: (
     Num a, NFData a, Unboxed.Unbox a
@@ -94,35 +114,10 @@ zipT :: (
       -> Tensor a                             -- ^ First tensor to zip
       -> Tensor a                             -- ^ Second tensor to zip
       -> Tensor a                             -- ^ Result tensor
-
--- Two simple tensors case
-zipT f t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 v2) = 
-    if index1 == index2 then 
-        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
-    else dot t1 t2
-
---Two finite tensors case
-zipT f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     = 
-    if index1 == index2 then 
-        FiniteTensor index1 $ Boxed.zipWith (zipT f) v1 v2 
-    else dot t1 t2
-
--- Finite and simple tensor case
-zipT f t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 v2)     = 
-    if index1 == index2 then 
-        let f' t s = (`f` s) `_map` t
-        in  FiniteTensor index1 $ Boxed.generate (Finite.indexSize index1) (\i -> f' (v1 Boxed.! i) (v2 Unboxed.! i)) 
-    else dot t1 t2
-
--- Simple and finite tensor case
-zipT f t1@(SimpleFinite index1 v1) t2@(FiniteTensor index2 v2)     = 
-    if index1 == index2 then 
-        let f' s t = (s `f`) `_map` t
-        in  FiniteTensor index1 $ Boxed.generate (Finite.indexSize index1) (\i -> f' (v1 Unboxed.! i) (v2 Boxed.! i))
-    else dot t1 t2
-
--- Zipping something with scalar is impossible
-zipT _ _ _ = error $ "zipT: " ++ scalarIndices
+zipT f t1 t2 = 
+    let t1' = t1
+        t2' = t2
+    in  zipT' f t1' t2'
 
 -- | dot product of two tensors
 {-# INLINE dot #-}
@@ -150,24 +145,6 @@ dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Fin
     | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr "finite-finite" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) t1 t2
-
--- Simple tensor and finite tensor product
-dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Unboxed.! i) *. (ts2' Boxed.! i))
-    | otherwise = contractionErr "simple-finite" (Index.toTIndex i1) (Index.toTIndex i2)
-dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
-    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Unboxed.! i) *. (ts2' Boxed.! i))
-    | otherwise = contractionErr "simple-finite" (Index.toTIndex i1) (Index.toTIndex i2)
-dot t1@(SimpleFinite _ _) t2@(FiniteTensor _ _) = zipT (*) t1 t2
-
--- Finite tensor and simple tensor product
-dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Boxed.! i) .* (ts2' Unboxed.! i))
-    | otherwise = contractionErr "finite-simple" (Index.toTIndex i1) (Index.toTIndex i2)
-dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
-    | count1 == count2 = Boxed.sum $ Boxed.generate count1 (\i -> (ts1' Boxed.! i) .* (ts2' Unboxed.! i))
-    | otherwise = contractionErr "finite-simple" (Index.toTIndex i1) (Index.toTIndex i2)
-dot t1@(FiniteTensor _ _) t2@(SimpleFinite _ _) = zipT (*) t1 t2
 
 -- Other cases cannot happen!
 dot t1' t2' = contractionErr "other" (tensorIndex t1') (tensorIndex t2')

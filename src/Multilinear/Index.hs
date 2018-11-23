@@ -30,9 +30,6 @@ class Index i where
     {-| Returns True if index is upper (contravariant), False otherwise. -}
     isContravariant :: i -> Bool
 
-    {-| Returns True if index if indifferent, False otherwise. -}
-    isIndifferent :: i -> Bool
-
     {-| Returns True if two indices are equivalent, thus differs only by name, but share same size and type. -}
     equivI :: i -> i -> Bool
 
@@ -53,18 +50,13 @@ data TIndex =
     Contravariant {
         indexSize  :: Maybe Int,
         tIndexName :: String
-    } |
-    Indifferent {
-        indexSize  :: Maybe Int,
-        tIndexName :: String
-    }
+    } 
     deriving (Eq, Generic)
 
 {-| Show tensor index -}
 instance Show TIndex where
     show (Covariant c n)     = "[" ++ n ++ ":" ++ show c ++ "]"
     show (Contravariant c n) = "<" ++ n ++ ":" ++ show c ++ ">"
-    show (Indifferent c n)   = "(" ++ n ++ ":" ++ show c ++ ")"
 
 {-| Finite index is a Multilinear.Index instance -}
 instance Index TIndex where
@@ -80,18 +72,11 @@ instance Index TIndex where
     isContravariant (Contravariant _ _) = True
     isContravariant _                   = False
 
-    {-| Return true if index is indifferent |-}
-    isIndifferent (Indifferent _ _) = True
-    isIndifferent _                 = False
-
     {-| Returns true if two indices are quivalent, i.e. differs only by name, but share same type and size. -}
     equivI (Covariant count1 _) (Covariant count2 _)
         | count1 == count2 = True
         | otherwise = False
     equivI (Contravariant count1 _) (Contravariant count2 _)
-        | count1 == count2 = True
-        | otherwise = False
-    equivI (Indifferent count1 _) (Indifferent count2 _)
         | count1 == count2 = True
         | otherwise = False
     equivI _ _ = False
@@ -105,5 +90,3 @@ instance Ord TIndex where
     ind1 <= ind2 = 
         tIndexName ind1 <= tIndexName ind2 || 
         (tIndexName ind1 == tIndexName ind2 && indexSize ind1 <= indexSize ind2)
-
-

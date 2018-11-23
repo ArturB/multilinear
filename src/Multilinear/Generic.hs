@@ -129,12 +129,9 @@ t ! i = case t of
 instance NFData a => NFData (Tensor a)
 
 -- | Move contravariant indices to lower recursion level
-_standardize :: (Num a, Unboxed.Unbox a, NFData a) => Tensor a -> Tensor a
-_standardize tens = foldr' f tens $ indices tens
-    where 
-        f i t = if Index.isContravariant i then 
-            t <<<| Index.indexName i 
-        else t
+{-# INLINE _standardize #-}
+_standardize :: (Unboxed.Unbox a) => Tensor a -> Tensor a
+_standardize tens = foldl' (<<<|) tens $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tens)
 
 -- | Print tensor
 instance (
@@ -219,7 +216,7 @@ zipErr variant i1' i2' = error $
     " and index2 is " ++ show i2'
 
 -- Multilinear operations
-instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
+instance (Unboxed.Unbox a) => Multilinear Tensor a where
     -- Generic tensor constructor
     -- If only one upper index is given, generate a SimpleFinite tensor with upper index
     fromIndices [u] [] [s] [] f = 
@@ -289,12 +286,10 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
         SimpleFinite index _ -> case index of
             Finite.Contravariant _ _ -> (1,0)
             Finite.Covariant _ _     -> (0,1)
-            Finite.Indifferent _ _   -> (0,0)
         _ -> let (cnvr, covr) = order $ firstTensor x
              in case tensorIndex x of
                 Index.Contravariant _ _ -> (cnvr+1,covr)
                 Index.Covariant _ _     -> (cnvr,covr+1)
-                Index.Indifferent _ _   -> (cnvr,covr)
 
     -- Get size of tensor index or Left if index is infinite or tensor has no such index
     {-# INLINE size #-}
@@ -353,15 +348,11 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Multilinear Tensor a where
         FiniteTensor (Finite.Contravariant count name) (Multilinear.transpose <$> ts)
     transpose (FiniteTensor (Finite.Contravariant count name) ts) =
         FiniteTensor (Finite.Covariant count name) (Multilinear.transpose <$> ts)
-    transpose (FiniteTensor (Finite.Indifferent count name) ts) =
-        FiniteTensor (Finite.Indifferent count name) (Multilinear.transpose <$> ts)
 
     transpose (SimpleFinite (Finite.Covariant count name) ts) =
         SimpleFinite (Finite.Contravariant count name) ts
     transpose (SimpleFinite (Finite.Contravariant count name) ts) =
         SimpleFinite (Finite.Covariant count name) ts
-    transpose (SimpleFinite (Finite.Indifferent count name) ts) =
-        SimpleFinite (Finite.Indifferent count name) ts
 
 
     {-| Shift tensor index right -}
@@ -469,6 +460,7 @@ map f x = case x of
         and for "a" index filter elements with index value <= 10
     But this disallow to remove particular matrix element. 
     If for some index all elements are removed, the index itself is removed from tensor. -}
+{-# INLINE filter #-}
 filter :: (
     Unboxed.Unbox a
     ) => (String -> Int -> Bool) -- ^ filter function
@@ -491,6 +483,7 @@ filter f (FiniteTensor index ts) =
     in  FiniteTensor index { Finite.indexSize = Boxed.length ts'' } ts''
 
 {-| Filtering one index of tensor. -}
+{-# INLINE filterIndex #-}
 filterIndex :: (
     Unboxed.Unbox a
     ) => String        -- ^ Index name to filter
@@ -499,38 +492,41 @@ filterIndex :: (
       -> Tensor a
 filterIndex iname f = Multilinear.Generic.filter (\i n -> i /= iname || f n)
 
-{-| Zip tensors with binary combinator -}
-zipWith :: (
+{-| Zip tensors with binary combinator, assuming they have all indices the same -}
+{-# INLINE zipWith' #-}
+zipWith' :: (
     Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 
       -> Tensor c
 -- Zipping two Scalars simply combines their values 
-zipWith f (Scalar x1) (Scalar x2) = Scalar $ f x1 x2
+zipWith' f (Scalar x1) (Scalar x2) = Scalar $ f x1 x2
 -- zipping complex tensor with scalar 
-zipWith f t (Scalar x) = (`f` x) `_map` t
+zipWith' f t (Scalar x) = (`f` x) `_map` t
 -- zipping scalar with complex tensor
-zipWith f (Scalar x) t = (x `f`) `_map` t
+zipWith' f (Scalar x) t = (x `f`) `_map` t
 -- Two simple tensors case
-zipWith f (SimpleFinite index1 v1) (SimpleFinite index2 v2) = 
+zipWith' f (SimpleFinite index1 v1) (SimpleFinite index2 v2) = 
     if index1 == index2 then 
         SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
     else zipErr "simple-simple" (Index.toTIndex index1) (Index.toTIndex index2)
 --Two finite tensors case
-zipWith f (FiniteTensor index1 v1) (FiniteTensor index2 v2)     = 
+zipWith' f (FiniteTensor index1 v1) (FiniteTensor index2 v2)     = 
     if index1 == index2 then 
         FiniteTensor index1 $ Boxed.zipWith (Multilinear.Generic.zipWith f) v1 v2 
     else zipErr "finite-finite" (Index.toTIndex index1) (Index.toTIndex index2)
--- Finite and simple tensor case
-zipWith f (FiniteTensor index1 v1) (SimpleFinite index2 v2)     = 
-    if index1 == index2 then 
-        let f' t s = (`f` s) `_map` t
-        in  FiniteTensor index1 $ Boxed.generate (Finite.indexSize index1) (\i -> f' (v1 Boxed.! i) (v2 Unboxed.! i)) 
-    else zipErr "finite-simple" (Index.toTIndex index1) (Index.toTIndex index2)
--- Simple and finite tensor case
-zipWith f (SimpleFinite index1 v1) (FiniteTensor index2 v2)     = 
-    if index1 == index2 then 
-        let f' s t = (s `f`) `_map` t
-        in  FiniteTensor index1 $ Boxed.generate (Finite.indexSize index1) (\i -> f' (v1 Unboxed.! i) (v2 Boxed.! i))
-    else zipErr "simple-finite" (Index.toTIndex index1) (Index.toTIndex index2)
+-- Other cases cannot happen!
+zipWith' _ _ _ = error "Invalid indices to peroform zip!"
+
+{-# INLINE zipWith #-}
+zipWith :: (
+    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c
+    ) => (a -> b -> c) 
+      -> Tensor a 
+      -> Tensor b 
+      -> Tensor c
+zipWith f t1 t2 = 
+    let t1' = _standardize t1
+        t2' = _standardize t2
+    in  zipWith' f t1' t2'
