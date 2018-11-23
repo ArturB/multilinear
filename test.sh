@@ -10,7 +10,7 @@ if stack test --coverage ; then
     echo -e "\u001b[32mAll tests passed!\u001b[0m"
 
     COV_PATH=$( dirname $( find .stack-work/install | grep hpc/index.html ) )
-    cp $COV_PATH/* test/coverage
+    cp -r $COV_PATH/* test/coverage
 
     echo -e "Pushing changes to git..."
     git add -A > /dev/null && git commit -qm "$BUILD_ID" && git pull -q && git push -q
