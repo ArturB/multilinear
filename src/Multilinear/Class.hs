@@ -143,8 +143,7 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 -}
 
 module Multilinear.Class (
-    Multilinear(..),
-    Accessible(..)
+    Multilinear(..)
 ) where
 
 import           Data.Maybe
@@ -156,30 +155,6 @@ import           Multilinear.Index
 class (
   Unboxed.Unbox a
   ) => Multilinear t a where
-
-    {-| Add scalar @a@ to each element of tensor @t@ -}
-    infixl 4 +.
-    (+.) :: a -> t a -> t a
-
-    {-| Subtract each element of tensor @t@ from scalar scalar left -}
-    infixl 4 -.
-    (-.) :: a -> t a -> t a
-
-    {-| Multiply scalar @a@ by each element of tensor @t@ -}
-    infixl 5 *.
-    (*.) :: a -> t a -> t a
-
-    {-| Add each element of tensor @t@ to scalar @a@ -}
-    infixl 4 .+
-    (.+) :: t a -> a -> t a
-
-    {-| Subtract scalar @a@ from each element of tensor @t@ -}
-    infixl 4 .-
-    (.-) :: t a -> a -> t a
-
-    {-| Multiply each element of tensor @t@ by scalar @a@ -}
-    infixl 5 .*
-    (.*) :: t a -> a -> t a
 
     {-| Generic tensor constructor, using combinator function on its indices -}
     fromIndices ::
@@ -200,6 +175,19 @@ class (
       -> a      -- Value of tensor elements
       -> t a    -- ^ Generated tensor
     const u d usize dsize v = fromIndices u d usize dsize (\_ _ -> v)
+
+    {-| Accessing tensor elements -}
+    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5.
+        Values of other indices are insignificant -}
+    {-| If given index value is out of range, then modulo operation is performed:
+        el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
+    el :: t a -> (String,[Int]) -> t a
+
+    {-| Infix equivalent for el -}
+    {-# INLINE ($$|) #-}
+    infixl 7 $$|
+    ($$|) :: t a -> (String,[Int]) -> t a
+    t $$| is = el t is
 
     {-| List of all tensor indices -}
     indices :: t a -> [TIndex]
@@ -323,54 +311,3 @@ class (
     infixl 6 <<<|
     (<<<|) :: t a -> String -> t a
     t <<<| n = shiftLeftmost t n
-
-    {-| Simple mapping -}
-    {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
-    map :: Unboxed.Unbox b => (a -> b) -> t a -> t b
-
-    {-| Filtering tensor. 
-        Filtering multi-dimensional arrray may be dangerous, as we always assume, 
-        that on each recursion level, all tensors have the same size (length). 
-        To disable invalid filters, filtering is done over indices, not tensor elements. 
-        Filter function takes and index name and index value and if it returns True, this index value remains in result tensor. 
-        This allows to remove whole columns or rows of eg. a matrix: 
-            filter (\i n -> i /= "a" || i > 10) filters all rows of "a" index (because if i /= "a", filter returns True)
-            and for "a" index filter elements with index value <= 10
-        But this disallow to remove particular matrix element. 
-        If for some index all elements are removed, the index itself is removed from tensor. -}
-    filter :: 
-        (String -> Int -> Bool) -- ^ filter function
-      -> t a                    -- ^ tensor to filter
-      -> t a
-
-    {-| Filtering one index of tensor. -}
-    filterIndex ::
-        String        -- ^ Index name to filter
-     -> (Int -> Bool) -- ^ filter function
-     -> t a           -- ^ tensor to filter
-     -> t a
-    filterIndex iname f = Multilinear.Class.filter (\i n -> i /= iname || f n)
-
-    {-| Zip tensors with binary combinator -}
-    zipWith :: (
-        Unboxed.Unbox b, Unboxed.Unbox c
-        ) => (a -> b -> c)
-          -> t a
-          -> t b
-          -> t c
-
-{-| If container on which tensor instance is built, allows for random access of its elements, then the tensor can be instanced as Accessible -}
-class Accessible t a where
-
-    {-| Accessing tensor elements -}
-    {-| @el ["i","j"] t [4,5]@ returns all tensor elements which index @i@ is equal to 4 and index @j@ is equal to 5.
-        Values of other indices are insignificant -}
-    {-| If given index value is out of range, then modulo operation is performed:
-        el ["i","j"] t [40 50] = t[40 mod size i, 50 mod size j] -}
-    el :: t a -> (String,[Int]) -> t a
-
-    {-| Infix equivalent for el -}
-    {-# INLINE ($$|) #-}
-    infixl 7 $$|
-    ($$|) :: t a -> (String,[Int]) -> t a
-    t $$| is = el t is

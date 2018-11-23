@@ -14,7 +14,7 @@ module Main (
 ) where
 
 import           Data.Maybe
-import qualified Data.Set                 as Set
+import qualified Data.Set                   as Set
 import           Multilinear
 import qualified Multilinear.Index        as Index
 import qualified Multilinear.Form         as Form
@@ -117,8 +117,7 @@ mergeCommonIndices f t1 t2 =
     in  Set.size commonIndices /= Set.size commonIndicesNames || 
         -- otherwise, the result indices set must be union of arguments indices
         expectedIndices == resultIndices
-
-
+        
 -- | Contracted indices have to be consumed in result tensor.
 consumeContractedIndices :: 
     Tensor Double -- ^ first tensor to contract
@@ -127,25 +126,12 @@ consumeContractedIndices ::
 consumeContractedIndices t1 t2 = 
     let inames1 = Set.fromList $ Index.indexName <$> indices t1
         inames2 = Set.fromList $ Index.indexName <$> indices t2
-
-        iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
-        iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
-
-        iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
-        iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
-
-        contractedIndices = 
-            -- contracted are indices covariant in the first tensor and contravariant in the second
-            Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
-            -- or contravariant in the first tensor and covariant in the second
-            Set.intersection iContravariantNames1 iCovariantNames2
-        
+        contractedIndices = _contractedIndices t1 t2
         expectedIndices = Set.difference (Set.union inames1 inames2) contractedIndices
         resultIndices = Set.fromList $ Index.indexName <$> indices (t1 * t2)
-
     in  expectedIndices == resultIndices
 
--- | Test generic vector constructor
+-- | Test generic vector constructor indices
 vectorConstructor :: Char -> Positive (Small Int) -> Bool
 vectorConstructor c s = 
     let size = getSmall $ getPositive s
@@ -153,7 +139,7 @@ vectorConstructor c s =
         vConst :: Tensor Double = Vector.const [c] size (fromIntegral size)
     in  v `Multilinear.size` [c] == size && vConst `Multilinear.size` [c] == size
 
--- | Test generic form constructor
+-- | Test generic form constructor indices
 formConstructor :: Char -> Positive (Small Int) -> Bool
 formConstructor c s = 
     let size = getSmall $ getPositive s
@@ -161,7 +147,7 @@ formConstructor c s =
         fConst :: Tensor Double = Form.const [c] size (fromIntegral size)
     in  f `Multilinear.size` [c] == size && fConst `Multilinear.size` [c] == size
 
--- | Test generic matrix constructor
+-- | Test generic matrix constructor indices
 matrixConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
 matrixConstructor c1 c2 s1 s2 = 
     let size1 = getSmall $ getPositive s1
@@ -171,7 +157,7 @@ matrixConstructor c1 c2 s1 s2 =
     in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2 
               && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
 
--- | Test generic NVector constructor
+-- | Test generic NVector constructor indices
 nVectorConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
 nVectorConstructor c1 c2 s1 s2 = 
     let size1 = getSmall $ getPositive s1
@@ -181,7 +167,7 @@ nVectorConstructor c1 c2 s1 s2 =
     in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
               && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
 
--- | Test generic NForm constructor
+-- | Test generic NForm constructor indices
 nFormConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
 nFormConstructor c1 c2 s1 s2 = 
     let size1 = getSmall $ getPositive s1
@@ -190,6 +176,68 @@ nFormConstructor c1 c2 s1 s2 =
         vConst :: Tensor Double = NForm.const [c1,c2] [size1,size2] (fromIntegral size1)
     in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
               && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
+
+
+-- | Test generic vector constructor values
+vectorConstructorValues :: Char -> Positive (Small Int) -> Bool
+vectorConstructorValues c s = 
+    let size = getSmall $ getPositive s
+        v :: Tensor Double = Vector.fromIndices [c] size fromIntegral
+        vConst :: Tensor Double = Vector.const [c] size (fromIntegral size)
+    in  all (\i -> v $$| ([c],[i]) == fromIntegral i) [0 .. size - 1] && 
+        all (\i -> vConst $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
+
+-- | Test generic form constructor values
+formConstructorValues :: Char -> Positive (Small Int) -> Bool
+formConstructorValues c s = 
+    let size = getSmall $ getPositive s
+        f :: Tensor Double = Form.fromIndices [c] size fromIntegral
+        fConst :: Tensor Double = Form.const [c] size (fromIntegral size)
+    in  all (\i -> f $$| ([c],[i]) == fromIntegral i) [0.. size - 1] && 
+        all (\i -> fConst $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
+
+-- | Test generic matrix constructor values
+matrixConstructorValues :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
+matrixConstructorValues c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = Matrix.fromIndices [c1,c2] size1 size2 (\x y -> fromIntegral x + fromIntegral y)
+        vConst :: Tensor Double = Matrix.const [c1,c2] size1 size2 (fromIntegral size1)
+    in  c1 == c2 || (
+        all (\(i1,i2) -> v $$| ([c1,c2],[i1,i2]) == fromIntegral i1 + fromIntegral i2) 
+            (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1]) && 
+        all (\(i1,i2) -> vConst $$| ([c1,c2],[i1,i2]) == fromIntegral size1) 
+            (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1])
+        )
+
+-- | Test generic NVector constructor values
+nVectorConstructorValues :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
+nVectorConstructorValues c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = NVector.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+        vConst :: Tensor Double = NVector.const [c1,c2] [size1,size2] (fromIntegral size1)
+    in  c1 == c2 || (
+        all (\(i1,i2) -> v $$| ([c1,c2],[i1,i2]) == fromIntegral i1 + fromIntegral i2) 
+            (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1]) && 
+        all (\(i1,i2) -> vConst $$| ([c1,c2],[i1,i2]) == fromIntegral size1) 
+            (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1])
+        )
+
+-- | Test generic NForm constructor values
+nFormConstructorValues :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
+nFormConstructorValues c1 c2 s1 s2 = 
+    let size1 = getSmall $ getPositive s1
+        size2 = getSmall $ getPositive s2
+        v :: Tensor Double = NForm.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+        vConst :: Tensor Double = NForm.const [c1,c2] [size1,size2] (fromIntegral size1)
+    in  c1 == c2 || (
+        all (\(i1,i2) -> v $$| ([c1,c2],[i1,i2]) == fromIntegral i1 + fromIntegral i2) 
+            (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1]) && 
+        all (\(i1,i2) -> vConst $$| ([c1,c2],[i1,i2]) == fromIntegral size1) 
+            (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1])
+        )
+
 
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
 orderIndices :: Tensor Double -> Bool
@@ -232,6 +280,14 @@ raiseLowerTest t =
         isRaised  (i,tr) = i `elem` (Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tr))
     in  all isLowered lowered && all isRaised raised
 
+transposeTest :: Tensor Double -> Bool
+transposeTest t = 
+    let indices1 = indices t
+        inames1 = indicesNames t
+        t2 = transpose t
+        indices2 = indices t2
+        inames2 = indicesNames t2
+    in  isScalar t || ( inames1 == inames2 && indices1 /= indices2 )
 
 -- | Filter second half of elements for each tensor index and check if they disappeared
 filterIndexTest :: 
@@ -246,13 +302,19 @@ filterIndexTest t =
                 size ft (Index.indexName i) == (fromJust (Index.indexSize i) `div` 2)
             ) fts
 
+-- | Simple show test, just to check if function evaluates at all
+showTest :: Tensor Double -> Bool
+showTest t = length (show t) > 0
+
 -- | ENTRY POINT
 main :: IO ()
 main = do
 
     -- PRINT PROBABILITY DISTRIBUTION OF TESTED TENSORS ORDER
-    executePropertyTest "probability distribution of order of tested tensors" 5000 $ 
+    executePropertyTest "probability distribution of tensors order" 10000 $ 
         \(t :: Tensor Double) -> collect (order t) $ preserveIndicesUnary abs
+    executePropertyTest "probability distribution of contracted indices" 10000 $
+        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ _contractedIndices t1 t2) $ preserveIndicesBinary (+)
 
     putStrLn "\nTesting multilinear library...\n"
 
@@ -291,22 +353,28 @@ main = do
     -- CHECKING MULTILINEAR INSTANCE --
     -----------------------------------
 
+    executePropertyTest "orderIndices" defTestN orderIndices
+    executePropertyTest "shiftEquiv" defTestN shiftEquiv
+    executePropertyTest "renamedTest" defTestN renameTest
+    executePropertyTest "raiseLowerTest" defTestN raiseLowerTest
+    executePropertyTest "transposeTest" defTestN transposeTest
+
+    -----------------------------------
+    -- CHECKING AUXILIRARY FUNCTIONS --
+    -----------------------------------
+
     executePropertyTest "preserveIndicesUnary for (+.)"   defTestN $ preserveIndicesUnary (5 +.)
     executePropertyTest "preserveIndicesUnary for (.+)"   defTestN $ preserveIndicesUnary (.+ 5)
     executePropertyTest "preserveIndicesUnary for (-.)"   defTestN $ preserveIndicesUnary (5 -.)
     executePropertyTest "preserveIndicesUnary for (.-)"   defTestN $ preserveIndicesUnary (.- 5)
     executePropertyTest "preserveIndicesUnary for (*.)"   defTestN $ preserveIndicesUnary (5 *.)
     executePropertyTest "preserveIndicesUnary for (.*)"   defTestN $ preserveIndicesUnary (.* 5)
-
-    executePropertyTest "orderIndices" defTestN orderIndices
-    executePropertyTest "shiftEquiv" defTestN shiftEquiv
-    executePropertyTest "renamedTest" defTestN renameTest
-    executePropertyTest "raiseLowerTest" defTestN raiseLowerTest
     executePropertyTest "filterIndexTest" defTestN filterIndexTest
     executePropertyTest "zipWithIndicesTest" defTestN $ preserveIndicesUnary (\t -> Multilinear.zipWith (+) t t)
+    executePropertyTest "showTest" defTestN showTest
 
     -----------------------------------
-    -- CHECKING SPECIAL CONSTRUCTORS --
+    -- CHECKING GENERIC CONSTRUCTORS --
     -----------------------------------
 
     executePropertyTest "vectorConstructor"  defTestN vectorConstructor
@@ -314,3 +382,9 @@ main = do
     executePropertyTest "matrixConstructor"  defTestN matrixConstructor
     executePropertyTest "nFormConstructor"   defTestN nFormConstructor
     executePropertyTest "nVectorConstructor" defTestN nVectorConstructor
+
+    executePropertyTest "vectorContructorValues"   100 vectorConstructorValues
+    executePropertyTest "formContructorValues"     100 formConstructorValues
+    executePropertyTest "matrixConstructorValues"  100 matrixConstructorValues
+    executePropertyTest "nFormConstructorValues"   100 nFormConstructorValues
+    executePropertyTest "nVectorConstructorValues" 100 nVectorConstructorValues

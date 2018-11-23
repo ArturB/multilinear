@@ -45,15 +45,15 @@ _elemByElem' :: (Num a, Unboxed.Unbox a, NFData a)
 -- @Scalar x + Scalar y = Scalar x + y@
 _elemByElem' (Scalar x1) (Scalar x2) f _ = Scalar $ f x1 x2
 -- @Scalar x + Tensor t[i] = Tensor r[i] | r[i] = x + t[i]@
-_elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.map` t
+_elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.Generic.map` t
 -- @Tensor t[i] + Scalar x = Tensor r[i] | r[i] = t[i] + x@
-_elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.map` t
+_elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.Generic.map` t
 
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | otherwise = FiniteTensor index1 $ Boxed.generate (Unboxed.length v1) 
-        (\i -> (\x -> f x `Multilinear.map` t2) (v1 Unboxed.! i))
+        (\i -> (\x -> f x `Multilinear.Generic.map` t2) (v1 Unboxed.! i))
 
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
@@ -202,11 +202,11 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
 
     -- Absolute value - element by element
     {-# INLINE abs #-}
-    abs t = abs `Multilinear.map` t
+    abs t = abs `Multilinear.Generic.map` t
 
     -- Signum operation - element by element
     {-# INLINE signum #-}
-    signum t = signum `Multilinear.map` t
+    signum t = signum `Multilinear.Generic.map` t
 
     -- Simple integer can be conveted to Scalar
     {-# INLINE fromInteger #-}
@@ -219,8 +219,8 @@ instance (Unboxed.Unbox a, Fractional a, NFData a) => Fractional (Tensor a) wher
     -- Scalar division return result of division of its values
     Scalar x1 / Scalar x2 = Scalar $ x1 / x2
     -- Tensor and scalar are divided value by value
-    Scalar x1 / t2 = (x1 /) `Multilinear.map` t2
-    t1 / Scalar x2 = (/ x2) `Multilinear.map` t1
+    Scalar x1 / t2 = (x1 /) `Multilinear.Generic.map` t2
+    t1 / Scalar x2 = (/ x2) `Multilinear.Generic.map` t1
     -- Two complex tensors cannot be (for now) simply divided
     -- // TODO - tensor division and inversion
     _ / _ = error "TODO"
@@ -240,49 +240,49 @@ instance (Unboxed.Unbox a, Floating a, NFData a) => Floating (Tensor a) where
 
     {-| Exponential function. (exp t)[i] = exp( t[i] ) -}
     {-# INLINE exp #-}
-    exp t = exp `Multilinear.map` t
+    exp t = exp `Multilinear.Generic.map` t
 
     {-| Natural logarithm. (log t)[i] = log( t[i] ) -}
     {-# INLINE log #-}
-    log t = log `Multilinear.map` t
+    log t = log `Multilinear.Generic.map` t
 
     {-| Sinus. (sin t)[i] = sin( t[i] ) -}
     {-# INLINE sin #-}
-    sin t = sin `Multilinear.map` t
+    sin t = sin `Multilinear.Generic.map` t
 
     {-| Cosinus. (cos t)[i] = cos( t[i] ) -}
     {-# INLINE cos #-}
-    cos t = cos `Multilinear.map` t
+    cos t = cos `Multilinear.Generic.map` t
 
     {-| Inverse sinus. (asin t)[i] = asin( t[i] ) -}
     {-# INLINE asin #-}
-    asin t = asin `Multilinear.map` t
+    asin t = asin `Multilinear.Generic.map` t
 
     {-| Inverse cosinus. (acos t)[i] = acos( t[i] ) -}
     {-# INLINE acos #-}
-    acos t = acos `Multilinear.map` t
+    acos t = acos `Multilinear.Generic.map` t
 
     {-| Inverse tangent. (atan t)[i] = atan( t[i] ) -}
     {-# INLINE atan #-}
-    atan t = atan `Multilinear.map` t
+    atan t = atan `Multilinear.Generic.map` t
 
     {-| Hyperbolic sinus. (sinh t)[i] = sinh( t[i] ) -}
     {-# INLINE sinh #-}
-    sinh t = sinh `Multilinear.map` t
+    sinh t = sinh `Multilinear.Generic.map` t
 
     {-| Hyperbolic cosinus. (cosh t)[i] = cosh( t[i] ) -}
     {-# INLINE cosh #-}
-    cosh t = cosh `Multilinear.map` t
+    cosh t = cosh `Multilinear.Generic.map` t
 
     {-| Inverse hyperbolic sinus. (asinh t)[i] = asinh( t[i] ) -}
     {-# INLINE asinh #-}
-    asinh t = acosh `Multilinear.map` t
+    asinh t = acosh `Multilinear.Generic.map` t
 
     {-| Inverse hyperbolic cosinus. (acosh t)[i] = acosh (t[i] ) -}
     {-# INLINE acosh #-}
-    acosh t = acosh `Multilinear.map` t
+    acosh t = acosh `Multilinear.Generic.map` t
 
     {-| Inverse hyperbolic tangent. (atanh t)[i] = atanh( t[i] ) -}
     {-# INLINE atanh #-}
-    atanh t = atanh `Multilinear.map` t
+    atanh t = atanh `Multilinear.Generic.map` t
 
