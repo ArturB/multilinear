@@ -1,6 +1,6 @@
 {-|
-Module      : Test.QuickCheck.Multilinear
-Description : QucikCheck instances of Multilinear library
+Module      : Test.QuickCheck.Multilinear.Generic.MultiCore
+Description : QucikCheck instances of MultiCore tensor
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
@@ -9,13 +9,13 @@ Portability : Windows/POSIX
 
 -}
 
-module Test.QuickCheck.Multilinear (
+module Test.QuickCheck.Multilinear.Generic.MultiCore (
     Arbitrary
 ) where
 
-import qualified Multilinear.Form         as Form
-import           Multilinear.Generic
-import qualified Multilinear.Vector       as Vector
+import qualified Multilinear.Form              as Form
+import           Multilinear.Generic.MultiCore
+import qualified Multilinear.Vector            as Vector
 import           Test.QuickCheck
 
 -- | Sizes of indices used in Arbitrary Tensor instance

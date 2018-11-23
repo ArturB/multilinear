@@ -25,16 +25,17 @@ module Multilinear.Generic.MultiCore (
 ) where
 
 import           Control.DeepSeq
+import qualified Control.Parallel.Strategies as Parallel
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
-import qualified Data.Set                   as Set
-import qualified Data.Vector                as Boxed
-import qualified Data.Vector.Unboxed        as Unboxed
+import qualified Data.Set                    as Set
+import qualified Data.Vector                 as Boxed
+import qualified Data.Vector.Unboxed         as Unboxed
 import           GHC.Generics
-import           Multilinear.Class          as Multilinear
-import qualified Multilinear.Index          as Index
-import qualified Multilinear.Index.Finite   as Finite
+import           Multilinear.Class           as Multilinear
+import qualified Multilinear.Index           as Index
+import qualified Multilinear.Index.Finite    as Finite
 
 {-| ERROR MESSAGE -}
 incompatibleTypes :: String

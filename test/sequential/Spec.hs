@@ -1,6 +1,6 @@
 {-|
 Module      : Main
-Description : Test of Multilinear library
+Description : Test of sequential tensor
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
@@ -14,18 +14,18 @@ module Main (
 ) where
 
 import           Data.Maybe
-import qualified Data.Set                   as Set
+import qualified Data.Set                       as Set
 import           Multilinear
-import qualified Multilinear.Index        as Index
-import qualified Multilinear.Form         as Form
-import qualified Multilinear.Matrix       as Matrix
-import qualified Multilinear.Vector       as Vector
-import qualified Multilinear.NForm        as NForm
-import qualified Multilinear.NVector      as NVector
+import qualified Multilinear.Index              as Index
+import qualified Multilinear.Form               as Form
+import qualified Multilinear.Matrix             as Matrix
+import qualified Multilinear.Vector             as Vector
+import qualified Multilinear.NForm              as NForm
+import qualified Multilinear.NVector            as NVector
 import           System.Exit
 import           System.IO
 import           Test.QuickCheck
-import           Test.QuickCheck.Multilinear()
+import           Test.QuickCheck.Multilinear.Generic.Sequential()
 
 -- | Default test number for property
 defTestN :: Int
@@ -64,9 +64,9 @@ executePropertyTest propName n f = do
         _ -> exitFailure
 
 
-------------------------------
--- TESTED TENSOR PROPERTIES --
-------------------------------
+----------------------------------------------------
+-- TESTED TENSOR PROPERTIES FOR SEQUENTIAL TENSOR --
+----------------------------------------------------
 
 
 -- | Unary operator applied on any tensor,
