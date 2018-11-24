@@ -8,7 +8,7 @@ PACKAGE_NAME=$( cat package.yaml | grep '^name:' | grep -o '[a-zA-z0-9]\+$' )
 let "TODAY_SEC = $( date +%s ) % 86400"
 BUILD_ID="$( date +%y%j ).$TODAY_SEC"
 
-echo -e "\u001b[33mChecking $PACKAGE_NAME, build $BUILD_ID...\n\u001b[0m"
+echo -e "Checking $PACKAGE_NAME, build $BUILD_ID...\n"
 
 # Perform whole-package checks: package version and up-to-date ChangeLog 
 PACKAGE_VERSION=$( cat package.yaml | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' )
