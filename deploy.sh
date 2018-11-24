@@ -1,6 +1,6 @@
 ./test.sh && 
 echo -e "Building doc...\n" && 
-stack haddock && 
+stack haddock --coverage && 
 echo -e "Uploading to Hackage...\n" && 
 stack sdist && 
-stack upload . && echo -e "\u001b[32mAll done!\u001b[0m"
+stack upload .
