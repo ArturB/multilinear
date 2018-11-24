@@ -1,1 +1,1 @@
-stack test && stack haddock && stack sdist && stack upload . 
+./test.sh && stack haddock && stack sdist && stack upload . 
