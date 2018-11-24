@@ -40,6 +40,6 @@ sizedMatrixAddBench s =
 -- | ENTRY POINT
 main :: IO ()
 main = defaultMain [
-    bgroup "matrix addition" $ sizedMatrixAddBench <$> [64, 128, 256, 512],
-    bgroup "matrix multiplication" $ sizedMatrixMultBench <$> [64, 128, 256, 512]
+    bgroup "matrix addition" $ sizedMatrixAddBench <$> [64, 128, 256, 512, 1024],
+    bgroup "matrix multiplication" $ sizedMatrixMultBench <$> [64, 128, 256, 512, 1024]
     ]

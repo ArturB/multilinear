@@ -164,7 +164,7 @@ _mergeScalars x = case x of
 
 -- | Generic map function, which does not require a,b types to be Num
 _map :: (
-    Unboxed.Unbox a, Unboxed.Unbox b
+    Unboxed.Unbox a, Unboxed.Unbox b, NFData b
     ) => (a -> b)
       -> Tensor a
       -> Tensor b
@@ -173,7 +173,11 @@ _map f x = case x of
     Scalar v                -> Scalar $ f v
     -- Mapping complex tensor does mapping element by element
     SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
-    FiniteTensor index ts   -> FiniteTensor index $ _map f <$> ts
+    FiniteTensor index ts   -> 
+        let len = Boxed.length ts
+            lts = Boxed.toList $ _map f <$> ts
+            ltsp = lts `Parallel.using` Parallel.parListChunk (len `div` 8) Parallel.rdeepseq
+        in  FiniteTensor index $ Boxed.fromList ltsp
 
 {-| Transpose Vector of Vectors, analogous to Data.List.transpose function. It is assumed, that all vectors on deeper recursion level have the same length.  -}
 _transpose :: Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
@@ -191,15 +195,12 @@ _contractedIndices ::
 _contractedIndices t1 t2 = 
     let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
         iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
-
         iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
         iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
-
     in  -- contracted are indices covariant in the first tensor and contravariant in the second
         Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
         -- or contravariant in the first tensor and covariant in the second
         Set.intersection iContravariantNames1 iCovariantNames2
-
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
@@ -209,36 +210,46 @@ _elemByElem' :: (Num a, Unboxed.Unbox a, NFData a)
              -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
              -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
              -> Tensor a                            -- ^ Result tensor
-
 -- @Scalar x + Scalar y = Scalar x + y@
 _elemByElem' (Scalar x1) (Scalar x2) f _ = Scalar $ f x1 x2
 -- @Scalar x + Tensor t[i] = Tensor r[i] | r[i] = x + t[i]@
 _elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.Generic.MultiCore.map` t
 -- @Tensor t[i] + Scalar x = Tensor r[i] | r[i] = t[i] + x@
 _elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.Generic.MultiCore.map` t
-
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | otherwise = FiniteTensor index1 $ Boxed.generate (Unboxed.length v1) 
         (\i -> (\x -> f x `Multilinear.Generic.MultiCore.map` t2) (v1 Unboxed.! i))
-
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | Index.indexName index1 `Data.List.elem` indicesNames t2 =
-        FiniteTensor index2 $ (\x -> _elemByElem' t1 x f op) <$> v2
-    | otherwise = FiniteTensor index1 $ (\x -> _elemByElem' x t2 f op) <$> v1
-
+        let len2 = Finite.indexSize index2
+            rl = Boxed.toList $ (\x -> _elemByElem' t1 x f op) <$> v2
+            rlp = rl `Parallel.using` Parallel.parListChunk (len2 `div` 8) Parallel.rdeepseq
+        in  FiniteTensor index2 $ Boxed.fromList rlp
+    | otherwise = 
+        let len1 = Finite.indexSize index1
+            rl = Boxed.toList $ (\x -> _elemByElem' x t2 f op) <$> v1
+            rlp = rl `Parallel.using` Parallel.parListChunk (len1 `div` 8) Parallel.rdeepseq
+        in  FiniteTensor index1 $ Boxed.fromList rlp
 -- Simple and finite tensor case
 _elemByElem' t1@(SimpleFinite index1 _) t2@(FiniteTensor index2 v2) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index2 $ (\x -> _elemByElem' t1 x f op) <$> v2
-
+    | otherwise = 
+        let len2 = Finite.indexSize index2
+            rl = Boxed.toList $ (\x -> _elemByElem' t1 x f op) <$> v2
+            rlp = rl `Parallel.using` Parallel.parListChunk (len2 `div` 8) Parallel.rdeepseq
+        in  FiniteTensor index2 $ Boxed.fromList rlp
 -- Finite and simple tensor case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index1 $ (\x -> _elemByElem' x t2 f op) <$> v1
+    | otherwise = 
+        let len1 = Finite.indexSize index1
+            rl = Boxed.toList $ (\x -> _elemByElem' x t2 f op) <$> v1
+            rlp = rl `Parallel.using` Parallel.parListChunk (len1 `div` 8) Parallel.rdeepseq
+        in  FiniteTensor index1 $ Boxed.fromList rlp
 
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
@@ -286,7 +297,6 @@ dot :: (Num a, Unboxed.Unbox a, NFData a)
       => Tensor a  -- ^ First dot product argument
       -> Tensor a  -- ^ Second dot product argument
       -> Tensor a  -- ^ Resulting dot product
-
 -- Two simple tensors product
 dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = 
@@ -297,16 +307,20 @@ dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Fin
         Scalar $ Unboxed.sum $ Unboxed.zipWith (*) ts1' ts2'
     | otherwise = contractionErr "simple-simple" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(SimpleFinite _ _) t2@(SimpleFinite _ _) = zipT (*) t1 t2
-
 -- Two finite tensors product
 dot (FiniteTensor i1@(Finite.Covariant count1 _) ts1') (FiniteTensor i2@(Finite.Contravariant count2 _) ts2')
-    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | count1 == count2 = 
+        let zipList = Boxed.toList $ Boxed.zipWith (*) ts1' ts2' 
+            zipListPar = zipList `Parallel.using` Parallel.parListChunk (count1 `div` 8) Parallel.rdeepseq
+        in  Boxed.sum $ Boxed.fromList zipListPar
     | otherwise = contractionErr "finite-finite" (Index.toTIndex i1) (Index.toTIndex i2)
 dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Finite.Covariant count2 _) ts2')
-    | count1 == count2 = Boxed.sum $ Boxed.zipWith (*) ts1' ts2'
+    | count1 == count2 = 
+        let zipList = Boxed.toList $ Boxed.zipWith (*) ts1' ts2' 
+            zipListPar = zipList `Parallel.using` Parallel.parListChunk (count1 `div` 8) Parallel.rdeepseq
+        in  Boxed.sum $ Boxed.fromList zipListPar
     | otherwise = contractionErr "finite-finite" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) t1 t2
-
 -- Other cases cannot happen!
 dot t1' t2' = contractionErr "other" (tensorIndex t1') (tensorIndex t2')
 
@@ -598,7 +612,7 @@ instance (Unboxed.Unbox a) => Multilinear Tensor a where
 -- Add scalar right
 {-# INLINE (.+) #-}
 (.+) :: (
-    Unboxed.Unbox a, Num a
+    Unboxed.Unbox a, Num a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -607,7 +621,7 @@ t .+ x = (+x) `Multilinear.Generic.MultiCore.map` t
 -- Subtract scalar right
 {-# INLINE (.-) #-}
 (.-) :: (
-    Unboxed.Unbox a, Num a
+    Unboxed.Unbox a, Num a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -616,7 +630,7 @@ t .- x = (\p -> p - x) `Multilinear.Generic.MultiCore.map` t
 -- Multiplicate by scalar right
 {-# INLINE (.*) #-}
 (.*) :: (
-    Unboxed.Unbox a, Num a
+    Unboxed.Unbox a, Num a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -625,7 +639,7 @@ t .* x = (*x) `Multilinear.Generic.MultiCore.map` t
 -- Add scalar left
 {-# INLINE (+.) #-}
 (+.) :: (
-    Unboxed.Unbox a, Num a
+    Unboxed.Unbox a, Num a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -634,7 +648,7 @@ x +. t = (x+) `Multilinear.Generic.MultiCore.map` t
 -- Subtract scalar left
 {-# INLINE (-.) #-}
 (-.) :: (
-    Unboxed.Unbox a, Num a
+    Unboxed.Unbox a, Num a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -643,7 +657,7 @@ x -. t = (x-) `Multilinear.Generic.MultiCore.map` t
 -- Multiplicate by scalar left
 {-# INLINE (*.) #-}
 (*.) :: (
-    Unboxed.Unbox a, Num a
+    Unboxed.Unbox a, Num a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -654,7 +668,7 @@ x *. t = (x*) `Multilinear.Generic.MultiCore.map` t
 {-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
 {-# INLINE map #-}
 map :: (
-    Unboxed.Unbox a, Unboxed.Unbox b
+    Unboxed.Unbox a, Unboxed.Unbox b, NFData b
     ) => (a -> b) 
       -> Tensor a 
       -> Tensor b
@@ -663,7 +677,11 @@ map f x = case x of
     Scalar v                -> Scalar $ f v
     -- Mapping complex tensor does mapping element by element
     SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
-    FiniteTensor index ts   -> FiniteTensor index $ Multilinear.Generic.MultiCore.map f <$> ts
+    FiniteTensor index ts   -> 
+        let len = Boxed.length ts
+            lts = Boxed.toList $ Multilinear.Generic.MultiCore.map f <$> ts
+            ltsp = lts `Parallel.using` Parallel.parListChunk (len `div` 8) Parallel.rdeepseq
+        in  FiniteTensor index $ Boxed.fromList ltsp
 
 {-| Filtering tensor. 
     Filtering multi-dimensional arrray may be dangerous, as we always assume, 
@@ -710,7 +728,7 @@ filterIndex iname f = Multilinear.Generic.MultiCore.filter (\i n -> i /= iname |
 {-| Zip tensors with binary combinator, assuming they have all indices the same -}
 {-# INLINE zipWith' #-}
 zipWith' :: (
-    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c
+    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c, NFData c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 
@@ -736,7 +754,7 @@ zipWith' _ _ _ = error "Invalid indices to peroform zip!"
 
 {-# INLINE zipWith #-}
 zipWith :: (
-    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c
+    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c, NFData c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 

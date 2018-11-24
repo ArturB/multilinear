@@ -22,5 +22,5 @@ gen j k = sin (fromIntegral j) + cos (fromIntegral k)
 
 main :: IO ()
 main = do
-    let m = (Matrix.fromIndices "ij" 5000 5000 gen :: Tensor Double) + (Matrix.fromIndices "ij" 5000 5000 gen :: Tensor Double)
+    let m = (Matrix.fromIndices "ij" 1000 1000 gen :: Tensor Double) + (Matrix.fromIndices "jk" 1000 1000 gen :: Tensor Double)
     m `deepseq` putStrLn $ "All done! Indices of m:" ++ show (indices m)

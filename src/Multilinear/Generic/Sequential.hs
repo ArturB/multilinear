@@ -190,15 +190,12 @@ _contractedIndices ::
 _contractedIndices t1 t2 = 
     let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
         iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
-
         iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
         iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
-
     in  -- contracted are indices covariant in the first tensor and contravariant in the second
         Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
         -- or contravariant in the first tensor and covariant in the second
         Set.intersection iContravariantNames1 iCovariantNames2
-
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
@@ -208,32 +205,27 @@ _elemByElem' :: (Num a, Unboxed.Unbox a, NFData a)
              -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
              -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
              -> Tensor a                            -- ^ Result tensor
-
 -- @Scalar x + Scalar y = Scalar x + y@
 _elemByElem' (Scalar x1) (Scalar x2) f _ = Scalar $ f x1 x2
 -- @Scalar x + Tensor t[i] = Tensor r[i] | r[i] = x + t[i]@
 _elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.Generic.Sequential.map` t
 -- @Tensor t[i] + Scalar x = Tensor r[i] | r[i] = t[i] + x@
 _elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.Generic.Sequential.map` t
-
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | otherwise = FiniteTensor index1 $ Boxed.generate (Unboxed.length v1) 
         (\i -> (\x -> f x `Multilinear.Generic.Sequential.map` t2) (v1 Unboxed.! i))
-
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | Index.indexName index1 `Data.List.elem` indicesNames t2 =
         FiniteTensor index2 $ (\x -> _elemByElem' t1 x f op) <$> v2
     | otherwise = FiniteTensor index1 $ (\x -> _elemByElem' x t2 f op) <$> v1
-
 -- Simple and finite tensor case
 _elemByElem' t1@(SimpleFinite index1 _) t2@(FiniteTensor index2 v2) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
     | otherwise = FiniteTensor index2 $ (\x -> _elemByElem' t1 x f op) <$> v2
-
 -- Finite and simple tensor case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
