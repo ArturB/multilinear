@@ -1,3 +1,8 @@
+# 0.4.0.0, 2018-11-24
+- added multi-core parallelism, sample benchmark is available in ./benchmark/results.zip
+- more robust QuickCheck tests
+- some API changes; simplified Multilinear class
+
 # 0.3.2.0, 2018-11-18
 - added filter and zipWith functions
 

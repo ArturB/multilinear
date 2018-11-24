@@ -1,6 +1,6 @@
 ./test.sh && 
-echo -e "Building doc...\n" && 
+echo -e "\nBuilding doc..." && 
 stack haddock --coverage && 
-echo -e "Uploading to Hackage...\n" && 
+echo -e "\nUploading to Hackage..." && 
 stack sdist && 
 stack upload .
