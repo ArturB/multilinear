@@ -249,35 +249,15 @@ _elemByElem :: (Num a, Unboxed.Unbox a, NFData a)
             -> (Tensor a -> Tensor a -> Tensor a)   -- ^ Tensor operator called if indices are the same
             -> Tensor a                             -- ^ Result tensor
 _elemByElem t1 t2 f op = 
-    let commonIndices = Data.List.filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
+    let commonIndices = 
+            if indices t1 /= indices t2 then
+                Data.List.filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
+            else []
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
-
-
-
     in _mergeScalars $ _elemByElem' t1' t2' f op
 
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
-{-# INLINE zipT' #-}
-zipT' :: (
-    Num a, NFData a, Unboxed.Unbox a
-    ) => (a -> a -> a)                        -- ^ The zipping combinator
-      -> Tensor a                             -- ^ First tensor to zip
-      -> Tensor a                             -- ^ Second tensor to zip
-      -> Tensor a                             -- ^ Result tensor
--- Two simple tensors case
-zipT' f t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 v2) = 
-    if index1 == index2 then 
-        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
-    else dot t1 t2
---Two finite tensors case
-zipT' f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     = 
-    if index1 == index2 then 
-        FiniteTensor index1 $ Boxed.zipWith (zipT f) v1 v2 
-    else dot t1 t2
--- Zipping something with scalar is impossible
-zipT' _ _ _ = error $ "zipT: " ++ scalarIndices
-
 {-# INLINE zipT #-}
 zipT :: (
     Num a, NFData a, Unboxed.Unbox a
@@ -285,10 +265,20 @@ zipT :: (
       -> Tensor a                             -- ^ First tensor to zip
       -> Tensor a                             -- ^ Second tensor to zip
       -> Tensor a                             -- ^ Result tensor
-zipT f t1 t2 = 
-    let t1' = t1
-        t2' = t2
-    in  zipT' f t1' t2'
+-- Two simple tensors case
+zipT f t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 v2) = 
+    if index1 == index2 then 
+        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
+    else dot t1 t2
+--Two finite tensors case
+zipT f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     = 
+    if index1 == index2 then let
+        l1l = Boxed.length v1
+        l3 = Boxed.toList (Boxed.zipWith (zipT f) v1 v2) `Parallel.using` Parallel.parListChunk (l1l `div` 8) Parallel.rdeepseq
+        in FiniteTensor index1 $ Boxed.fromList l3
+    else dot t1 t2
+-- Zipping something with scalar is impossible
+zipT _ _ _ = error $ "zipT: " ++ scalarIndices
 
 -- | dot product of two tensors
 {-# INLINE dot #-}
@@ -599,8 +589,9 @@ instance (Unboxed.Unbox a) => Multilinear Tensor a where
                        then (\un -> Boxed.generate (Unboxed.length un) (\i -> Scalar $ un Unboxed.! i)) <$> 
                             (tensorScalars <$> ts1)
                        else tensorsFinite <$> ts1
+                result = FiniteTensor index2 $ FiniteTensor index1 <$> (_transpose dane)
             -- reconstruct tensor with transposed elements
-            in  _mergeScalars $ FiniteTensor index2 $ FiniteTensor index1 <$> (_transpose dane)
+            in  _mergeScalars result
         -- there is only one index and therefore it cannot be shifted
         | otherwise = t1
 

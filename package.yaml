@@ -75,9 +75,27 @@ tests:
     - generic-random
 
 benchmarks:
-  time:
+  sequential-time:
     main:                Bench.hs
-    source-dirs:         benchmark/time
+    source-dirs:         benchmark/sequential/time
+    dependencies:
+    - criterion
+    - multilinear
+  sequential-memory:
+    main:                Bench.hs
+    source-dirs:         benchmark/sequential/memory
+    dependencies:
+    - multilinear
+    - weigh
+  sequential-profile:
+    main:                Bench.hs
+    source-dirs:         benchmark/sequential/profile
+    dependencies:
+    - deepseq
+    - multilinear
+  multicore-time:
+    main:                Bench.hs
+    source-dirs:         benchmark/multicore/time
     ghc-options:
     - -threaded
     - -rtsopts
@@ -85,9 +103,9 @@ benchmarks:
     dependencies:
     - criterion
     - multilinear
-  memory:
+  multicore-memory:
     main:                Bench.hs
-    source-dirs:         benchmark/memory
+    source-dirs:         benchmark/multicore/memory
     ghc-options:
     - -threaded
     - -rtsopts
@@ -95,9 +113,9 @@ benchmarks:
     dependencies:
     - multilinear
     - weigh
-  profile:
+  multicore-profile:
     main:                Bench.hs
-    source-dirs:         benchmark/profile
+    source-dirs:         benchmark/multicore/profile
     ghc-options:
     - -threaded
     - -rtsopts

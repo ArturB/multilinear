@@ -14,7 +14,8 @@ module Main (
 ) where
 
 import           Control.DeepSeq
-import           Multilinear
+import           Multilinear.Class
+import           Multilinear.Generic.MultiCore
 import qualified Multilinear.Matrix as Matrix
 
 gen :: Int -> Int -> Double
@@ -22,5 +23,5 @@ gen j k = sin (fromIntegral j) + cos (fromIntegral k)
 
 main :: IO ()
 main = do
-    let m = (Matrix.fromIndices "ij" 40 6000 gen :: Tensor Double) * (Matrix.fromIndices "jk" 6000 40 gen :: Tensor Double)
+    let m = (Matrix.fromIndices "ij" 5000 5000 gen :: Tensor Double) + (Matrix.fromIndices "ij" 5000 5000 gen :: Tensor Double)
     m `deepseq` putStrLn $ "All done! Indices of m:" ++ show (indices m)

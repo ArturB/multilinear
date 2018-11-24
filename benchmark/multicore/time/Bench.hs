@@ -14,7 +14,8 @@ module Main (
 ) where
 
 import           Criterion.Main
-import           Multilinear
+import           Multilinear.Class
+import           Multilinear.Generic.MultiCore
 import qualified Multilinear.Matrix                  as Matrix
 
 -- | Simple generator function for bencharking matrices
@@ -40,6 +41,6 @@ sizedMatrixAddBench s =
 -- | ENTRY POINT
 main :: IO ()
 main = defaultMain [
-    bgroup "matrix multiplication" $ sizedMatrixMultBench <$> [64, 128, 256, 512],
-    bgroup "matrix addition" $ sizedMatrixAddBench <$> [64, 128, 256, 512]
+    bgroup "matrix addition" $ sizedMatrixAddBench <$> [64, 128, 256, 512],
+    bgroup "matrix multiplication" $ sizedMatrixMultBench <$> [64, 128, 256, 512]
     ]
