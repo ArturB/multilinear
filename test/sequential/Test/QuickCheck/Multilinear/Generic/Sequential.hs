@@ -76,6 +76,6 @@ tensors3D = pure (*) <*> ts <*> tensors1D
   where ts = pure (*) <*> tensors1D <*> tensors1D
 
 -- | Arbitrary random generating instance of Tensor Double
--- | Simply choose a tensot from tensors list above
+-- | Simply choose a tensor from tensors list above
 instance Arbitrary (Tensor Double) where
     arbitrary = elements tensors3D

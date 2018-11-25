@@ -98,7 +98,6 @@ If you want to do a matrix multiplication, a lower index of first matrix must ha
    | [k:4] [3,4,5,6]
    | [k:4] [4,5,6,7]
 >>> m1 * m2
-
 \<i:3\>
    | [k:4] [30,40,50,60]
    | [k:4] [40,50,60,70]
@@ -149,11 +148,13 @@ module Multilinear.Class (
 import           Data.Maybe
 import           Data.Set
 import qualified Data.Vector.Unboxed as Unboxed
+import           GHC.Generics
 import           Multilinear.Index
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
-  Unboxed.Unbox a
+   Generic (t a),  -- ^ Enforce Generic instance, allowing to derive e.g. serialization instances for any tensor
+   Unboxed.Unbox a -- ^ For performance reasons, every tensor should be implemented using Vector.Unboxed
   ) => Multilinear t a where
 
     {-| Generic tensor constructor, using combinator function on its indices -}
