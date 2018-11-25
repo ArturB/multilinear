@@ -145,6 +145,7 @@ module Multilinear.Class (
     Multilinear(..)
 ) where
 
+import           Control.DeepSeq
 import           Data.Maybe
 import           Data.Set
 import qualified Data.Vector.Unboxed as Unboxed
@@ -153,8 +154,9 @@ import           Multilinear.Index
 
 {-| Multidimensional array treated as multilinear map - tensor -}
 class (
-   Generic (t a),  -- ^ Enforce Generic instance, allowing to derive e.g. serialization instances for any tensor
-   Unboxed.Unbox a -- ^ For performance reasons, every tensor should be implemented using Vector.Unboxed
+   Generic (t a),          -- ^ Enforce Generic instance, allowing to derive e.g. serialization instances for any tensor
+   NFData a, NFData (t a), -- ^ For performance reasons, every tensor should be able to be fully evaluated
+   Unboxed.Unbox a         -- ^ For performance reasons, every tensor should be implemented using Vector.Unboxed
   ) => Multilinear t a where
 
     {-| Generic tensor constructor, using combinator function on its indices -}
@@ -312,3 +314,6 @@ class (
     infixl 6 <<<|
     (<<<|) :: t a -> String -> t a
     t <<<| n = shiftLeftmost t n
+
+    -- | Move covariant indices to deeper recursion level
+    standardize :: t a -> t a

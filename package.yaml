@@ -35,6 +35,7 @@ default-extensions:
 - MultiParamTypeClasses
 - ScopedTypeVariables
 - StandaloneDeriving
+- UndecidableInstances
 
 library:
   source-dirs: src

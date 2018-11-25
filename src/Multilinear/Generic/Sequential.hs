@@ -14,8 +14,8 @@ module Multilinear.Generic.Sequential (
     Tensor(..), 
     -- * Auxiliary functions
     (!), isScalar, isSimple, isFiniteTensor,
-    tensorIndex, _standardize, _mergeScalars, 
-    _map, _contractedIndices, _elemByElem, zipT,
+    tensorIndex, _mergeScalars, 
+    _contractedIndices, _elemByElem, zipT,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.Sequential.map, 
@@ -73,6 +73,9 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
+-- | NFData instance
+instance NFData a => NFData (Tensor a)
+
 {-| Return true if tensor is a scalar -}
 {-# INLINE isScalar #-}
 isScalar :: Unboxed.Unbox a => Tensor a -> Bool
@@ -120,21 +123,14 @@ t ! i = case t of
     SimpleFinite ind ts -> Scalar $ ts Unboxed.! (i `mod` Finite.indexSize ind)
     FiniteTensor ind ts -> ts Boxed.! (i `mod` Finite.indexSize ind)
 
--- | NFData instance
-instance NFData a => NFData (Tensor a)
-
--- | Move contravariant indices to lower recursion level
-{-# INLINE _standardize #-}
-_standardize :: (Unboxed.Unbox a) => Tensor a -> Tensor a
-_standardize tens = foldl' (<<<|) tens $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tens)
-
 -- | Print tensor
+-- | Assumes tensor is already in Multilinear class, because standardize function
 instance (
-    Unboxed.Unbox a, Show a
+    Multilinear Tensor a, Show a
     ) => Show (Tensor a) where
 
     -- merge errors first and then print whole tensor
-    show = show' . _standardize
+    show = show' . standardize
         where
         show' x = case x of
             -- Scalar is showed simply as its value
@@ -161,19 +157,6 @@ _mergeScalars x = case x of
         _        -> FiniteTensor index1 $ _mergeScalars <$> ts1
     _ -> x
 
--- | Generic map function, which does not require a,b types to be Num
-_map :: (
-    Unboxed.Unbox a, Unboxed.Unbox b
-    ) => (a -> b)
-      -> Tensor a
-      -> Tensor b
-_map f x = case x of
-    -- Mapping scalar simply maps its value
-    Scalar v                -> Scalar $ f v
-    -- Mapping complex tensor does mapping element by element
-    SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
-    FiniteTensor index ts   -> FiniteTensor index $ _map f <$> ts
-
 {-| Transpose Vector of Vectors, analogous to Data.List.transpose function. It is assumed, that all vectors on deeper recursion level have the same length.  -}
 _transpose :: Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
            -> Boxed.Vector (Boxed.Vector a)
@@ -199,7 +182,7 @@ _contractedIndices t1 t2 =
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
-_elemByElem' :: (Num a, Unboxed.Unbox a, NFData a)
+_elemByElem' :: (Num a, Multilinear Tensor a)
              => Tensor a                            -- ^ First argument of operator
              -> Tensor a                            -- ^ Second argument of operator
              -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
@@ -233,7 +216,7 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
-_elemByElem :: (Num a, Unboxed.Unbox a, NFData a)
+_elemByElem :: (Num a, Multilinear Tensor a)
             => Tensor a                             -- ^ First argument of operator
             -> Tensor a                             -- ^ Second argument of operator
             -> (a -> a -> a)                        -- ^ Operator on tensor elements if indices are different
@@ -251,7 +234,7 @@ _elemByElem t1 t2 f op =
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
 zipT :: (
-    Num a, NFData a, Unboxed.Unbox a
+    Num a, Multilinear Tensor a
     ) => (a -> a -> a)                        -- ^ The zipping combinator
       -> Tensor a                             -- ^ First tensor to zip
       -> Tensor a                             -- ^ Second tensor to zip
@@ -271,7 +254,7 @@ zipT _ _ _ = error $ "zipT: " ++ scalarIndices
 
 -- | dot product of two tensors
 {-# INLINE dot #-}
-dot :: (Num a, Unboxed.Unbox a, NFData a)
+dot :: (Num a, Multilinear Tensor a)
       => Tensor a  -- ^ First dot product argument
       -> Tensor a  -- ^ Second dot product argument
       -> Tensor a  -- ^ Resulting dot product
@@ -324,7 +307,7 @@ zipErr variant i1' i2' = error $
 
 
 -- | Tensors can be added, subtracted and multiplicated
-instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
+instance (Multilinear Tensor a, Num a) => Num (Tensor a) where
 
     -- Adding - element by element
     {-# INLINE (+) #-}
@@ -352,7 +335,7 @@ instance (Unboxed.Unbox a, Num a, NFData a) => Num (Tensor a) where
     fromInteger x = Scalar $ fromInteger x
 
 -- | Tensors can be divided by each other
-instance (Unboxed.Unbox a, Fractional a, NFData a) => Fractional (Tensor a) where
+instance (Fractional a, Multilinear Tensor a) => Fractional (Tensor a) where
     -- Tensor dividing: TODO
     {-# INLINE (/) #-}
     _ / _ = error "TODO"
@@ -364,7 +347,7 @@ instance (Unboxed.Unbox a, Fractional a, NFData a) => Fractional (Tensor a) wher
 -- Real-number functions on tensors.
 -- Function of tensor is tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (Unboxed.Unbox a, Floating a, NFData a) => Floating (Tensor a) where
+instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
 
     {-| PI number -}
     {-# INLINE pi #-}
@@ -419,7 +402,7 @@ instance (Unboxed.Unbox a, Floating a, NFData a) => Floating (Tensor a) where
     atanh t = atanh `Multilinear.Generic.Sequential.map` t
 
 -- Multilinear operations
-instance (Unboxed.Unbox a) => Multilinear Tensor a where
+instance (NFData a, Unboxed.Unbox a) => Multilinear Tensor a where
     -- Generic tensor constructor
     -- If only one upper index is given, generate a SimpleFinite tensor with upper index
     fromIndices [u] [] [s] [] f = 
@@ -546,17 +529,14 @@ instance (Unboxed.Unbox a) => Multilinear Tensor a where
     {-| Transpose a tensor (switch all indices types) -}
     {-# INLINE transpose #-}
     transpose (Scalar x) = Scalar x
-
     transpose (FiniteTensor (Finite.Covariant count name) ts) =
         FiniteTensor (Finite.Contravariant count name) (Multilinear.transpose <$> ts)
     transpose (FiniteTensor (Finite.Contravariant count name) ts) =
         FiniteTensor (Finite.Covariant count name) (Multilinear.transpose <$> ts)
-
     transpose (SimpleFinite (Finite.Covariant count name) ts) =
         SimpleFinite (Finite.Contravariant count name) ts
     transpose (SimpleFinite (Finite.Contravariant count name) ts) =
         SimpleFinite (Finite.Covariant count name) ts
-
 
     {-| Shift tensor index right -}
     {-| Moves given index one level deeper in recursion -}
@@ -584,10 +564,14 @@ instance (Unboxed.Unbox a) => Multilinear Tensor a where
         -- there is only one index and therefore it cannot be shifted
         | otherwise = t1
 
+    -- | Move contravariant indices to lower recursion level
+    standardize tens = foldl' (<<<|) tens $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tens)
+
+
 -- Add scalar right
 {-# INLINE (.+) #-}
 (.+) :: (
-    Unboxed.Unbox a, Num a
+    Num a, Multilinear Tensor a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -596,7 +580,7 @@ t .+ x = (+x) `Multilinear.Generic.Sequential.map` t
 -- Subtract scalar right
 {-# INLINE (.-) #-}
 (.-) :: (
-    Unboxed.Unbox a, Num a
+    Num a, Multilinear Tensor a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -605,7 +589,7 @@ t .- x = (\p -> p - x) `Multilinear.Generic.Sequential.map` t
 -- Multiplicate by scalar right
 {-# INLINE (.*) #-}
 (.*) :: (
-    Unboxed.Unbox a, Num a
+    Num a, Multilinear Tensor a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -614,7 +598,7 @@ t .* x = (*x) `Multilinear.Generic.Sequential.map` t
 -- Add scalar left
 {-# INLINE (+.) #-}
 (+.) :: (
-    Unboxed.Unbox a, Num a
+    Num a, Multilinear Tensor a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -623,7 +607,7 @@ x +. t = (x+) `Multilinear.Generic.Sequential.map` t
 -- Subtract scalar left
 {-# INLINE (-.) #-}
 (-.) :: (
-    Unboxed.Unbox a, Num a
+    Num a, Multilinear Tensor a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -632,20 +616,17 @@ x -. t = (x-) `Multilinear.Generic.Sequential.map` t
 -- Multiplicate by scalar left
 {-# INLINE (*.) #-}
 (*.) :: (
-    Unboxed.Unbox a, Num a
+    Num a, Multilinear Tensor a
     ) => a 
       -> Tensor a 
       -> Tensor a
 x *. t = (x*) `Multilinear.Generic.Sequential.map` t
 
-    
-{-| Simple mapping -}
-{-| @map f t@ returns tensor @t2@ in which @t2[i1,i2,...] = f t[i1,i2,...]@ -}
-{-# INLINE map #-}
+-- | Simple mapping
 map :: (
-    Unboxed.Unbox a, Unboxed.Unbox b
-    ) => (a -> b) 
-      -> Tensor a 
+    Multilinear Tensor a, Multilinear Tensor b
+    ) => (a -> b)
+      -> Tensor a
       -> Tensor b
 map f x = case x of
     -- Mapping scalar simply maps its value
@@ -666,7 +647,7 @@ map f x = case x of
     If for some index all elements are removed, the index itself is removed from tensor. -}
 {-# INLINE filter #-}
 filter :: (
-    Unboxed.Unbox a
+    Multilinear Tensor a
     ) => (String -> Int -> Bool) -- ^ filter function
       -> Tensor a                -- ^ tensor to filter
       -> Tensor a
@@ -689,7 +670,7 @@ filter f (FiniteTensor index ts) =
 {-| Filtering one index of tensor. -}
 {-# INLINE filterIndex #-}
 filterIndex :: (
-    Unboxed.Unbox a
+    Multilinear Tensor a
     ) => String        -- ^ Index name to filter
       -> (Int -> Bool) -- ^ filter function
       -> Tensor a      -- ^ tensor to filter
@@ -699,7 +680,7 @@ filterIndex iname f = Multilinear.Generic.Sequential.filter (\i n -> i /= iname 
 {-| Zip tensors with binary combinator, assuming they have all indices the same -}
 {-# INLINE zipWith' #-}
 zipWith' :: (
-    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c
+    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 
@@ -707,9 +688,9 @@ zipWith' :: (
 -- Zipping two Scalars simply combines their values 
 zipWith' f (Scalar x1) (Scalar x2) = Scalar $ f x1 x2
 -- zipping complex tensor with scalar 
-zipWith' f t (Scalar x) = (`f` x) `_map` t
+zipWith' f t (Scalar x) = (`f` x) `Multilinear.Generic.Sequential.map` t
 -- zipping scalar with complex tensor
-zipWith' f (Scalar x) t = (x `f`) `_map` t
+zipWith' f (Scalar x) t = (x `f`) `Multilinear.Generic.Sequential.map` t
 -- Two simple tensors case
 zipWith' f (SimpleFinite index1 v1) (SimpleFinite index2 v2) = 
     if index1 == index2 then 
@@ -725,12 +706,12 @@ zipWith' _ _ _ = error "Invalid indices to peroform zip!"
 
 {-# INLINE zipWith #-}
 zipWith :: (
-    Unboxed.Unbox a, Unboxed.Unbox b, Unboxed.Unbox c
+    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 
       -> Tensor c
 zipWith f t1 t2 = 
-    let t1' = _standardize t1
-        t2' = _standardize t2
+    let t1' = standardize t1
+        t2' = standardize t2
     in  zipWith' f t1' t2'
