@@ -158,12 +158,16 @@ _mergeScalars x = case x of
     _ -> x
 
 {-| Transpose Vector of Vectors, analogous to Data.List.transpose function. It is assumed, that all vectors on deeper recursion level have the same length.  -}
-_transpose :: Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
-           -> Boxed.Vector (Boxed.Vector a)
+_transpose :: (
+    NFData a
+    ) => Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
+      -> Boxed.Vector (Boxed.Vector a)
 _transpose v = 
     let outerS = Boxed.length v
         innerS = Boxed.length $ v Boxed.! 0
-    in  Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
+        l = Boxed.toList $ Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
+        lp = l `Parallel.using` Parallel.parListChunk (innerS `div` 8) Parallel.rdeepseq
+    in  Boxed.fromList lp
 
 -- | Contracted indices have to be consumed in result tensor.
 _contractedIndices :: 
