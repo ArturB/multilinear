@@ -152,11 +152,16 @@ import qualified Data.Vector.Unboxed as Unboxed
 import           GHC.Generics
 import           Multilinear.Index
 
-{-| Multidimensional array treated as multilinear map - tensor -}
+{-| Multidimensional array treated as multilinear map - tensor 
+    Superclasses:
+     - Generic (t a) - enforce Generic instance, allowing to derive e.g. serialization instances for any tensor
+     - NFData a, NFData (t a) - for performance reasons, every tensor should be able to be fully evaluated
+     - Unboxed.Unbox a - for performance reasons, every tensor should be implemented using Vector.Unboxed
+ -}
 class (
-   Generic (t a),          -- ^ Enforce Generic instance, allowing to derive e.g. serialization instances for any tensor
-   NFData a, NFData (t a), -- ^ For performance reasons, every tensor should be able to be fully evaluated
-   Unboxed.Unbox a         -- ^ For performance reasons, every tensor should be implemented using Vector.Unboxed
+   Generic (t a),          
+   NFData a, NFData (t a), 
+   Unboxed.Unbox a         
   ) => Multilinear t a where
 
     {-| Generic tensor constructor, using combinator function on its indices -}
