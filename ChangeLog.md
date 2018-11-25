@@ -1,3 +1,7 @@
+# 0.5.0.0, 2018-11-25
+- reformulation of Multilinear class - added Generic and NFData superclasses. This allows any Multilinear tensor to be derived generically in e.g. serialization instances and fully evaluated for performace reasons
+- added simple Sequential <=> MultiCore converters in Multilinear.Generic module
+
 # 0.4.0.0, 2018-11-24
 - added multi-core parallelism, sample benchmark is available in ./benchmark/results.zip
 - more robust QuickCheck tests

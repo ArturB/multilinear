@@ -143,11 +143,9 @@ If you want to know more about linear algebra and Einstein convention, read Wiki
 
 module Multilinear (
     module Multilinear.Class,
-    module Multilinear.Generic,
-    module Multilinear.Generic.Sequential
+    module Multilinear.Generic
 ) where
 
 -- Re-export basic library modules
 import           Multilinear.Class
 import           Multilinear.Generic
-import           Multilinear.Generic.Sequential
