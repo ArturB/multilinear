@@ -8,6 +8,13 @@ rm -f benchmark/results.html
 rm -f benchmark/multicore-results.html
 rm -f benchmark/sequential-results.html
 
+# Build all benchmartks and push changes to git if successful
+if stack bench --no-run-benchmarks ; then
+    echo -e "Build successful!\nPushing changes to git..."
+    ( git add -A > /dev/null && git commit -qm "Untested build $BUILD_ID" && git pull -q && git push -q ) &
+    echo -e "Running all benchmarks..."
+fi
+
 # Perform all benchmarks in background and move on
 stack bench --ba "--output $BNAME" &
 STACK_PID=$!

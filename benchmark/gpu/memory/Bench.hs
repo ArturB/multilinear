@@ -49,24 +49,24 @@ main = mainWith (do
         (Matrix.fromIndices "ij" s3 s3 gen :: Tensor Double)
 
     -- Benchmarking matrix addition
-    value "matrix 64 x 64 addition" $ 
+    func "matrix 64 x 64 addition"
         (+ Matrix.fromIndices "ab" s1 s1 gen)
         (Matrix.fromIndices "ab" s1 s1 (\a b -> fromIntegral a + fromIntegral b) :: Tensor Double)
-    value "matrix 256 x 256 addition" $ 
+    func "matrix 256 x 256 addition"
         (+ Matrix.fromIndices "ab" s2 s2 gen)
         (Matrix.fromIndices "ab" s2 s2 (\a b -> fromIntegral a + fromIntegral b) :: Tensor Double)
-    value "matrix 1024 x 1024 addition" $ 
+    func "matrix 1024 x 1024 addition"
         (+ Matrix.fromIndices "ab" s3 s3 gen)
         (Matrix.fromIndices "ab" s3 s3 (\a b -> fromIntegral a + fromIntegral b) :: Tensor Double)
     
     -- Benchmarking matrix multiplication
-    value "matrix 40 x 4,000 multiplication" $ 
+    func "matrix 40 x 4,000 multiplication"
         (* Matrix.fromIndices "jk" 4000 40 gen)
         (Matrix.fromIndices "ij" 40 4000 gen :: Tensor Double)
-    value "matrix 40 x 16,000 multiplication" $ 
+    func "matrix 40 x 16,000 multiplication"
         (* Matrix.fromIndices "jk" 16000 40 gen)
         (Matrix.fromIndices "ij" 40 16000 gen :: Tensor Double)
-    value "matrix 40 x 64,000 multiplication" $ 
+    func "matrix 40 x 64,000 multiplication"
         (* Matrix.fromIndices "jk" 64000 40 gen)
         (Matrix.fromIndices "ij" 40 64000 gen :: Tensor Double)
     )

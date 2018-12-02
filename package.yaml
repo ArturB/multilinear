@@ -43,6 +43,7 @@ library:
   source-dirs: src
   c-sources:
   - cbits/dot.c
+  cc-options: -O3
   dependencies:
   - containers
   - deepseq
