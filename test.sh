@@ -31,7 +31,7 @@ fi
 if stack test --coverage ; then
     echo -e "\u001b[32mAll tests passed!\u001b[0m"
     echo -e "Pushing changes to git..."
-    ( git add -A > /dev/null && git commit -qm "Build $BUILD_ID" && git pull -q && git push -q ) &
+    ( git add -A > /dev/null && git commit -qm "Tested build $BUILD_ID" && git pull -q && git push -q ) &
     echo -e "All done!"
     exit 0
 else
