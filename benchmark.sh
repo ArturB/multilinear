@@ -3,17 +3,20 @@
 # Benchmark results filename
 BNAME="benchmark/results.html"
 
-# Remove earlier benchmarks result if present
-rm -f benchmark/results.html
-rm -f benchmark/multicore-results.html
-rm -f benchmark/sequential-results.html
-
 # Build all benchmartks and push changes to git if successful
+# If build failed, don't go on, but exit
 if stack bench --no-run-benchmarks ; then
     echo -e "Build successful!\nPushing changes to git..."
     ( git add -A > /dev/null && git commit -qm "Untested build $BUILD_ID" && git pull -q && git push -q ) &
     echo -e "Running all benchmarks..."
+else
+    exit 1
 fi
+
+# Remove earlier benchmarks result if present
+rm -f benchmark/results.html
+rm -f benchmark/multicore-results.html
+rm -f benchmark/sequential-results.html
 
 # Perform all benchmarks in background and move on
 stack bench --ba "--output $BNAME" &
