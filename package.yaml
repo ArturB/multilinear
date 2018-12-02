@@ -29,16 +29,20 @@ default-extensions:
 - DeriveGeneric
 - FlexibleContexts
 - FlexibleInstances
+- ForeignFunctionInterface 
 - GADTs
 - GeneralizedNewtypeDeriving
 - LambdaCase
 - MultiParamTypeClasses
 - ScopedTypeVariables
 - StandaloneDeriving
+- TypeFamilies
 - UndecidableInstances
 
 library:
   source-dirs: src
+  cxx-sources:
+  - cbits/dot.cpp
   dependencies:
   - containers
   - deepseq

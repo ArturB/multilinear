@@ -1,6 +1,6 @@
 {-|
-Module      : Multilinear.Generic.MultiCore
-Description : Generic implementation of tensor as nested arrays, evaluated in sequential manner
+Module      : Multilinear.Generic.GPU
+Description : Generic implementation of tensor as nested arrays, evaluated on GPU using OpenCL
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
@@ -9,7 +9,7 @@ Portability : Windows/POSIX
 
 -}
 
-module Multilinear.Generic.MultiCore (
+module Multilinear.Generic.GPU (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
@@ -18,10 +18,10 @@ module Multilinear.Generic.MultiCore (
     _contractedIndices, _elemByElem, zipT,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
-    Multilinear.Generic.MultiCore.map, 
-    Multilinear.Generic.MultiCore.filter,
-    Multilinear.Generic.MultiCore.filterIndex,
-    Multilinear.Generic.MultiCore.zipWith
+    Multilinear.Generic.GPU.map, 
+    Multilinear.Generic.GPU.filter,
+    Multilinear.Generic.GPU.filterIndex,
+    Multilinear.Generic.GPU.zipWith
 ) where
 
 import           Control.DeepSeq
@@ -31,12 +31,17 @@ import           Data.List
 import           Data.Maybe
 import qualified Data.Set                    as Set
 import qualified Data.Vector                 as Boxed
+import qualified Data.Vector.Storable        as StorableV
 import qualified Data.Vector.Unboxed         as Unboxed
+import           Foreign.ForeignPtr.Unsafe
+import           Foreign.Ptr
 import           Foreign.Storable
 import           GHC.Generics
 import           Multilinear.Class           as Multilinear
 import qualified Multilinear.Index           as Index
 import qualified Multilinear.Index.Finite    as Finite
+
+foreign import ccall "dot" c_dot :: Ptr Double -> Ptr Double -> Double
 
 {-| ERROR MESSAGE -}
 incompatibleTypes :: String
@@ -64,7 +69,7 @@ data Tensor a where
     {-| Simple, one-dimensional finite tensor -}
     SimpleFinite :: {
         tensorFiniteIndex :: Finite.Index,
-        tensorScalars     :: Unboxed.Vector a
+        tensorScalars     :: StorableV.Vector a
     } -> Tensor a
     {-| Finite array of other tensors -}
     FiniteTensor :: {
@@ -77,28 +82,28 @@ data Tensor a where
 
 {-| Return true if tensor is a scalar -}
 {-# INLINE isScalar #-}
-isScalar :: Unboxed.Unbox a => Tensor a -> Bool
+isScalar :: Storable a => Tensor a -> Bool
 isScalar x = case x of
     Scalar _ -> True
     _        -> False
 
 {-| Return true if tensor is a simple tensor -}
 {-# INLINE isSimple #-}
-isSimple :: Unboxed.Unbox a => Tensor a -> Bool
+isSimple :: Storable a => Tensor a -> Bool
 isSimple x = case x of
     SimpleFinite _ _ -> True
     _                -> False
 
 {-| Return True if tensor is a complex tensor -}
 {-# INLINE isFiniteTensor #-}
-isFiniteTensor :: Unboxed.Unbox a => Tensor a -> Bool
+isFiniteTensor :: Storable a => Tensor a -> Bool
 isFiniteTensor x = case x of
     FiniteTensor _ _ -> True
     _                -> False
 
 {-| Return generic tensor index -}
 {-# INLINE tensorIndex #-}
-tensorIndex :: Unboxed.Unbox a => Tensor a -> Index.TIndex
+tensorIndex :: Storable a => Tensor a -> Index.TIndex
 tensorIndex x = case x of
     Scalar _           -> error scalarIndices
     SimpleFinite i _   -> Index.toTIndex i
@@ -106,7 +111,7 @@ tensorIndex x = case x of
 
 {-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
 {-# INLINE firstTensor #-}
-firstTensor :: Unboxed.Unbox a => Tensor a -> Tensor a
+firstTensor :: Storable a => Tensor a -> Tensor a
 firstTensor x = case x of
     FiniteTensor _ ts   -> Boxed.head ts
     _                   -> x
@@ -114,12 +119,12 @@ firstTensor x = case x of
 {-| Recursive indexing on list tensor. If index is greater than index size, performs modulo indexing
     @t ! i = t[i]@ -}
 {-# INLINE (!) #-}
-(!) :: Unboxed.Unbox a => Tensor a      -- ^ tensor @t@
+(!) :: Storable a => Tensor a      -- ^ tensor @t@
     -> Int           -- ^ index @i@
     -> Tensor a      -- ^ tensor @t[i]@
 t ! i = case t of
     Scalar _            -> error scalarIndices
-    SimpleFinite ind ts -> Scalar $ ts Unboxed.! (i `mod` Finite.indexSize ind)
+    SimpleFinite ind ts -> Scalar $ ts StorableV.! (i `mod` Finite.indexSize ind)
     FiniteTensor ind ts -> ts Boxed.! (i `mod` Finite.indexSize ind)
 
 -- | NFData instance
@@ -127,7 +132,7 @@ instance NFData a => NFData (Tensor a)
 
 -- | Print tensor
 instance (
-    Multilinear Tensor a, Show a, Unboxed.Unbox a
+    Multilinear Tensor a, Show a
     ) => Show (Tensor a) where
 
     -- merge errors first and then print whole tensor
@@ -139,9 +144,9 @@ instance (
             -- SimpleFinite is shown dependent on its index...
             SimpleFinite index ts -> show index ++ "S: " ++ case index of
                 -- If index is contravariant, show tensor components vertically
-                Finite.Contravariant _ _ -> "\n" ++ tail (Unboxed.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
+                Finite.Contravariant _ _ -> "\n" ++ tail (StorableV.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
                 -- If index is covariant or indifferent, show tensor compoments horizontally
-                _                        -> "["  ++ tail (Unboxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
+                _                        -> "["  ++ tail (StorableV.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
             -- FiniteTensor is shown dependent on its index...
             FiniteTensor index ts -> show index ++ "T: " ++ case index of
                 -- If index is contravariant, show tensor components vertically
@@ -151,10 +156,10 @@ instance (
 
 {-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
 {-# INLINE _mergeScalars #-}
-_mergeScalars :: Unboxed.Unbox a => Tensor a -> Tensor a
+_mergeScalars :: Storable a => Tensor a -> Tensor a
 _mergeScalars x = case x of
     (FiniteTensor index1 ts1) -> case ts1 Boxed.! 0 of
-        Scalar _ -> SimpleFinite index1 $ Unboxed.generate (Boxed.length ts1) (\i -> scalarVal (ts1 Boxed.! i))
+        Scalar _ -> SimpleFinite index1 $ StorableV.generate (Boxed.length ts1) (\i -> scalarVal (ts1 Boxed.! i))
         _        -> FiniteTensor index1 $ _mergeScalars <$> ts1
     _ -> x
 
@@ -196,14 +201,14 @@ _elemByElem' :: (Num a, Multilinear Tensor a)
 -- @Scalar x + Scalar y = Scalar x + y@
 _elemByElem' (Scalar x1) (Scalar x2) f _ = Scalar $ f x1 x2
 -- @Scalar x + Tensor t[i] = Tensor r[i] | r[i] = x + t[i]@
-_elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.Generic.MultiCore.map` t
+_elemByElem' (Scalar x) t f _ = (x `f`) `Multilinear.Generic.GPU.map` t
 -- @Tensor t[i] + Scalar x = Tensor r[i] | r[i] = t[i] + x@
-_elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.Generic.MultiCore.map` t
+_elemByElem' t (Scalar x) f _ = (`f` x) `Multilinear.Generic.GPU.map` t
 -- Two simple tensors case
 _elemByElem' t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 _) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
-    | otherwise = FiniteTensor index1 $ Boxed.generate (Unboxed.length v1) 
-        (\i -> (\x -> f x `Multilinear.Generic.MultiCore.map` t2) (v1 Unboxed.! i))
+    | otherwise = FiniteTensor index1 $ Boxed.generate (StorableV.length v1) 
+        (\i -> (\x -> f x `Multilinear.Generic.GPU.map` t2) (v1 StorableV.! i))
 -- Two finite tensors case
 _elemByElem' t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2) f op
     | Index.indexName index1 == Index.indexName index2 = op t1 t2
@@ -262,7 +267,7 @@ zipT :: (
 -- Two simple tensors case
 zipT f t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 v2) = 
     if index1 == index2 then 
-        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
+        SimpleFinite index1 $ StorableV.zipWith f v1 v2 
     else dot t1 t2
 --Two finite tensors case
 zipT f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     = 
@@ -274,6 +279,15 @@ zipT f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     =
 -- Zipping something with scalar is impossible
 zipT _ _ _ = error $ "zipT: " ++ scalarIndices
 
+fastDot :: StorableV.Vector Double -> StorableV.Vector Double -> Double
+fastDot v1 v2 = let
+    (fp1, _, _) = StorableV.unsafeToForeignPtr v1
+    (fp2, _, _) = StorableV.unsafeToForeignPtr v2
+    p1 = unsafeForeignPtrToPtr fp1
+    p2 = unsafeForeignPtrToPtr fp2
+    in c_dot p1 p2
+
+
 -- | dot product of two tensors
 {-# INLINE dot #-}
 dot :: (Num a, Multilinear Tensor a)
@@ -283,11 +297,11 @@ dot :: (Num a, Multilinear Tensor a)
 -- Two simple tensors product
 dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = 
-        Scalar $ Unboxed.sum $ Unboxed.zipWith (*) ts1' ts2'
+        Scalar $ StorableV.sum $ StorableV.zipWith (*) ts1' ts2'
     | otherwise = contractionErr "simple-simple" (Index.toTIndex i1) (Index.toTIndex i2)
 dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
     | count1 == count2 = 
-        Scalar $ Unboxed.sum $ Unboxed.zipWith (*) ts1' ts2'
+        Scalar $ StorableV.sum $ StorableV.zipWith (*) ts1' ts2'
     | otherwise = contractionErr "simple-simple" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(SimpleFinite _ _) t2@(SimpleFinite _ _) = zipT (*) t1 t2
 -- Two finite tensors product
@@ -348,11 +362,11 @@ instance (Num a, Multilinear Tensor a) => Num (Tensor a) where
 
     -- Absolute value - element by element
     {-# INLINE abs #-}
-    abs t = abs `Multilinear.Generic.MultiCore.map` t
+    abs t = abs `Multilinear.Generic.GPU.map` t
 
     -- Signum operation - element by element
     {-# INLINE signum #-}
-    signum t = signum `Multilinear.Generic.MultiCore.map` t
+    signum t = signum `Multilinear.Generic.GPU.map` t
 
     -- Simple integer can be conveted to Scalar
     {-# INLINE fromInteger #-}
@@ -379,62 +393,62 @@ instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
 
     {-| Exponential function. (exp t)[i] = exp( t[i] ) -}
     {-# INLINE exp #-}
-    exp t = exp `Multilinear.Generic.MultiCore.map` t
+    exp t = exp `Multilinear.Generic.GPU.map` t
 
     {-| Natural logarithm. (log t)[i] = log( t[i] ) -}
     {-# INLINE log #-}
-    log t = log `Multilinear.Generic.MultiCore.map` t
+    log t = log `Multilinear.Generic.GPU.map` t
 
     {-| Sinus. (sin t)[i] = sin( t[i] ) -}
     {-# INLINE sin #-}
-    sin t = sin `Multilinear.Generic.MultiCore.map` t
+    sin t = sin `Multilinear.Generic.GPU.map` t
 
     {-| Cosinus. (cos t)[i] = cos( t[i] ) -}
     {-# INLINE cos #-}
-    cos t = cos `Multilinear.Generic.MultiCore.map` t
+    cos t = cos `Multilinear.Generic.GPU.map` t
 
     {-| Inverse sinus. (asin t)[i] = asin( t[i] ) -}
     {-# INLINE asin #-}
-    asin t = asin `Multilinear.Generic.MultiCore.map` t
+    asin t = asin `Multilinear.Generic.GPU.map` t
 
     {-| Inverse cosinus. (acos t)[i] = acos( t[i] ) -}
     {-# INLINE acos #-}
-    acos t = acos `Multilinear.Generic.MultiCore.map` t
+    acos t = acos `Multilinear.Generic.GPU.map` t
 
     {-| Inverse tangent. (atan t)[i] = atan( t[i] ) -}
     {-# INLINE atan #-}
-    atan t = atan `Multilinear.Generic.MultiCore.map` t
+    atan t = atan `Multilinear.Generic.GPU.map` t
 
     {-| Hyperbolic sinus. (sinh t)[i] = sinh( t[i] ) -}
     {-# INLINE sinh #-}
-    sinh t = sinh `Multilinear.Generic.MultiCore.map` t
+    sinh t = sinh `Multilinear.Generic.GPU.map` t
 
     {-| Hyperbolic cosinus. (cosh t)[i] = cosh( t[i] ) -}
     {-# INLINE cosh #-}
-    cosh t = cosh `Multilinear.Generic.MultiCore.map` t
+    cosh t = cosh `Multilinear.Generic.GPU.map` t
 
     {-| Inverse hyperbolic sinus. (asinh t)[i] = asinh( t[i] ) -}
     {-# INLINE asinh #-}
-    asinh t = acosh `Multilinear.Generic.MultiCore.map` t
+    asinh t = acosh `Multilinear.Generic.GPU.map` t
 
     {-| Inverse hyperbolic cosinus. (acosh t)[i] = acosh (t[i] ) -}
     {-# INLINE acosh #-}
-    acosh t = acosh `Multilinear.Generic.MultiCore.map` t
+    acosh t = acosh `Multilinear.Generic.GPU.map` t
 
     {-| Inverse hyperbolic tangent. (atanh t)[i] = atanh( t[i] ) -}
     {-# INLINE atanh #-}
-    atanh t = atanh `Multilinear.Generic.MultiCore.map` t
+    atanh t = atanh `Multilinear.Generic.GPU.map` t
 
 -- Multilinear operations
 instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
     -- Generic tensor constructor
     -- If only one upper index is given, generate a SimpleFinite tensor with upper index
     fromIndices [u] [] [s] [] f = 
-        SimpleFinite (Finite.Contravariant s [u]) $ Unboxed.generate s $ \x -> f [x] []
+        SimpleFinite (Finite.Contravariant s [u]) $ StorableV.generate s $ \x -> f [x] []
   
     -- If only one lower index is given, generate a SimpleFinite tensor with lower index
     fromIndices [] [d] [] [s] f = 
-        SimpleFinite (Finite.Covariant s [d]) $ Unboxed.generate s $ \x -> f [] [x]
+        SimpleFinite (Finite.Covariant s [d]) $ StorableV.generate s $ \x -> f [] [x]
   
     -- If many indices are given, first generate upper indices recursively from indices list
     fromIndices (u:us) d (s:size) dsize f =
@@ -582,7 +596,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             let index2 = tensorFiniteIndex (ts1 Boxed.! 0)
                 -- Elements to transpose
                 dane = if isSimple (ts1 Boxed.! 0)
-                       then (\un -> Boxed.generate (Unboxed.length un) (\i -> Scalar $ un Unboxed.! i)) <$> 
+                       then (\un -> Boxed.generate (StorableV.length un) (\i -> Scalar $ un StorableV.! i)) <$> 
                             (tensorScalars <$> ts1)
                        else tensorsFinite <$> ts1
                 result = FiniteTensor index2 $ FiniteTensor index1 <$> (_transpose dane)
@@ -601,7 +615,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
     ) => Tensor a 
       -> a 
       -> Tensor a
-t .+ x = (+x) `Multilinear.Generic.MultiCore.map` t
+t .+ x = (+x) `Multilinear.Generic.GPU.map` t
 
 -- Subtract scalar right
 {-# INLINE (.-) #-}
@@ -610,7 +624,7 @@ t .+ x = (+x) `Multilinear.Generic.MultiCore.map` t
     ) => Tensor a 
       -> a 
       -> Tensor a
-t .- x = (\p -> p - x) `Multilinear.Generic.MultiCore.map` t
+t .- x = (\p -> p - x) `Multilinear.Generic.GPU.map` t
 
 -- Multiplicate by scalar right
 {-# INLINE (.*) #-}
@@ -619,7 +633,7 @@ t .- x = (\p -> p - x) `Multilinear.Generic.MultiCore.map` t
     ) => Tensor a 
       -> a 
       -> Tensor a
-t .* x = (*x) `Multilinear.Generic.MultiCore.map` t
+t .* x = (*x) `Multilinear.Generic.GPU.map` t
 
 -- Add scalar left
 {-# INLINE (+.) #-}
@@ -628,7 +642,7 @@ t .* x = (*x) `Multilinear.Generic.MultiCore.map` t
     ) => a 
       -> Tensor a 
       -> Tensor a
-x +. t = (x+) `Multilinear.Generic.MultiCore.map` t
+x +. t = (x+) `Multilinear.Generic.GPU.map` t
 
 -- Subtract scalar left
 {-# INLINE (-.) #-}
@@ -637,7 +651,7 @@ x +. t = (x+) `Multilinear.Generic.MultiCore.map` t
     ) => a 
       -> Tensor a 
       -> Tensor a
-x -. t = (x-) `Multilinear.Generic.MultiCore.map` t
+x -. t = (x-) `Multilinear.Generic.GPU.map` t
 
 -- Multiplicate by scalar left
 {-# INLINE (*.) #-}
@@ -646,7 +660,7 @@ x -. t = (x-) `Multilinear.Generic.MultiCore.map` t
     ) => a 
       -> Tensor a 
       -> Tensor a
-x *. t = (x*) `Multilinear.Generic.MultiCore.map` t
+x *. t = (x*) `Multilinear.Generic.GPU.map` t
 
 -- | Simple mapping
 map :: (
@@ -658,10 +672,10 @@ map f x = case x of
     -- Mapping scalar simply maps its value
     Scalar v                -> Scalar $ f v
     -- Mapping complex tensor does mapping element by element
-    SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
+    SimpleFinite index ts   -> SimpleFinite index (f `StorableV.map` ts)
     FiniteTensor index ts   -> 
         let len = Boxed.length ts
-            lts = Boxed.toList $ Multilinear.Generic.MultiCore.map f <$> ts
+            lts = Boxed.toList $ Multilinear.Generic.GPU.map f <$> ts
             ltsp = lts `Parallel.using` Parallel.parListChunk (len `div` 8) Parallel.rdeepseq
         in  FiniteTensor index $ Boxed.fromList ltsp
 
@@ -684,14 +698,14 @@ filter :: (
 filter _ (Scalar x) = Scalar x
 filter f (SimpleFinite index ts) = 
     let iname = Finite.indexName' index
-        ts' = (\i _ -> f iname i) `Unboxed.ifilter` ts
-    in  SimpleFinite index { Finite.indexSize = Unboxed.length ts' } ts'
+        ts' = (\i _ -> f iname i) `StorableV.ifilter` ts
+    in  SimpleFinite index { Finite.indexSize = StorableV.length ts' } ts'
 filter f (FiniteTensor index ts) = 
     let iname = Finite.indexName' index
-        ts' = Multilinear.Generic.MultiCore.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
+        ts' = Multilinear.Generic.GPU.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
         ts'' = 
             (\case 
-                (SimpleFinite _ ts) -> not $ Unboxed.null ts
+                (SimpleFinite _ ts) -> not $ StorableV.null ts
                 (FiniteTensor _ ts) -> not $ Boxed.null ts
                 _ -> error $ "Filter: " ++ tensorOfScalars
             ) `Boxed.filter` ts'
@@ -705,7 +719,7 @@ filterIndex :: (
       -> (Int -> Bool) -- ^ filter function
       -> Tensor a      -- ^ tensor to filter
       -> Tensor a
-filterIndex iname f = Multilinear.Generic.MultiCore.filter (\i n -> i /= iname || f n)
+filterIndex iname f = Multilinear.Generic.GPU.filter (\i n -> i /= iname || f n)
 
 {-| Zip tensors with binary combinator, assuming they have all indices the same -}
 {-# INLINE zipWith' #-}
@@ -718,18 +732,18 @@ zipWith' :: (
 -- Zipping two Scalars simply combines their values 
 zipWith' f (Scalar x1) (Scalar x2) = Scalar $ f x1 x2
 -- zipping complex tensor with scalar 
-zipWith' f t (Scalar x) = (`f` x) `Multilinear.Generic.MultiCore.map` t
+zipWith' f t (Scalar x) = (`f` x) `Multilinear.Generic.GPU.map` t
 -- zipping scalar with complex tensor
-zipWith' f (Scalar x) t = (x `f`) `Multilinear.Generic.MultiCore.map` t
+zipWith' f (Scalar x) t = (x `f`) `Multilinear.Generic.GPU.map` t
 -- Two simple tensors case
 zipWith' f (SimpleFinite index1 v1) (SimpleFinite index2 v2) = 
     if index1 == index2 then 
-        SimpleFinite index1 $ Unboxed.zipWith f v1 v2 
+        SimpleFinite index1 $ StorableV.zipWith f v1 v2 
     else zipErr "simple-simple" (Index.toTIndex index1) (Index.toTIndex index2)
 --Two finite tensors case
 zipWith' f (FiniteTensor index1 v1) (FiniteTensor index2 v2)     = 
     if index1 == index2 then 
-        FiniteTensor index1 $ Boxed.zipWith (Multilinear.Generic.MultiCore.zipWith f) v1 v2 
+        FiniteTensor index1 $ Boxed.zipWith (Multilinear.Generic.GPU.zipWith f) v1 v2 
     else zipErr "finite-finite" (Index.toTIndex index1) (Index.toTIndex index2)
 -- Other cases cannot happen!
 zipWith' _ _ _ = error "Invalid indices to peroform zip!"

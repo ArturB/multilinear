@@ -31,6 +31,7 @@ import           Data.Maybe
 import qualified Data.Set                   as Set
 import qualified Data.Vector                as Boxed
 import qualified Data.Vector.Unboxed        as Unboxed
+import           Foreign.Storable
 import           GHC.Generics
 import           Multilinear.Class          as Multilinear
 import qualified Multilinear.Index          as Index
@@ -402,7 +403,7 @@ instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
     atanh t = atanh `Multilinear.Generic.Sequential.map` t
 
 -- Multilinear operations
-instance (NFData a, Unboxed.Unbox a) => Multilinear Tensor a where
+instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
     -- Generic tensor constructor
     -- If only one upper index is given, generate a SimpleFinite tensor with upper index
     fromIndices [u] [] [s] [] f = 

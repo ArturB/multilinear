@@ -149,6 +149,7 @@ import           Control.DeepSeq
 import           Data.Maybe
 import           Data.Set
 import qualified Data.Vector.Unboxed as Unboxed
+import           Foreign.Storable
 import           GHC.Generics
 import           Multilinear.Index
 
@@ -161,7 +162,7 @@ import           Multilinear.Index
 class (
    Generic (t a),          
    NFData a, NFData (t a), 
-   Unboxed.Unbox a         
+   Unboxed.Unbox a, Storable a         
   ) => Multilinear t a where
 
     {-| Generic tensor constructor, using combinator function on its indices -}
