@@ -94,6 +94,7 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
+
 {-| Return true if tensor is a scalar -}
 {-# INLINE isScalar #-}
 isScalar :: Storable a => Tensor a -> Bool
