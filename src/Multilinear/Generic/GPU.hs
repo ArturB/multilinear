@@ -25,20 +25,22 @@ module Multilinear.Generic.GPU (
 ) where
 
 import           Control.DeepSeq
-import qualified Control.Parallel.Strategies as Parallel
+import qualified Control.Parallel.Strategies   as Parallel
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
-import qualified Data.Set                    as Set
-import qualified Data.Vector                 as Boxed
-import qualified Data.Vector.Storable        as StorableV
+import qualified Data.Set                      as Set
+import qualified Data.Vector                   as Boxed
+import qualified Data.Vector.Storable          as StorableV
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
+import           Foreign.ForeignPtr.Unsafe
 import           Foreign.Storable
 import           GHC.Generics
-import           Multilinear.Class           as Multilinear
-import qualified Multilinear.Index           as Index
-import qualified Multilinear.Index.Finite    as Finite
+import           Multilinear.Class             as Multilinear
+import qualified Multilinear.Index             as Index
+import qualified Multilinear.Index.Finite      as Finite
+import qualified Multilinear.Generic.PtrTensor as Ptr
 import           System.IO.Unsafe
 
 foreign import ccall "dot" 
@@ -93,6 +95,21 @@ data Tensor a where
         tensorsFinite     :: Boxed.Vector (Tensor a)
     } -> Tensor a
     deriving (Eq, Generic)
+
+toPtrTensor :: Storable a => Tensor a -> Ptr.Tensor a
+toPtrTensor (Scalar x) = Ptr.Scalar x
+toPtrTensor (SimpleFinite i ts) = let
+    (ptr,_) = StorableV.unsafeToForeignPtr0 ts
+    in Ptr.SimpleFinite i (unsafeForeignPtrToPtr ptr, StorableV.length ts)
+toPtrTensor (FiniteTensor i ts) = Ptr.FiniteTensor i (toPtrTensor <$> ts)
+
+fromPtrTensor :: Storable a => Ptr.Tensor a -> Tensor a
+fromPtrTensor (Ptr.Scalar x) = Scalar x
+fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
+    fptr = unsafePerformIO $ newForeignPtr_ ptr
+    ts = StorableV.unsafeFromForeignPtr0 fptr len
+    in SimpleFinite i ts
+fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
 
 
 {-| Return true if tensor is a scalar -}

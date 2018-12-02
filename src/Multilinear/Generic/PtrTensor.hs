@@ -1,6 +1,5 @@
 module Multilinear.Generic.PtrTensor (
     Tensor(..), 
-    toPtrTensor, fromPtrTensor, 
     _elemByElem, zipT, dot
 ) where
 
@@ -17,7 +16,6 @@ import           GHC.Generics
 --import           Multilinear.Class
 import qualified Multilinear.Index.Finite    as Finite
 import qualified Multilinear.Index           as Index
-import qualified Multilinear.Generic.GPU     as GPU
 import           System.IO.Unsafe
 
 
@@ -65,21 +63,6 @@ data Tensor a where
         tensorsFinite     :: Boxed.Vector (Tensor a)
     } -> Tensor a
     deriving (Eq, Generic)
-
-toPtrTensor :: Storable a => GPU.Tensor a -> Tensor a
-toPtrTensor (GPU.Scalar x) = Scalar x
-toPtrTensor (GPU.SimpleFinite i ts) = let
-    (ptr,_) = StorableV.unsafeToForeignPtr0 ts
-    in SimpleFinite i (unsafeForeignPtrToPtr ptr, StorableV.length ts)
-toPtrTensor (GPU.FiniteTensor i ts) = FiniteTensor i (toPtrTensor <$> ts)
-
-fromPtrTensor :: Storable a => Tensor a -> GPU.Tensor a
-fromPtrTensor (Scalar x) = GPU.Scalar x
-fromPtrTensor (SimpleFinite i (ptr,len)) = let
-    fptr = unsafePerformIO $ newForeignPtr_ ptr
-    ts = StorableV.unsafeFromForeignPtr0 fptr len
-    in GPU.SimpleFinite i ts
-fromPtrTensor (FiniteTensor i ts) = GPU.FiniteTensor i (fromPtrTensor <$> ts)
 
 {-| Return generic tensor index -}
 {-# INLINE tensorIndex #-}
