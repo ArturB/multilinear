@@ -274,11 +274,13 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
 _elemByElem ::
-               Tensor Double                                       -- ^ First argument of operator
-            -> Tensor Double                                       -- ^ Second argument of operator
-            -> (Double -> Double -> Double)                        -- ^ Operator on tensor elements if indices are different
-            -> (Tensor Double -> Tensor Double -> Tensor Double)   -- ^ Tensor operator called if indices are the same
-            -> Tensor Double                                       -- ^ Result tensor
+               Tensor Double                -- ^ First argument of operator
+            -> Tensor Double                -- ^ Second argument of operator
+            -> (Double -> Double -> Double) -- ^ Operator on tensor elements if indices are different
+            -> (Ptr.Tensor Double -> 
+                Ptr.Tensor Double -> 
+                Ptr.Tensor Double)          -- ^ Tensor operator called if indices are the same
+            -> Tensor Double                -- ^ Result tensor
 _elemByElem t1 t2 f op = 
     let commonIndices = 
             if indices t1 /= indices t2 then
@@ -286,7 +288,11 @@ _elemByElem t1 t2 f op =
             else []
         t1' = foldl' (|>>>) t1 commonIndices
         t2' = foldl' (|>>>) t2 commonIndices
-    in _mergeScalars $ _elemByElem' t1' t2' f op
+        t1Ptr = toPtrTensor t1'
+        t2Ptr = toPtrTensor t2'
+        t3Ptr = Ptr._elemByElem t1Ptr t2Ptr f op
+    in _mergeScalars $ fromPtrTensor t3Ptr
+
 
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
@@ -380,16 +386,16 @@ instance Num (Tensor Double) where
 
     -- Adding - element by element
     {-# INLINE (+) #-}
-    t1 + t2 = _elemByElem t1 t2 (+) $ zipT (+)
+    t1 + t2 = _elemByElem t1 t2 (+) $ Ptr.zipT (+)
 
     -- Subtracting - element by element
     {-# INLINE (-) #-}
-    t1 - t2 = _elemByElem t1 t2 (-) $ zipT (-)
+    t1 - t2 = _elemByElem t1 t2 (-) $ Ptr.zipT (-)
 
     -- Multiplicating is treated as tensor product
     -- Tensor product applies Einstein summation convention
     {-# INLINE (*) #-}
-    t1 * t2 = _elemByElem t1 t2 (*) dot
+    t1 * t2 = _elemByElem t1 t2 (*) Ptr.dot
 
     -- Absolute value - element by element
     {-# INLINE abs #-}
