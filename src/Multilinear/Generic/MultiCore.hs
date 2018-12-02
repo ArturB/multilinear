@@ -127,7 +127,7 @@ instance NFData a => NFData (Tensor a)
 
 -- | Print tensor
 instance (
-    Multilinear Tensor a, Show a, Unboxed.Unbox a
+    Multilinear Tensor a, Show a, Unboxed.Unbox a, NFData a
     ) => Show (Tensor a) where
 
     -- merge errors first and then print whole tensor
@@ -187,7 +187,7 @@ _contractedIndices t1 t2 =
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
-_elemByElem' :: (Num a, Multilinear Tensor a)
+_elemByElem' :: (Num a, Multilinear Tensor a, NFData a)
              => Tensor a                            -- ^ First argument of operator
              -> Tensor a                            -- ^ Second argument of operator
              -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
@@ -236,7 +236,7 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
-_elemByElem :: (Num a, Multilinear Tensor a)
+_elemByElem :: (Num a, Multilinear Tensor a, NFData a)
             => Tensor a                             -- ^ First argument of operator
             -> Tensor a                             -- ^ Second argument of operator
             -> (a -> a -> a)                        -- ^ Operator on tensor elements if indices are different
@@ -254,7 +254,7 @@ _elemByElem t1 t2 f op =
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
 zipT :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => (a -> a -> a)                        -- ^ The zipping combinator
       -> Tensor a                             -- ^ First tensor to zip
       -> Tensor a                             -- ^ Second tensor to zip
@@ -276,7 +276,7 @@ zipT _ _ _ = error $ "zipT: " ++ scalarIndices
 
 -- | dot product of two tensors
 {-# INLINE dot #-}
-dot :: (Num a, Multilinear Tensor a)
+dot :: (Num a, Multilinear Tensor a, NFData a)
       => Tensor a  -- ^ First dot product argument
       -> Tensor a  -- ^ Second dot product argument
       -> Tensor a  -- ^ Resulting dot product
@@ -331,7 +331,7 @@ zipErr variant i1' i2' = error $
     " and index2 is " ++ show i2'
 
 -- | Tensors can be added, subtracted and multiplicated
-instance (Num a, Multilinear Tensor a) => Num (Tensor a) where
+instance (Num a, Multilinear Tensor a, NFData a) => Num (Tensor a) where
 
     -- Adding - element by element
     {-# INLINE (+) #-}
@@ -359,7 +359,7 @@ instance (Num a, Multilinear Tensor a) => Num (Tensor a) where
     fromInteger x = Scalar $ fromInteger x
 
 -- | Tensors can be divided by each other
-instance (Fractional a, Multilinear Tensor a) => Fractional (Tensor a) where
+instance (Fractional a, Multilinear Tensor a, NFData a) => Fractional (Tensor a) where
     -- Tensor dividing: TODO
     {-# INLINE (/) #-}
     _ / _ = error "TODO"
@@ -371,7 +371,7 @@ instance (Fractional a, Multilinear Tensor a) => Fractional (Tensor a) where
 -- Real-number functions on tensors.
 -- Function of tensor is tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
+instance (Floating a, Multilinear Tensor a, NFData a) => Floating (Tensor a) where
 
     {-| PI number -}
     {-# INLINE pi #-}
@@ -426,7 +426,7 @@ instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
     atanh t = atanh `Multilinear.Generic.MultiCore.map` t
 
 -- Multilinear operations
-instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
+instance (NFData a, Unboxed.Unbox a, Storable a, NFData a) => Multilinear Tensor a where
     -- Generic tensor constructor
     -- If only one upper index is given, generate a SimpleFinite tensor with upper index
     fromIndices [u] [] [s] [] f = 
@@ -597,7 +597,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
 -- Add scalar right
 {-# INLINE (.+) #-}
 (.+) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -606,7 +606,7 @@ t .+ x = (+x) `Multilinear.Generic.MultiCore.map` t
 -- Subtract scalar right
 {-# INLINE (.-) #-}
 (.-) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -615,7 +615,7 @@ t .- x = (\p -> p - x) `Multilinear.Generic.MultiCore.map` t
 -- Multiplicate by scalar right
 {-# INLINE (.*) #-}
 (.*) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -624,7 +624,7 @@ t .* x = (*x) `Multilinear.Generic.MultiCore.map` t
 -- Add scalar left
 {-# INLINE (+.) #-}
 (+.) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -633,7 +633,7 @@ x +. t = (x+) `Multilinear.Generic.MultiCore.map` t
 -- Subtract scalar left
 {-# INLINE (-.) #-}
 (-.) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -642,7 +642,7 @@ x -. t = (x-) `Multilinear.Generic.MultiCore.map` t
 -- Multiplicate by scalar left
 {-# INLINE (*.) #-}
 (*.) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -650,7 +650,8 @@ x *. t = (x*) `Multilinear.Generic.MultiCore.map` t
 
 -- | Simple mapping
 map :: (
-    Multilinear Tensor a, Multilinear Tensor b
+    Multilinear Tensor a, Multilinear Tensor b, 
+    NFData a, NFData b
     ) => (a -> b)
       -> Tensor a
       -> Tensor b
@@ -677,7 +678,7 @@ map f x = case x of
     If for some index all elements are removed, the index itself is removed from tensor. -}
 {-# INLINE filter #-}
 filter :: (
-    Multilinear Tensor a
+    Multilinear Tensor a, NFData a
     ) => (String -> Int -> Bool) -- ^ filter function
       -> Tensor a                -- ^ tensor to filter
       -> Tensor a
@@ -700,7 +701,7 @@ filter f (FiniteTensor index ts) =
 {-| Filtering one index of tensor. -}
 {-# INLINE filterIndex #-}
 filterIndex :: (
-    Multilinear Tensor a
+    Multilinear Tensor a, NFData a
     ) => String        -- ^ Index name to filter
       -> (Int -> Bool) -- ^ filter function
       -> Tensor a      -- ^ tensor to filter
@@ -710,7 +711,8 @@ filterIndex iname f = Multilinear.Generic.MultiCore.filter (\i n -> i /= iname |
 {-| Zip tensors with binary combinator, assuming they have all indices the same -}
 {-# INLINE zipWith' #-}
 zipWith' :: (
-    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c
+    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c, 
+    NFData a, NFData b, NFData c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 
@@ -736,7 +738,8 @@ zipWith' _ _ _ = error "Invalid indices to peroform zip!"
 
 {-# INLINE zipWith #-}
 zipWith :: (
-    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c
+    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c, 
+    NFData a, NFData b, NFData c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 

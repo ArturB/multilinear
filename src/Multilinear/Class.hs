@@ -145,7 +145,6 @@ module Multilinear.Class (
     Multilinear(..)
 ) where
 
-import           Control.DeepSeq
 import           Data.Maybe
 import           Data.Set
 import qualified Data.Vector.Unboxed as Unboxed
@@ -161,7 +160,6 @@ import           Multilinear.Index
  -}
 class (
    Generic (t a),          
-   NFData a, NFData (t a), 
    Unboxed.Unbox a, Storable a         
   ) => Multilinear t a where
 

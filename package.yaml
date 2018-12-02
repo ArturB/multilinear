@@ -41,8 +41,8 @@ default-extensions:
 
 library:
   source-dirs: src
-  cxx-sources:
-  - cbits/dot.cpp
+  c-sources:
+  - cbits/dot.c
   dependencies:
   - containers
   - deepseq
@@ -121,6 +121,39 @@ benchmarks:
   multicore-profile:
     main:                Bench.hs
     source-dirs:         benchmark/multicore/profile
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - deepseq
+    - multilinear
+  gpu-time:
+    main:                Bench.hs
+    source-dirs:         benchmark/gpu/time
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - criterion
+    - deepseq
+    - multilinear
+  gpu-memory:
+    main:                Bench.hs
+    source-dirs:         benchmark/gpu/memory
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - deepseq
+    - multilinear
+    - vector
+    - weigh
+  gpu-profile:
+    main:                Bench.hs
+    source-dirs:         benchmark/gpu/profile
     ghc-options:
     - -threaded
     - -rtsopts

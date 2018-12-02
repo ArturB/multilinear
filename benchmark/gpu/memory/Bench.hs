@@ -14,7 +14,7 @@ module Main (
 ) where
 
 import           Weigh
-import           Multilinear.Generic.Sequential
+import           Multilinear.Generic.GPU
 import qualified Multilinear.Matrix as Matrix
 import qualified Multilinear.Vector as Vector
 

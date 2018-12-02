@@ -15,7 +15,7 @@ module Multilinear.Generic.GPU (
     -- * Auxiliary functions
     (!), isScalar, isSimple, isFiniteTensor,
     tensorIndex, _mergeScalars, 
-    _contractedIndices, _elemByElem, zipT,
+    _contractedIndices, _elemByElem, zipT, fastDot,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.GPU.map, 
@@ -32,16 +32,30 @@ import           Data.Maybe
 import qualified Data.Set                    as Set
 import qualified Data.Vector                 as Boxed
 import qualified Data.Vector.Storable        as StorableV
-import qualified Data.Vector.Unboxed         as Unboxed
-import           Foreign.ForeignPtr.Unsafe
+import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import           Foreign.Storable
 import           GHC.Generics
 import           Multilinear.Class           as Multilinear
 import qualified Multilinear.Index           as Index
 import qualified Multilinear.Index.Finite    as Finite
+import           System.IO.Unsafe
 
-foreign import ccall "dot" c_dot :: Ptr Double -> Ptr Double -> Double
+foreign import ccall "dot" 
+    c_dot :: 
+        Ptr Double -- ^ First array to dot
+     -> Ptr Double -- ^ Second array to dot
+     -> Int        -- ^ Length of arrays to dot
+     -> Double     -- ^ Result dot product value
+
+foreign import ccall "zip" 
+    c_zip :: 
+        FunPtr (Double -> Double) -- ^ Zipping combinator
+     -> Ptr Double                -- ^ First array to zip
+     -> Ptr Double                -- ^ Second array to zip
+     -> Int                       -- ^ Length of arrays to zip
+     -> Ptr Double                -- ^ Result array
+     -> IO ()                     -- ^ return void
 
 {-| ERROR MESSAGE -}
 incompatibleTypes :: String
@@ -192,12 +206,12 @@ _contractedIndices t1 t2 =
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
-_elemByElem' :: (Num a, Multilinear Tensor a)
-             => Tensor a                            -- ^ First argument of operator
-             -> Tensor a                            -- ^ Second argument of operator
-             -> (a -> a -> a)                       -- ^ Operator on tensor elements if indices are different
-             -> (Tensor a -> Tensor a -> Tensor a)  -- ^ Tensor operator called if indices are the same
-             -> Tensor a                            -- ^ Result tensor
+_elemByElem' :: 
+                Tensor Double                                      -- ^ First argument of operator
+             -> Tensor Double                                      -- ^ Second argument of operator
+             -> (Double -> Double -> Double)                       -- ^ Operator on tensor elements if indices are different
+             -> (Tensor Double -> Tensor Double -> Tensor Double)  -- ^ Tensor operator called if indices are the same
+             -> Tensor Double                                      -- ^ Result tensor
 -- @Scalar x + Scalar y = Scalar x + y@
 _elemByElem' (Scalar x1) (Scalar x2) f _ = Scalar $ f x1 x2
 -- @Scalar x + Tensor t[i] = Tensor r[i] | r[i] = x + t[i]@
@@ -241,12 +255,12 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
-_elemByElem :: (Num a, Multilinear Tensor a)
-            => Tensor a                             -- ^ First argument of operator
-            -> Tensor a                             -- ^ Second argument of operator
-            -> (a -> a -> a)                        -- ^ Operator on tensor elements if indices are different
-            -> (Tensor a -> Tensor a -> Tensor a)   -- ^ Tensor operator called if indices are the same
-            -> Tensor a                             -- ^ Result tensor
+_elemByElem ::
+               Tensor Double                                       -- ^ First argument of operator
+            -> Tensor Double                                       -- ^ Second argument of operator
+            -> (Double -> Double -> Double)                        -- ^ Operator on tensor elements if indices are different
+            -> (Tensor Double -> Tensor Double -> Tensor Double)   -- ^ Tensor operator called if indices are the same
+            -> Tensor Double                                       -- ^ Result tensor
 _elemByElem t1 t2 f op = 
     let commonIndices = 
             if indices t1 /= indices t2 then
@@ -258,12 +272,11 @@ _elemByElem t1 t2 f op =
 
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
-zipT :: (
-    Num a, Multilinear Tensor a
-    ) => (a -> a -> a)                        -- ^ The zipping combinator
-      -> Tensor a                             -- ^ First tensor to zip
-      -> Tensor a                             -- ^ Second tensor to zip
-      -> Tensor a                             -- ^ Result tensor
+zipT :: 
+         (Double -> Double -> Double) -- ^ The zipping combinator
+      -> Tensor Double                -- ^ First tensor to zip
+      -> Tensor Double                -- ^ Second tensor to zip
+      -> Tensor Double                -- ^ Result tensor
 -- Two simple tensors case
 zipT f t1@(SimpleFinite index1 v1) t2@(SimpleFinite index2 v2) = 
     if index1 == index2 then 
@@ -279,29 +292,29 @@ zipT f t1@(FiniteTensor index1 v1) t2@(FiniteTensor index2 v2)     =
 -- Zipping something with scalar is impossible
 zipT _ _ _ = error $ "zipT: " ++ scalarIndices
 
+-- | CPP-based fast dot product
+{-# INLINE fastDot #-}
 fastDot :: StorableV.Vector Double -> StorableV.Vector Double -> Double
 fastDot v1 v2 = let
     (fp1, _, _) = StorableV.unsafeToForeignPtr v1
     (fp2, _, _) = StorableV.unsafeToForeignPtr v2
-    p1 = unsafeForeignPtrToPtr fp1
-    p2 = unsafeForeignPtrToPtr fp2
-    in c_dot p1 p2
-
+    ioRes = withForeignPtr fp1 $ \p1 -> withForeignPtr fp2 $ \p2 -> return $ c_dot p1 p2 (StorableV.length v1)
+    in unsafePerformIO ioRes
 
 -- | dot product of two tensors
 {-# INLINE dot #-}
-dot :: (Num a, Multilinear Tensor a)
-      => Tensor a  -- ^ First dot product argument
-      -> Tensor a  -- ^ Second dot product argument
-      -> Tensor a  -- ^ Resulting dot product
+dot :: 
+         Tensor Double  -- ^ First dot product argument
+      -> Tensor Double  -- ^ Second dot product argument
+      -> Tensor Double  -- ^ Resulting dot product
 -- Two simple tensors product
 dot (SimpleFinite i1@(Finite.Covariant count1 _) ts1') (SimpleFinite i2@(Finite.Contravariant count2 _) ts2')
     | count1 == count2 = 
-        Scalar $ StorableV.sum $ StorableV.zipWith (*) ts1' ts2'
+        Scalar $ fastDot ts1' ts2'
     | otherwise = contractionErr "simple-simple" (Index.toTIndex i1) (Index.toTIndex i2)
 dot (SimpleFinite i1@(Finite.Contravariant count1 _) ts1') (SimpleFinite i2@(Finite.Covariant count2 _) ts2')
     | count1 == count2 = 
-        Scalar $ StorableV.sum $ StorableV.zipWith (*) ts1' ts2'
+        Scalar $ fastDot ts1' ts2'
     | otherwise = contractionErr "simple-simple" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(SimpleFinite _ _) t2@(SimpleFinite _ _) = zipT (*) t1 t2
 -- Two finite tensors product
@@ -345,7 +358,7 @@ zipErr variant i1' i2' = error $
     " and index2 is " ++ show i2'
 
 -- | Tensors can be added, subtracted and multiplicated
-instance (Num a, Multilinear Tensor a) => Num (Tensor a) where
+instance Num (Tensor Double) where
 
     -- Adding - element by element
     {-# INLINE (+) #-}
@@ -373,7 +386,7 @@ instance (Num a, Multilinear Tensor a) => Num (Tensor a) where
     fromInteger x = Scalar $ fromInteger x
 
 -- | Tensors can be divided by each other
-instance (Fractional a, Multilinear Tensor a) => Fractional (Tensor a) where
+instance Fractional (Tensor Double) where
     -- Tensor dividing: TODO
     {-# INLINE (/) #-}
     _ / _ = error "TODO"
@@ -385,7 +398,7 @@ instance (Fractional a, Multilinear Tensor a) => Fractional (Tensor a) where
 -- Real-number functions on tensors.
 -- Function of tensor is tensor of function of its elements
 -- E.g. exp [1,2,3,4] = [exp 1, exp2, exp3, exp4]
-instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
+instance Floating (Tensor Double) where
 
     {-| PI number -}
     {-# INLINE pi #-}
@@ -440,7 +453,7 @@ instance (Floating a, Multilinear Tensor a) => Floating (Tensor a) where
     atanh t = atanh `Multilinear.Generic.GPU.map` t
 
 -- Multilinear operations
-instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
+instance Multilinear Tensor Double where
     -- Generic tensor constructor
     -- If only one upper index is given, generate a SimpleFinite tensor with upper index
     fromIndices [u] [] [s] [] f = 
@@ -611,7 +624,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
 -- Add scalar right
 {-# INLINE (.+) #-}
 (.+) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -620,7 +633,7 @@ t .+ x = (+x) `Multilinear.Generic.GPU.map` t
 -- Subtract scalar right
 {-# INLINE (.-) #-}
 (.-) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -629,7 +642,7 @@ t .- x = (\p -> p - x) `Multilinear.Generic.GPU.map` t
 -- Multiplicate by scalar right
 {-# INLINE (.*) #-}
 (.*) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => Tensor a 
       -> a 
       -> Tensor a
@@ -638,7 +651,7 @@ t .* x = (*x) `Multilinear.Generic.GPU.map` t
 -- Add scalar left
 {-# INLINE (+.) #-}
 (+.) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -647,7 +660,7 @@ x +. t = (x+) `Multilinear.Generic.GPU.map` t
 -- Subtract scalar left
 {-# INLINE (-.) #-}
 (-.) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -656,7 +669,7 @@ x -. t = (x-) `Multilinear.Generic.GPU.map` t
 -- Multiplicate by scalar left
 {-# INLINE (*.) #-}
 (*.) :: (
-    Num a, Multilinear Tensor a
+    Num a, Multilinear Tensor a, NFData a
     ) => a 
       -> Tensor a 
       -> Tensor a
@@ -664,7 +677,8 @@ x *. t = (x*) `Multilinear.Generic.GPU.map` t
 
 -- | Simple mapping
 map :: (
-    Multilinear Tensor a, Multilinear Tensor b
+    Multilinear Tensor a, Multilinear Tensor b, 
+    NFData a, NFData b
     ) => (a -> b)
       -> Tensor a
       -> Tensor b
@@ -691,7 +705,7 @@ map f x = case x of
     If for some index all elements are removed, the index itself is removed from tensor. -}
 {-# INLINE filter #-}
 filter :: (
-    Multilinear Tensor a
+    Multilinear Tensor a, NFData a
     ) => (String -> Int -> Bool) -- ^ filter function
       -> Tensor a                -- ^ tensor to filter
       -> Tensor a
@@ -714,7 +728,7 @@ filter f (FiniteTensor index ts) =
 {-| Filtering one index of tensor. -}
 {-# INLINE filterIndex #-}
 filterIndex :: (
-    Multilinear Tensor a
+    Multilinear Tensor a, NFData a
     ) => String        -- ^ Index name to filter
       -> (Int -> Bool) -- ^ filter function
       -> Tensor a      -- ^ tensor to filter
@@ -724,7 +738,8 @@ filterIndex iname f = Multilinear.Generic.GPU.filter (\i n -> i /= iname || f n)
 {-| Zip tensors with binary combinator, assuming they have all indices the same -}
 {-# INLINE zipWith' #-}
 zipWith' :: (
-    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c
+    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c, 
+    NFData a, NFData b, NFData c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 
@@ -750,7 +765,8 @@ zipWith' _ _ _ = error "Invalid indices to peroform zip!"
 
 {-# INLINE zipWith #-}
 zipWith :: (
-    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c
+    Multilinear Tensor a, Multilinear Tensor b, Multilinear Tensor c, 
+    NFData a, NFData b, NFData c
     ) => (a -> b -> c) 
       -> Tensor a 
       -> Tensor b 

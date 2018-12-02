@@ -127,7 +127,7 @@ t ! i = case t of
 -- | Print tensor
 -- | Assumes tensor is already in Multilinear class, because standardize function
 instance (
-    Multilinear Tensor a, Show a
+    Multilinear Tensor a, Show a, NFData a
     ) => Show (Tensor a) where
 
     -- merge errors first and then print whole tensor
