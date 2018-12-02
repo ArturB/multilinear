@@ -7,7 +7,7 @@ BNAME="benchmark/results.html"
 # If build failed, don't go on, but exit
 if stack bench --no-run-benchmarks ; then
     echo -e "Build successful!\nPushing changes to git..."
-    ( git add -A > /dev/null && git commit -qm "Untested build $BUILD_ID" && git pull -q && git push -q ) &
+    ( git add -A > /dev/null && git commit -qm "Benchmark build $BUILD_ID" && git pull -q && git push -q ) &
     echo -e "Running all benchmarks..."
 else
     exit 1
