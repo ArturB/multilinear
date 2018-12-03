@@ -279,9 +279,9 @@ nFormConstructorValues c1 c2 s1 s2 =
 
 -- | Check indices preservation if zipWith function
 zipWithTest :: Tensor Double -> Tensor Double -> Bool
-zipWithTest t1@(Scalar _) t2 = preserveIndicesUnary (\t -> Multilinear.Generic.MultiCore.zipWith (+) t1 t) t2
-zipWithTest t1 t2@(Scalar _) = preserveIndicesUnary (\t -> Multilinear.Generic.MultiCore.zipWith (+) t t2) t1
-zipWithTest t1 _ = preserveIndicesBinary (Multilinear.Generic.MultiCore.zipWith (+)) t1 t1
+zipWithTest t1@(Scalar _) t2 = preserveIndicesUnary (\t -> Multilinear.Generic.GPU.zipWith (+) t1 t) t2
+zipWithTest t1 t2@(Scalar _) = preserveIndicesUnary (\t -> Multilinear.Generic.GPU.zipWith (+) t t2) t1
+zipWithTest t1 _ = preserveIndicesBinary (Multilinear.Generic.GPU.zipWith (+)) t1 t1
 
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
 orderIndices :: Tensor Double -> Bool

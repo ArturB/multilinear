@@ -273,7 +273,7 @@ _elemByElem' t1@(FiniteTensor index1 v1) t2@(SimpleFinite index2 _) f op
 
 {-| Apply a tensor operator elem by elem and merge scalars to simple tensor at the and -}
 {-# INLINE _elemByElem #-}
-_elemByElem ::
+{-_elemByElem ::
                Tensor Double                -- ^ First argument of operator
             -> Tensor Double                -- ^ Second argument of operator
             -> (Double -> Double -> Double) -- ^ Operator on tensor elements if indices are different
@@ -292,7 +292,23 @@ _elemByElem t1 t2 f op =
         t2Ptr = toPtrTensor t2'
         t3Ptr = Ptr._elemByElem t1Ptr t2Ptr f op
     in _mergeScalars $ fromPtrTensor t3Ptr
-
+-}
+_elemByElem ::
+               Tensor Double                -- ^ First argument of operator
+            -> Tensor Double                -- ^ Second argument of operator
+            -> (Double -> Double -> Double) -- ^ Operator on tensor elements if indices are different
+            -> (Tensor Double -> 
+                Tensor Double -> 
+                Tensor Double)              -- ^ Tensor operator called if indices are the same
+            -> Tensor Double                -- ^ Result tensor
+_elemByElem t1 t2 f op = 
+    let commonIndices = 
+            if indices t1 /= indices t2 then
+                Data.List.filter (`Data.List.elem` indicesNames t2) $ indicesNames t1
+            else []
+        t1' = foldl' (|>>>) t1 commonIndices
+        t2' = foldl' (|>>>) t2 commonIndices
+    in _mergeScalars $ _elemByElem' t1' t2' f op
 
 -- | Zipping two tensors with a combinator, assuming they have the same indices. 
 {-# INLINE zipT #-}
@@ -386,16 +402,16 @@ instance Num (Tensor Double) where
 
     -- Adding - element by element
     {-# INLINE (+) #-}
-    t1 + t2 = _elemByElem t1 t2 (+) $ Ptr.zipT (+)
+    t1 + t2 = _elemByElem t1 t2 (+) $ zipT (+)
 
     -- Subtracting - element by element
     {-# INLINE (-) #-}
-    t1 - t2 = _elemByElem t1 t2 (-) $ Ptr.zipT (-)
+    t1 - t2 = _elemByElem t1 t2 (-) $ zipT (-)
 
     -- Multiplicating is treated as tensor product
     -- Tensor product applies Einstein summation convention
     {-# INLINE (*) #-}
-    t1 * t2 = _elemByElem t1 t2 (*) Ptr.dot
+    t1 * t2 = _elemByElem t1 t2 (*) dot
 
     -- Absolute value - element by element
     {-# INLINE abs #-}

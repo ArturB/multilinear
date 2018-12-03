@@ -15,4 +15,5 @@ if stack build --fast --test --coverage --no-run-tests --bench --no-run-benchmar
     exit 0
 else
     echo -e "\u001b[31mBuild failure!\u001b[0m"
+    exit 1
 fi

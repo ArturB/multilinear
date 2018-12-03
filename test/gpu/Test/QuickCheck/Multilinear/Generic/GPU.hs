@@ -1,6 +1,6 @@
 {-|
-Module      : Test.QuickCheck.Multilinear.Generic.MultiCore
-Description : QucikCheck instances of MultiCore tensor
+Module      : Test.QuickCheck.Multilinear.Generic.GPU
+Description : QucikCheck instances of GPU tensor
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
@@ -9,7 +9,7 @@ Portability : Windows/POSIX
 
 -}
 
-module Test.QuickCheck.Multilinear.Generic.MultiCore (
+module Test.QuickCheck.Multilinear.Generic.GPU (
     Arbitrary
 ) where
 

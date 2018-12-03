@@ -28,8 +28,11 @@ else
     echo -e "Performing library tests...\n"
 fi
 
+# Check if all builds successfully
+if ! ./build.sh --nogit ; then
+    exit 1
+fi
 # Perform library tests and push changes to git if all tests passed
-./build.sh --nogit
 if stack test --coverage ; then
     echo -e "\u001b[32mAll tests passed!\u001b[0m"
     echo -e "Pushing changes to git..."
