@@ -30,10 +30,17 @@ function ctrl_c {
 }
 trap ctrl_c INT
 
-# Here we have two benchmarks, MultiCore and Sequential. Both are written by stack to benchmark/results.html
+# Here we have three benchmarks, GPU, MultiCore and Sequential. Both are written by stack to benchmark/results.html
 # so when results of first benchmark (MultiCore) are available, rename them to multicore-results.html 
 # and after second results (sequential) are available, rename them to sequential-results.html
 
+while [ true ] ; do
+    sleep 1
+    if [ -f $BNAME ] ; then
+        mv $BNAME benchmark/gpu-results.html
+        break
+    fi
+done
 while [ true ] ; do
     sleep 1
     if [ -f $BNAME ] ; then
