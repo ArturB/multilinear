@@ -338,8 +338,9 @@ fastDot :: StorableV.Vector Double -> StorableV.Vector Double -> Double
 fastDot v1 v2 = let
     (fp1, _, _) = StorableV.unsafeToForeignPtr v1
     (fp2, _, _) = StorableV.unsafeToForeignPtr v2
-    ioRes = withForeignPtr fp1 $ \p1 -> withForeignPtr fp2 $ \p2 -> return $ c_dot p1 p2 (StorableV.length v1)
-    in unsafePerformIO ioRes
+    p1 = unsafeForeignPtrToPtr fp1
+    p2 = unsafeForeignPtrToPtr fp2
+    in c_dot p1 p2 (StorableV.length v1)
 
 -- | dot product of two tensors
 {-# INLINE dot #-}
