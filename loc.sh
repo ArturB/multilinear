@@ -1,4 +1,4 @@
-# Calculate total LOC number in the project
+#!/bin/bash
 
 # Library LOC
 LIB=$( cat $( find . | grep src/.*\.hs$ ) | wc -l )

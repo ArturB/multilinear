@@ -1,6 +1,8 @@
-# Re-build, prform all checks and tests and generate coverage report
+#/bin/bash
+
+# Re-build, perform all checks and tests and generate coverage report
 # If all tests succeeded, copy coverage report to test/coverage
-# and make a git commit&push
+# and make git commit&push
 
 # Get package name
 PACKAGE_NAME=$( cat package.yaml | grep '^name:' | grep -o '[a-zA-z0-9]\+$' )
@@ -25,7 +27,6 @@ else
     echo -e "Package version and ChangeLog.md up-to-date!"
     echo -e "Performing library tests...\n"
 fi
-
 
 # Perform library tests and push changes to git if all tests passed
 ./build.sh --nogit
