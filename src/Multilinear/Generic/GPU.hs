@@ -43,21 +43,21 @@ import qualified Multilinear.Index.Finite      as Finite
 import qualified Multilinear.Generic.PtrTensor as Ptr
 import           System.IO.Unsafe
 
-foreign import ccall "dot" 
+foreign import ccall "multAndAddVectors" 
     c_dot :: 
         Ptr Double -- ^ First array to dot
      -> Ptr Double -- ^ Second array to dot
      -> Int        -- ^ Length of arrays to dot
      -> Double     -- ^ Result dot product value
 
-foreign import ccall "zip" 
-    c_zip :: 
-        FunPtr (Double -> Double) -- ^ Zipping combinator
-     -> Ptr Double                -- ^ First array to zip
-     -> Ptr Double                -- ^ Second array to zip
-     -> Int                       -- ^ Length of arrays to zip
-     -> Ptr Double                -- ^ Result array
-     -> IO ()                     -- ^ return void
+-- foreign import ccall "zip" 
+--     c_zip :: 
+--         FunPtr (Double -> Double) -- ^ Zipping combinator
+--      -> Ptr Double                -- ^ First array to zip
+--      -> Ptr Double                -- ^ Second array to zip
+--      -> Int                       -- ^ Length of arrays to zip
+--      -> Ptr Double                -- ^ Result array
+--      -> IO ()                     -- ^ return void
 
 {-| ERROR MESSAGE -}
 incompatibleTypes :: String

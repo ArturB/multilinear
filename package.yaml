@@ -41,9 +41,13 @@ default-extensions:
 
 library:
   source-dirs: src
-  c-sources:
-  - cbits/dot.c
-  cc-options: -O3
+  #c-sources:
+  #- cbits/vec_mult.c
+  #cc-options: -O3 -lOpenCL -lm
+  extra-lib-dirs:
+  - cbits
+  extra-libraries:
+  - vec_mult
   dependencies:
   - containers
   - deepseq
