@@ -45,8 +45,11 @@ library:
   #- cbits/vec_mult.c
   #cc-options: -O3 -lOpenCL -lm
   extra-lib-dirs:
-  - cbits
+  - /usr/lib/x86_64-linux-gnu
+  - /home/bzwgolem/Documents/multilinear/cbits
+
   extra-libraries:
+  - OpenCL
   - vec_mult
   dependencies:
   - containers
