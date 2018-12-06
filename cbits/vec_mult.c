@@ -16,75 +16,13 @@
 #define WB 2048
 ////////////////////////////////////////////////////////////////////////////////
 
-double multAndAddVectors(double* A, 
-                          double* B,
-                          const int len, cl_context context, cl_command_queue commands, cl_kernel kernel)
-{
-    unsigned int size_C = len;
-   unsigned int mem_size_C = sizeof(double) * size_C;
-   double* C = (double*) malloc(mem_size_C); 
-  cl_mem d_A;
-   cl_mem d_B;
-   cl_mem d_C;   
 
-int err;
-// Create the input and output arrays in device memory for our calculation
-   d_C = clCreateBuffer(context, CL_MEM_READ_WRITE, mem_size_C, NULL, &err);
-   d_A = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(A)*len, A, &err);
-   d_B = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(B)*len, B, &err);
-
-   if (!d_A || !d_B || !d_C)
-   {
-    //    printf("Error: Failed to allocate device memory!\n");
-       exit(1);
-   }    
-
-   
-	//Launch OpenCL kernel
-   size_t localWorkSize[2], globalWorkSize[2];
-
-   localWorkSize[0] = 1;
-   localWorkSize[1] = 1;
-   globalWorkSize[0] = len;
-   globalWorkSize[1] = len;
-
-   err = clEnqueueNDRangeKernel(commands, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
-    
-   if (err != CL_SUCCESS)
-   {
-    //    printf("Error: Failed to execute kernel! %d\n", err);
-       exit(1);
-   }
-   //Retrieve result from device
-   err = clEnqueueReadBuffer(commands, d_C, CL_TRUE, 0, mem_size_C, C, 0, NULL, NULL);
-
-   if (err != CL_SUCCESS)
-   {
-    //    printf("Error: Failed to read output array! %d\n", err);
-       exit(1);
-   }
-    double result = 0;
-    for(int i = 0; i<len; ++i )
-        result += C[i];
-
-   free(C);
-   clReleaseMemObject(d_A);
-   clReleaseMemObject(d_C);
-   clReleaseMemObject(d_B);
-
-    return result;
-}
 long LoadOpenCLKernel(char const* path, char **buf);
 
-int final(cl_context context, cl_command_queue commands, cl_program program, cl_kernel kernel){
-
-   clReleaseProgram(program);
-   clReleaseKernel(kernel);
-   clReleaseCommandQueue(commands);
-   clReleaseContext(context);
-}
 /*LOAD ME TO HASKELL */
-int setup()
+double multAndAddVectors(double* A, 
+                          double* B,
+                          const int len)
 {
 
    int err;                            // error code returned from api calls
@@ -96,12 +34,14 @@ int setup()
    cl_kernel kernel;                   // compute kernel
 
     // OpenCL device memory for matrices
-//    cl_mem d_A;
-//    cl_mem d_B;
-//    cl_mem d_C;
+   cl_mem d_A;
+   cl_mem d_B;
+   cl_mem d_C;
 
       //Allocate host memory for the result vector C
-
+   unsigned int size_C = len;
+   unsigned int mem_size_C = sizeof(double) * size_C;
+   double* C = (double*) malloc(mem_size_C);
 
 //    printf("Initializing OpenCL device...\n"); 
    cl_uint dev_cnt = 0;
@@ -156,10 +96,10 @@ int setup()
    err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
    if (err != CL_SUCCESS)
    {
-       //size_t len;
-       //char buffer[2048];
+       size_t len;
+       char buffer[2048];
     //    printf("Error: Failed to build program executable!\n");
-      // clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
+       clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
     //    printf("%s\n", buffer);
        exit(1);
    }
@@ -173,55 +113,55 @@ int setup()
        exit(1);
    }
 
-//    // Create the input and output arrays in device memory for our calculation
-//    d_C = clCreateBuffer(context, CL_MEM_READ_WRITE, mem_size_C, NULL, &err);
-//    d_A = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(A)*len, A, &err);
-//    d_B = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(B)*len, B, &err);
+   // Create the input and output arrays in device memory for our calculation
+   d_C = clCreateBuffer(context, CL_MEM_READ_WRITE, mem_size_C, NULL, &err);
+   d_A = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(A)*len, A, &err);
+   d_B = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(B)*len, B, &err);
 
-//    if (!d_A || !d_B || !d_C)
-//    {
-//     //    printf("Error: Failed to allocate device memory!\n");
-//        exit(1);
-//    }    
+   if (!d_A || !d_B || !d_C)
+   {
+    //    printf("Error: Failed to allocate device memory!\n");
+       exit(1);
+   }    
 
-//    //Launch OpenCL kernel
-//    size_t localWorkSize[2], globalWorkSize[2];
+   //Launch OpenCL kernel
+   size_t localWorkSize[2], globalWorkSize[2];
  
-//    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_C);
-//    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&d_A);
-//    err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_B);
-//    err |= clSetKernelArg(kernel, 3, sizeof(int), (void *)&len);
-// //    err |= clSetKernelArg(kernel, 4, sizeof(int), (void *)&wC);
+   err = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&d_C);
+   err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&d_A);
+   err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&d_B);
+   err |= clSetKernelArg(kernel, 3, sizeof(int), (void *)&len);
+//    err |= clSetKernelArg(kernel, 4, sizeof(int), (void *)&wC);
 
-//    if (err != CL_SUCCESS)
-//    {
-//     //    printf("Error: Failed to set kernel arguments! %d\n", err);
-//        exit(1);
-//    }
+   if (err != CL_SUCCESS)
+   {
+    //    printf("Error: Failed to set kernel arguments! %d\n", err);
+       exit(1);
+   }
  
-//    localWorkSize[0] = 1;
-//    localWorkSize[1] = 1;
-//    globalWorkSize[0] = len;
-//    globalWorkSize[1] = len;
+   localWorkSize[0] = 1;
+   localWorkSize[1] = 1;
+   globalWorkSize[0] = len;
+   globalWorkSize[1] = len;
 
-//    err = clEnqueueNDRangeKernel(commands, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
+   err = clEnqueueNDRangeKernel(commands, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
     
-//    if (err != CL_SUCCESS)
-//    {
-//     //    printf("Error: Failed to execute kernel! %d\n", err);
-//        exit(1);
-//    }
-//    //Retrieve result from device
-//    err = clEnqueueReadBuffer(commands, d_C, CL_TRUE, 0, mem_size_C, C, 0, NULL, NULL);
+   if (err != CL_SUCCESS)
+   {
+    //    printf("Error: Failed to execute kernel! %d\n", err);
+       exit(1);
+   }
+   //Retrieve result from device
+   err = clEnqueueReadBuffer(commands, d_C, CL_TRUE, 0, mem_size_C, C, 0, NULL, NULL);
 
-//    if (err != CL_SUCCESS)
-//    {
-//     //    printf("Error: Failed to read output array! %d\n", err);
-//        exit(1);
-//    }
-//     double result = 0;
-//     for(int i = 0; i<len; ++i )
-//         result += C[i];
+   if (err != CL_SUCCESS)
+   {
+    //    printf("Error: Failed to read output array! %d\n", err);
+       exit(1);
+   }
+    double result = 0;
+    for(int i = 0; i<len; ++i )
+        result += C[i];
 //    printf("%f\n", result[0]);
 //    printf("\n\nMatrix C (Results)\n");
 //    printf("\n");
@@ -230,11 +170,18 @@ int setup()
 
    //Shutdown and cleanup
  
+   free(C);
+   clReleaseMemObject(d_A);
+   clReleaseMemObject(d_C);
+   clReleaseMemObject(d_B);
 
-
+   clReleaseProgram(program);
+   clReleaseKernel(kernel);
+   clReleaseCommandQueue(commands);
+   clReleaseContext(context);
 
     
-    return 0;
+    return result;
  }
 // Allocates a matrix with random float entries.
 void randomMemInit(double* data, int size)
