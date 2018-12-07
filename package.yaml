@@ -113,6 +113,26 @@ benchmarks:
     dependencies:
     - deepseq
     - multilinear
+  2-cores-time:
+    main:                Bench.hs
+    source-dirs:         benchmark/2-cores/time
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N2
+    dependencies:
+    - criterion
+    - multilinear
+  3-cores-time:
+    main:                Bench.hs
+    source-dirs:         benchmark/3-cores/time
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N3
+    dependencies:
+    - criterion
+    - multilinear
   multicore-time:
     main:                Bench.hs
     source-dirs:         benchmark/multicore/time
