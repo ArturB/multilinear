@@ -14,7 +14,7 @@ module Main (
 ) where
 
 import           Criterion.Main
-import           Multilinear.Class
+import           Criterion.Types
 import           Multilinear.Generic.MultiCore
 import qualified Multilinear.Matrix                  as Matrix
 
@@ -40,7 +40,7 @@ sizedMatrixAddBench s =
 
 -- | ENTRY POINT
 main :: IO ()
-main = defaultMain [
+main = defaultMainWith defaultConfig { reportFile = Just "benchmark/multicore-bench.html" } [
     bgroup "matrix addition" $ sizedMatrixAddBench <$> [64, 128, 256, 512, 1024],
     bgroup "matrix multiplication" $ sizedMatrixMultBench <$> [64, 128, 256, 512, 1024]
     ]
