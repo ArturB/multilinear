@@ -14,13 +14,4 @@ else
 fi
 
 # Perform all benchmarks in background and move on
-stack bench &
-STACK_PID=$!
-
-function ctrl_c {
-    echo "Terminating stack..."
-    kill $STACK_PID
-    echo Done!
-    exit 0
-}
-trap ctrl_c INT
+stack bench
