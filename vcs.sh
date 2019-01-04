@@ -21,7 +21,7 @@ DAILY_BRANCH=$( date +%d-%m )
 
 # based on build state, commit to master or to daily branch
 if [ $CUR_BRANCH == "master" ] ; then
-    if "$TESTED" ; then
+    if [ "$TESTED" != "" ] ; then
         ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
         git branch "daily-$DAILY_BRANCH"
