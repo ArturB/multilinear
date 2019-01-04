@@ -35,4 +35,3 @@ if [ $CUR_BRANCH == "master" ] ; then
         fi
     fi
 fi
-
