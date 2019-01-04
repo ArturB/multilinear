@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Generate build ID
-let "TODAY_SEC = $( date +%s ) % 86400"
-BUILD_ID="$( date +%y%j ).$TODAY_SEC"
+source id-build.sh
 
 # Build whole project: library, tests, benchmarks, documentation 
 if stack build --fast --test --coverage --no-run-tests --bench --no-run-benchmarks --haddock; then
