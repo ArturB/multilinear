@@ -41,11 +41,12 @@ if [ $CUR_BRANCH == "master" ] ; then
 # ON DAILY BRANCH
 else
     if [ "$TESTED" != "" ] ; then
-        git add -A && git commit -qm "Build $BUILD_ID" && git pull -q
-        git checkout master
-        git merge $CUR_BRANCH
-        git branch -D $CUR_BRANCH
-        git push
+        ( git add -A && git commit -qm "Build $BUILD_ID" && git pull -q &&
+          git checkout -q master &&
+          git merge -q $CUR_BRANCH &&
+          git branch -qD $CUR_BRANCH &&
+          git push -q
+        ) &
     else
         if [ "$COMPILED" != "" ] ; then
             ( git add -A && git commit -qm "Build $BUILD_ID" && git push -q ) &
