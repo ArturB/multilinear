@@ -38,3 +38,4 @@ echo
 echo -e "\u001b[33mTotal LOC: $TOTAL, therein\u001b[0m"
 echo -e "\u001b[33m  - Code: $TOTAL_CODE\u001b[0m"
 echo -e "\u001b[33m  - Comments: $TOTAL_COMMENTS\u001b[0m"
+
