@@ -15,20 +15,17 @@ while [ $i -le $# ] ; do
     shift
 done
 
-echo "TESTED=$TESTED"
-echo "COMPILED=$COMPILED"
-
 # get current branch name
 CUR_BRANCH=$( git rev-parse --abbrev-ref HEAD )
 DAILY_BRANCH=$( date +%d-%m )
 
 # based on build state, commit to master or to daily branch
 if [ $CUR_BRANCH == "master" ] ; then
-    if $TESTED ; then
+    if "$TESTED" ; then
         ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
         git branch "daily-$DAILY_BRANCH"
-        if $COMPILED ; then
+        if "$COMPILED" ; then
             ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
         else
             ( git commit -aqm "Temp $BUILD_ID" && git pull -q && git push -q ) &
