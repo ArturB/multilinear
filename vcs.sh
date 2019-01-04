@@ -43,7 +43,7 @@ else
         git add -A && git commit -qm "Build $BUILD_ID" && git pull -q
         git checkout master
         git merge $CUR_BRANCH
-
+        git push
     else
         if [ "$COMPILED" != "" ] ; then
             ( git add -A && git commit -qm "Build $BUILD_ID" && git push -q ) &
