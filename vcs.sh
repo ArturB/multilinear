@@ -24,7 +24,7 @@ if [ $CUR_BRANCH == "master" ] ; then
     if $TESTED ; then
         ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
-        git branch Daily $DAILY_BRANCH
+        git branch "daily-$DAILY_BRANCH"
         if $COMPILED ; then
             ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
         else
