@@ -45,7 +45,7 @@ else
           git checkout -q master &&
           git merge -q $CUR_BRANCH &&
           git branch -qD $CUR_BRANCH &&
-          git push -q
+          git push -q --delete $CUR_BRANCH
         ) &
     else
         if [ "$COMPILED" != "" ] ; then
