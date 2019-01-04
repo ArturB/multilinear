@@ -1,3 +1,5 @@
+source id-build.sh
+
 # parse arguments
 COMPILED=""
 TESTED=""
