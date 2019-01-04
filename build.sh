@@ -11,7 +11,9 @@ if stack build --fast --test --coverage --no-run-tests --bench --no-run-benchmar
     echo -e "All done!"
     exit 0
 else
-    ./vcs.sh
+    if [ "$1" != "--nogit" ] ; then
+        ./vcs.s
+    fi
     echo -e "\u001b[31mBuild failure!\u001b[0m"
     exit 1
 fi
