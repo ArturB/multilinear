@@ -15,6 +15,9 @@ while [ $i -le $# ] ; do
     shift
 done
 
+echo "TESTED=$TESTED"
+echo "COMPILED=$COMPILED"
+
 # get current branch name
 CUR_BRANCH=$( git rev-parse --abbrev-ref HEAD )
 DAILY_BRANCH=$( date +%d-%m )
