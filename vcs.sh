@@ -31,9 +31,9 @@ if [ $CUR_BRANCH == "master" ] ; then
         git checkout -b "$DAILY_BRANCH"
         git stash pop
         if [ "$COMPILED" != "" ] ; then
-            ( git commit -aqm "Build $BUILD_ID" && git push -q --set-upstream origin "$DAILY_BRANCH" 2>/dev/null ) &
+            ( git commit -aqm "Build $BUILD_ID" && git push -q --set-upstream origin "$DAILY_BRANCH" 1>/dev/null 2>/dev/null ) &
         else
-            ( git commit -aqm "Temp $BUILD_ID"  && git push -q --set-upstream origin "$DAILY_BRANCH" 2>/dev/null ) &
+            ( git commit -aqm "Temp $BUILD_ID"  && git push -q --set-upstream origin "$DAILY_BRANCH" 1>/dev/null 2>/dev/null ) &
         fi
     fi
 
