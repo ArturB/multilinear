@@ -25,6 +25,7 @@ if [ $CUR_BRANCH == "master" ] ; then
         ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
         git branch "daily-$DAILY_BRANCH"
+        git checkout "daily-$DAILY_BRANCH"
         if "$COMPILED" ; then
             ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
         else
