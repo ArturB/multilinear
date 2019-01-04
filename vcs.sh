@@ -27,14 +27,15 @@ if [ $CUR_BRANCH == "master" ] ; then
     if [ "$TESTED" != "" ] ; then
         ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
-        git add -A && git stash -q &&
-        git checkout -qb "$DAILY_BRANCH" &&
-        git stash pop -q &&
-        if [ "$COMPILED" != "" ] ; then
-            ( git commit -aqm "Build $BUILD_ID" && git push -q --set-upstream origin "$DAILY_BRANCH" 1>/dev/null 2>/dev/null ) &
-        else
-            ( git commit -aqm "Temp $BUILD_ID"  && git push -q --set-upstream origin "$DAILY_BRANCH" 1>/dev/null 2>/dev/null ) &
-        fi
+        ( git add -A && git stash -q &&
+          git checkout -qb "$DAILY_BRANCH" &&
+          git stash pop -q &&
+          if [ "$COMPILED" != "" ] ; then
+              git commit -aqm "Build $BUILD_ID" && git push -q --set-upstream origin "$DAILY_BRANCH" 1>/dev/null 2>/dev/null
+          else
+              git commit -aqm "Temp $BUILD_ID"  && git push -q --set-upstream origin "$DAILY_BRANCH" 1>/dev/null 2>/dev/null
+          fi
+        ) &
     fi
 
 # ON DAILY BRANCH
