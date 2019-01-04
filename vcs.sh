@@ -26,13 +26,12 @@ if [ $CUR_BRANCH == "master" ] ; then
         ( git commit -aqm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
         git stash 
-        git checkout -b "DAILY_BRANCH"
+        git checkout -b "$DAILY_BRANCH"
         git stash pop
         if [ "$COMPILED" != "" ] ; then
-            ( git commit -aqm "Build $BUILD_ID" && git push -q ) &
+            ( git commit -aqm "Build $BUILD_ID" && git push -q --set-upstream origin "$DAILY_BRANCH" ) &
         else
-            ( git commit -aqm "Temp $BUILD_ID"  && git push -q ) &
+            ( git commit -aqm "Temp $BUILD_ID"  && git push -q --set-upstream origin "$DAILY_BRANCH" ) &
         fi
     fi
 fi
-
