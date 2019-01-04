@@ -28,10 +28,11 @@ if [ $CUR_BRANCH == "master" ] ; then
         git stash 
         git checkout -b "DAILY_BRANCH"
         git stash pop
-        if "$COMPILED" ; then
-            ( git commit -qm "Build $BUILD_ID" && git push -q ) &
+        if [ "$COMPILED" != "" ] ; then
+            ( git commit -aqm "Build $BUILD_ID" && git push -q ) &
         else
-            ( git commit -qm "Temp $BUILD_ID"  && git push -q ) &
+            ( git commit -aqm "Temp $BUILD_ID"  && git push -q ) &
         fi
     fi
 fi
+
