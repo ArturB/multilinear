@@ -30,7 +30,7 @@ import           Test.QuickCheck.Multilinear.Generic.GPU()
 
 -- | Default test number for property
 defTestN :: Int
-defTestN = 1000
+defTestN = 200
 
 
 ------------------------------

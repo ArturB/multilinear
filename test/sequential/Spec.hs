@@ -29,7 +29,7 @@ import           Test.QuickCheck.Multilinear.Generic.Sequential()
 
 -- | Default test number for property
 defTestN :: Int
-defTestN = 1000
+defTestN = 200
 
 
 ------------------------------
