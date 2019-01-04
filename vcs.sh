@@ -5,15 +5,17 @@ COMPILED=""
 TESTED=""
 
 i=0
-while [ $i -le $# ] ; do
-    case $1 in
-        --compiled) COMPILED="true" ; ;; 
-        --tested)   TESTED="true" ;   ;; 
-        *) echo Unknown option $1 ;   ;; 
-    esac
-    let "i=$i+1"
-    shift
-done
+if [ $# -gt 0 ] ; then
+    while [ $i -le $# ] ; do
+        case $1 in
+            --compiled) COMPILED="true" ; ;; 
+            --tested)   TESTED="true" ;   ;; 
+            *) echo Unknown option $1 ;   ;; 
+        esac
+        let "i=$i+1"
+        shift
+    done
+fi
 
 # get current branch name
 CUR_BRANCH=$( git rev-parse --abbrev-ref HEAD )
