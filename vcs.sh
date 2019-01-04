@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source id-build.sh
 
 # parse arguments
@@ -47,7 +49,7 @@ else
           git checkout -q master &&
           git merge -q $CUR_BRANCH &&
           git branch -qD $CUR_BRANCH &&
-          git push -q && git push origin --delete $CUR_BRANCH
+          git push -q && git push -q origin --delete $CUR_BRANCH
         ) &
     else
         if [ "$COMPILED" != "" ] ; then
