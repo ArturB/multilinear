@@ -43,9 +43,9 @@ else
         ( git add -A && git commit -qm "Build $BUILD_ID" && git pull -q && git push -q ) &
     else
         if [ "$COMPILED" != "" ] ; then
-            ( git add -A && git commit -qm "Build $BUILD_ID" && git push -q --set-upstream origin "$DAILY_BRANCH" ) &
+            ( git add -A && git commit -qm "Build $BUILD_ID" && git push -q ) &
         else
-            ( git add -A && git commit -qm "Temp $BUILD_ID"  && git push -q --set-upstream origin "$DAILY_BRANCH" ) &
+            ( git add -A && git commit -qm "Temp $BUILD_ID"  && git push -q ) &
         fi
     fi
 fi
