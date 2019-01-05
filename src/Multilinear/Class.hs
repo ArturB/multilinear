@@ -380,10 +380,9 @@ class (
 
     {-| Filtering one index of tensor. -}
     {-# INLINE filterIndex #-}
-    filterIndex :: (
-        Multilinear Tensor a
-        ) => String        -- ^ Index name to filter
+    filterIndex :: 
+             String        -- ^ Index name to filter
           -> (Int -> Bool) -- ^ filter function
-          -> Tensor a      -- ^ tensor to filter
-          -> Tensor a
+          -> t a           -- ^ tensor to filter
+          -> t a
     filterIndex iname f = filter (\i n -> i /= iname || f n)
