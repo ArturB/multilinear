@@ -323,28 +323,29 @@ class (
     standardize :: t a -> t a
 
     -- | Return list of indices with the same name in two tensors
-    commonIndices :: t a -> t a -> Set.Set Index.TIndex
+    commonIndices :: t a -> t a -> [Index.TIndex]
     commonIndices t1 t2 = let 
         indices1 = Set.fromList $ indices t1
         indices2 = Set.fromList $ indices t2
-        in Set.intersection indices1 indices2
+        in Set.toList $ Set.intersection indices1 indices2
 
     -- | Return just names of common indices of tensors. 
-    commonIndicesNames :: t a -> t a -> Set.Set String
+    commonIndicesNames :: t a -> t a -> [String]
     commonIndicesNames t1 t2 = Index.indexName <$> commonIndices t1 t2
 
     -- | Return list of contracted indices in two tensors
-    contractedIndices :: t a -> t a -> Set.Set Index.TIndex
+    contractedIndices :: t a -> t a -> [Index.TIndex]
     contractedIndices t1 t2 = 
       let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
           iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
           iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
           iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
-      in  -- contracted are indices covariant in the first tensor and contravariant in the second
+      in  Set.toList $ 
+          -- contracted are indices covariant in the first tensor and contravariant in the second
           Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
           -- or contravariant in the first tensor and covariant in the second
           Set.intersection iContravariantNames1 iCovariantNames2
    
     -- | Return just names of contracted indices of tensors. 
-    contractedIndicesNames :: t a -> t a -> Set.Set String
+    contractedIndicesNames :: t a -> t a -> [String]
     contractedIndicesNames t1 t2 = Index.indexName <$> contractedIndices t1 t2
