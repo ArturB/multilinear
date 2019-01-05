@@ -15,15 +15,14 @@ module Sequential (
 
 import           Data.Maybe
 import qualified Data.Set                       as Set
-import           Multilinear
+import           Multilinear.Class
+import           Multilinear.Generic.Sequential
 import qualified Multilinear.Index              as Index
 import qualified Multilinear.Form               as Form
 import qualified Multilinear.Matrix             as Matrix
 import qualified Multilinear.Vector             as Vector
 import qualified Multilinear.NForm              as NForm
 import qualified Multilinear.NVector            as NVector
-import           System.Exit
-import           System.IO
 import           Test.QuickCheck
 import           Test.QuickCheck.Common
 import           Test.QuickCheck.Multilinear.Generic.Sequential()
