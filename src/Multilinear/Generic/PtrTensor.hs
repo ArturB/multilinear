@@ -13,7 +13,7 @@ import           Foreign.ForeignPtr.Unsafe
 import           Foreign.Ptr
 import           Foreign.Storable
 import           GHC.Generics
---import           Multilinear.Class
+import qualified Multilinear.Class           as Multilinear
 import qualified Multilinear.Index.Finite    as Finite
 import qualified Multilinear.Index           as Index
 import           System.IO.Unsafe
