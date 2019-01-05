@@ -19,16 +19,12 @@ module ConstructorsTests (
 
 import           Control.DeepSeq
 import           Multilinear.Class
-import           Multilinear.Generic.GPU
 import qualified Multilinear.Form               as Form
 import qualified Multilinear.Matrix             as Matrix
 import qualified Multilinear.Vector             as Vector
 import qualified Multilinear.NForm              as NForm
 import qualified Multilinear.NVector            as NVector
-import qualified MultilinearTests
 import           Test.QuickCheck
-import           Test.QuickCheck.Common
-import           Test.QuickCheck.Multilinear.Generic.GPU()
 
 
 -- | Test generic vector constructor values
@@ -137,7 +133,7 @@ vectorConstructorError c s _ =
 
 -- | Test generic form constructor indices error
 formConstructorError :: forall a t . (
-    NFData a, NFData (t a), Multilinear t a
+    NFData a, NFData (t a), Multilinear t a, Num a
  ) => Char 
    -> Positive (Small Int) 
    -> t a 
@@ -149,7 +145,7 @@ formConstructorError c s _ =
 
 -- | Test generic matrix constructor indices error
 matrixConstructorError :: forall a t . (
-    NFData a, NFData (t a), Multilinear t a
+    NFData a, NFData (t a), Multilinear t a, Num a
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
@@ -164,7 +160,7 @@ matrixConstructorError c1 c2 s1 s2 _ =
 
 -- | Test generic NVector constructor indices error
 nVectorConstructorError :: forall a t . (
-    NFData a, NFData (t a), Multilinear t a
+    NFData a, NFData (t a), Multilinear t a, Num a
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
@@ -179,7 +175,7 @@ nVectorConstructorError c1 c2 s1 s2 _ =
 
 -- | Test generic NForm constructor indices error
 nFormConstructorError :: forall a t . (
-    NFData a, NFData (t a), Multilinear t a
+    NFData a, NFData (t a), Multilinear t a, Num a
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
