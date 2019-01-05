@@ -336,10 +336,10 @@ class (
     -- | Return list of contracted indices in two tensors
     contractedIndices :: t a -> t a -> [Index.TIndex]
     contractedIndices t1 t2 = 
-      let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
-          iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
-          iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
-          iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
+      let iContravariantNames1 = Set.fromList (Index.isContravariant `Prelude.filter` indices t1)
+          iCovariantNames1 = Set.fromList (Index.isCovariant `Prelude.filter` indices t1)
+          iContravariantNames2 = Set.fromList (Index.isContravariant `Prelude.filter` indices t2)
+          iCovariantNames2 = Set.fromList (Index.isCovariant `Prelude.filter` indices t2)
       in  Set.toList $ 
           -- contracted are indices covariant in the first tensor and contravariant in the second
           Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
