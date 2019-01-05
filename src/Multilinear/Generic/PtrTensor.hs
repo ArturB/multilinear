@@ -71,7 +71,7 @@ fromStorableTensor (StorableT.Scalar x) = Scalar x
 fromStorableTensor (StorableT.SimpleFinite i ts) = let
     (ptr,_) = StorableV.unsafeToForeignPtr0 ts
     in SimpleFinite i (unsafeForeignPtrToPtr ptr, StorableV.length ts)
-fromStorableTensor (StorableT.FiniteTensor i ts) = FiniteTensor i (toPtrTensor <$> ts)
+fromStorableTensor (StorableT.FiniteTensor i ts) = FiniteTensor i (fromStorableTensor <$> ts)
 
 toStorableTensor :: Storable a => Tensor a -> StorableT.Tensor a
 toStorableTensor (Scalar x) = StorableT.Scalar x
@@ -79,7 +79,7 @@ toStorableTensor (SimpleFinite i (ptr,len)) = let
     fptr = unsafePerformIO $ newForeignPtr_ ptr
     ts = StorableV.unsafeFromForeignPtr0 fptr len
     in StorableT.SimpleFinite i ts
-toStorableTensor (FiniteTensor i ts) = StorableT.FiniteTensor i (fromPtrTensor <$> ts)
+toStorableTensor (FiniteTensor i ts) = StorableT.FiniteTensor i (toStorableTensor <$> ts)
 
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
