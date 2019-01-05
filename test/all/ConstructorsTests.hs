@@ -33,7 +33,7 @@ import           Test.QuickCheck.Multilinear.Generic.GPU()
 
 -- | Test generic vector constructor values
 vectorConstructorValues :: forall a t . (
-    Num a, Eq (t a), Multilinear t a
+    Num a, Eq (t a), Multilinear t a, Num (t a)
  ) => Char 
    -> Positive (Small Int) 
    -> t a 
