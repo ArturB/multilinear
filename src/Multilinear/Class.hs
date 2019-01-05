@@ -349,3 +349,15 @@ class (
     -- | Return just names of contracted indices of tensors. 
     contractedIndicesNames :: t a -> t a -> [String]
     contractedIndicesNames t1 t2 = Index.indexName <$> contractedIndices t1 t2
+
+    -- | Check if tensor is a scalar
+    isScalar :: t a -> Bool
+    isScalar = null . indices
+
+    -- | Check if tensor is a one-dimensional tensor
+    isSimple :: t a -> Bool
+    isSimple t = length (indices t) == 1
+
+    -- | Check if tensor is a complex tensor
+    isComplexTensor :: t a -> Bool
+    isComplexTensor = length (indices t) > 1

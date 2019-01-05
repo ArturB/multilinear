@@ -75,27 +75,6 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
-{-| Return true if tensor is a scalar -}
-{-# INLINE isScalar #-}
-isScalar :: Unboxed.Unbox a => Tensor a -> Bool
-isScalar x = case x of
-    Scalar _ -> True
-    _        -> False
-
-{-| Return true if tensor is a simple tensor -}
-{-# INLINE isSimple #-}
-isSimple :: Unboxed.Unbox a => Tensor a -> Bool
-isSimple x = case x of
-    SimpleFinite _ _ -> True
-    _                -> False
-
-{-| Return True if tensor is a complex tensor -}
-{-# INLINE isFiniteTensor #-}
-isFiniteTensor :: Unboxed.Unbox a => Tensor a -> Bool
-isFiniteTensor x = case x of
-    FiniteTensor _ _ -> True
-    _                -> False
-
 {-| Return generic tensor index -}
 {-# INLINE tensorIndex #-}
 tensorIndex :: Unboxed.Unbox a => Tensor a -> Index.TIndex

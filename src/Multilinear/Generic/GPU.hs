@@ -111,28 +111,6 @@ fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
     in SimpleFinite i ts
 fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
 
-
-{-| Return true if tensor is a scalar -}
-{-# INLINE isScalar #-}
-isScalar :: Storable a => Tensor a -> Bool
-isScalar x = case x of
-    Scalar _ -> True
-    _        -> False
-
-{-| Return true if tensor is a simple tensor -}
-{-# INLINE isSimple #-}
-isSimple :: Storable a => Tensor a -> Bool
-isSimple x = case x of
-    SimpleFinite _ _ -> True
-    _                -> False
-
-{-| Return True if tensor is a complex tensor -}
-{-# INLINE isFiniteTensor #-}
-isFiniteTensor :: Storable a => Tensor a -> Bool
-isFiniteTensor x = case x of
-    FiniteTensor _ _ -> True
-    _                -> False
-
 {-| Return generic tensor index -}
 {-# INLINE tensorIndex #-}
 tensorIndex :: Storable a => Tensor a -> Index.TIndex
