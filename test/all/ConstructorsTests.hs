@@ -46,8 +46,8 @@ vectorConstructorValues c s _ =
         all (\i -> vConst  $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
 
 -- | Test generic form constructor values
-formConstructorValues :: (
-    Num a, Multilinear t a
+formConstructorValues :: forall a t . (
+    Num a, Eq (t a), Multilinear t a, Num (t a)
  ) => Char 
    -> Positive (Small Int) 
    -> t a 
@@ -60,8 +60,8 @@ formConstructorValues c s _ =
         all (\i -> fConst $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
 
 -- | Test generic matrix constructor values
-matrixConstructorValues :: (
-    Num a, Multilinear t a
+matrixConstructorValues :: forall a t . (
+    Num a, Eq (t a), Multilinear t a, Num (t a)
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
@@ -81,8 +81,8 @@ matrixConstructorValues c1 c2 s1 s2 _ =
         )
 
 -- | Test generic NVector constructor values
-nVectorConstructorValues :: (
-    Num a, Multilinear t a
+nVectorConstructorValues :: forall a t . (
+    Num a, Eq (t a), Multilinear t a, Num (t a)
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
@@ -102,8 +102,8 @@ nVectorConstructorValues c1 c2 s1 s2 _ =
         )
 
 -- | Test generic NForm constructor values
-nFormConstructorValues :: (
-    Num a, Multilinear t a
+nFormConstructorValues :: forall a t . (
+    Num a, Eq (t a), Multilinear t a, Num (t a)
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
@@ -124,7 +124,7 @@ nFormConstructorValues c1 c2 s1 s2 _ =
 
 
 -- | Test generic vector constructor indices error
-vectorConstructorError :: (
+vectorConstructorError :: forall a t . (
     NFData a, NFData (t a), Multilinear t a
  ) => Char 
    -> Positive (Small Int) 
@@ -136,7 +136,7 @@ vectorConstructorError c s _ =
     in  expectFailure (total v)
 
 -- | Test generic form constructor indices error
-formConstructorError :: (
+formConstructorError :: forall a t . (
     NFData a, NFData (t a), Multilinear t a
  ) => Char 
    -> Positive (Small Int) 
@@ -148,7 +148,7 @@ formConstructorError c s _ =
     in  expectFailure (total f)
 
 -- | Test generic matrix constructor indices error
-matrixConstructorError :: (
+matrixConstructorError :: forall a t . (
     NFData a, NFData (t a), Multilinear t a
  ) => Char 
    -> Char 
@@ -163,7 +163,7 @@ matrixConstructorError c1 c2 s1 s2 _ =
     in  expectFailure (total v)
 
 -- | Test generic NVector constructor indices error
-nVectorConstructorError :: (
+nVectorConstructorError :: forall a t . (
     NFData a, NFData (t a), Multilinear t a
  ) => Char 
    -> Char 
@@ -178,7 +178,7 @@ nVectorConstructorError c1 c2 s1 s2 _ =
     in  expectFailure (total v)
 
 -- | Test generic NForm constructor indices error
-nFormConstructorError :: (
+nFormConstructorError :: forall a t . (
     NFData a, NFData (t a), Multilinear t a
  ) => Char 
    -> Char 
