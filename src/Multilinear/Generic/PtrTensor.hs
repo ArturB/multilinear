@@ -7,6 +7,7 @@ module Multilinear.Generic.PtrTensor (
 import           Control.DeepSeq
 import qualified Control.Parallel.Strategies  as Parallel
 import           Data.List
+import           Data.Maybe
 import qualified Data.Vector                  as Boxed
 import qualified Data.Vector.Storable         as StorableV
 import           Foreign.ForeignPtr
@@ -267,7 +268,7 @@ instance Num (Tensor Double) where
 -- Multilinear operations
 instance Multilinear Tensor Double where
     fromIndices u d un dn f = 
-        let st = Multilinear.Class.fromIndices u d un dn f :: StorableT.Tensor
+        let st = Multilinear.Class.fromIndices u d un dn f :: StorableT.Tensor Double
         in fromStorableTensor st
   
     {-| Accessing tensor elements -}
