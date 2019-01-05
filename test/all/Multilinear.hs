@@ -66,11 +66,11 @@ mergeCommonIndices :: Multilinear t a =>
 mergeCommonIndices f t1 t2 = 
     let inames1 = Set.fromList $ indicesNames t1
         inames2 = Set.fromList $ indicesNames t2
-        commonIndicesNames = Set.intersection inames1 inames2
+        commonIndicesNamesNoType = Set.intersection inames1 inames2
         expectedIndices = Set.union inames1 inames2
         resultIndices = Set.fromList $ Index.indexName <$> indices (f t1 t2)
         -- if we have indices, which have the same name but different type, it is forbidden and test passed
-    in  Set.size commonIndices /= Set.size commonIndicesNames t1 t2 || 
+    in  Set.size commonIndicesNamesNoType /= Set.size commonIndicesNames t1 t2 || 
         -- otherwise, the result indices set must be union of arguments indices
         expectedIndices == resultIndices
         
