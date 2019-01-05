@@ -20,6 +20,7 @@ import qualified Multilinear.Matrix             as Matrix
 import qualified Multilinear.Vector             as Vector
 import qualified Multilinear.NForm              as NForm
 import qualified Multilinear.NVector            as NVector
+import qualified ConstructorsTests
 import qualified MultilinearTests
 import           Test.QuickCheck
 import           Test.QuickCheck.Common
@@ -84,6 +85,13 @@ filterIndexTest = MultilinearTests.filterIndexTest
 
 showTest :: Tensor Double -> Bool
 showTest = MultilinearTests.showTest
+
+vectorConstructorValues :: Char -> Positive (Small Int) -> Tensor Double -> Bool
+vectorConstructorValues = ConstructorsTests.vectorConstructorValues
+
+
+
+
 
 -- | Test generic vector constructor indices
 vectorConstructor :: Char -> Positive (Small Int) -> Bool
