@@ -199,12 +199,6 @@ main = do
     -- CHECKING GENERIC CONSTRUCTORS --
     -----------------------------------
 
-    executePropertyTest "vectorConstructor"  defTestN vectorConstructor
-    executePropertyTest "formConstructor"    defTestN formConstructor
-    executePropertyTest "matrixConstructor"  defTestN matrixConstructor
-    executePropertyTest "nFormConstructor"   defTestN nFormConstructor
-    executePropertyTest "nVectorConstructor" defTestN nVectorConstructor
-
     executePropertyTest "vectorConstructorError"  defTestN vectorConstructorError
     executePropertyTest "formConstructorError"    defTestN formConstructorError
     executePropertyTest "matrixConstructorError"  defTestN matrixConstructorError
