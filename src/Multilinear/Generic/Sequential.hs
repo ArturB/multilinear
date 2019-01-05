@@ -546,6 +546,22 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
     -- | Move contravariant indices to lower recursion level
     standardize tens = foldl' (<<<|) tens $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tens)
 
+    -- | Filter tensor
+    filter _ (Scalar x) = Scalar x
+    filter f (SimpleFinite index ts) = 
+        let iname = Finite.indexName' index
+            ts' = (\i _ -> f iname i) `Unboxed.ifilter` ts
+        in  SimpleFinite index { Finite.indexSize = Unboxed.length ts' } ts'
+    filter f (FiniteTensor index ts) = 
+        let iname = Finite.indexName' index
+            ts' = Multilinear.Generic.Sequential.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
+            ts'' = 
+                (\case 
+                    (SimpleFinite _ ts) -> not $ Unboxed.null ts
+                    (FiniteTensor _ ts) -> not $ Boxed.null ts
+                    _ -> error $ "Filter: " ++ tensorOfScalars
+                ) `Boxed.filter` ts'
+        in  FiniteTensor index { Finite.indexSize = Boxed.length ts'' } ts''
 
 -- Add scalar right
 {-# INLINE (.+) #-}
@@ -613,48 +629,6 @@ map f x = case x of
     -- Mapping complex tensor does mapping element by element
     SimpleFinite index ts   -> SimpleFinite index (f `Unboxed.map` ts)
     FiniteTensor index ts   -> FiniteTensor index $ Multilinear.Generic.Sequential.map f <$> ts
-
-{-| Filtering tensor. 
-    Filtering multi-dimensional arrray may be dangerous, as we always assume, 
-    that on each recursion level, all tensors have the same size (length). 
-    To disable invalid filters, filtering is done over indices, not tensor elements. 
-    Filter function takes and index name and index value and if it returns True, this index value remains in result tensor. 
-    This allows to remove whole columns or rows of eg. a matrix: 
-        filter (\i n -> i /= "a" || i > 10) filters all rows of "a" index (because if i /= "a", filter returns True)
-        and for "a" index filter elements with index value <= 10
-    But this disallow to remove particular matrix element. 
-    If for some index all elements are removed, the index itself is removed from tensor. -}
-{-# INLINE filter #-}
-filter :: (
-    Multilinear Tensor a
-    ) => (String -> Int -> Bool) -- ^ filter function
-      -> Tensor a                -- ^ tensor to filter
-      -> Tensor a
-filter _ (Scalar x) = Scalar x
-filter f (SimpleFinite index ts) = 
-    let iname = Finite.indexName' index
-        ts' = (\i _ -> f iname i) `Unboxed.ifilter` ts
-    in  SimpleFinite index { Finite.indexSize = Unboxed.length ts' } ts'
-filter f (FiniteTensor index ts) = 
-    let iname = Finite.indexName' index
-        ts' = Multilinear.Generic.Sequential.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
-        ts'' = 
-            (\case 
-                (SimpleFinite _ ts) -> not $ Unboxed.null ts
-                (FiniteTensor _ ts) -> not $ Boxed.null ts
-                _ -> error $ "Filter: " ++ tensorOfScalars
-            ) `Boxed.filter` ts'
-    in  FiniteTensor index { Finite.indexSize = Boxed.length ts'' } ts''
-
-{-| Filtering one index of tensor. -}
-{-# INLINE filterIndex #-}
-filterIndex :: (
-    Multilinear Tensor a
-    ) => String        -- ^ Index name to filter
-      -> (Int -> Bool) -- ^ filter function
-      -> Tensor a      -- ^ tensor to filter
-      -> Tensor a
-filterIndex iname f = Multilinear.Generic.Sequential.filter (\i n -> i /= iname || f n)
 
 {-| Zip tensors with binary combinator, assuming they have all indices the same -}
 {-# INLINE zipWith' #-}

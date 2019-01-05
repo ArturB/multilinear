@@ -361,3 +361,29 @@ class (
     -- | Check if tensor is a complex tensor
     isComplexTensor :: t a -> Bool
     isComplexTensor t = length (indices t) > 1
+
+    {-| Filtering tensor. 
+    Filtering multi-dimensional arrray may be dangerous, as we always assume, 
+    that on each recursion level, all tensors have the same size (length). 
+    To disable invalid filters, filtering is done over indices, not tensor elements. 
+    Filter function takes and index name and index value and if it returns True, this index value remains in result tensor. 
+    This allows to remove whole columns or rows of eg. a matrix: 
+        filter (\i n -> i /= "a" || i > 10) filters all rows of "a" index (because if i /= "a", filter returns True)
+        and for "a" index filter elements with index value <= 10
+    But this disallow to remove particular matrix element. 
+    If for some index all elements are removed, the index itself is removed from tensor. -}
+    {-# INLINE filter #-}
+    filter :: 
+          (String -> Int -> Bool) -- ^ filter function
+          -> t a                  -- ^ tensor to filter
+          -> t a
+
+    {-| Filtering one index of tensor. -}
+    {-# INLINE filterIndex #-}
+    filterIndex :: (
+        Multilinear Tensor a
+        ) => String        -- ^ Index name to filter
+          -> (Int -> Bool) -- ^ filter function
+          -> Tensor a      -- ^ tensor to filter
+          -> Tensor a
+    filterIndex iname f = filter (\i n -> i /= iname || f n)
