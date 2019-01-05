@@ -82,7 +82,7 @@ consumeContractedIndices :: Multilinear t a =>
 consumeContractedIndices t1 t2 = 
     let inames1 = Set.fromList $ Index.indexName <$> indices t1
         inames2 = Set.fromList $ Index.indexName <$> indices t2
-        expectedIndices = Set.difference (Set.union inames1 inames2) (contractedIndices t1 t2)
+        expectedIndices = Set.difference (Set.union inames1 inames2) (Set.fromList $ contractedIndicesNames t1 t2)
         resultIndices = Set.fromList $ Index.indexName <$> indices (t1 * t2)
     in  expectedIndices == resultIndices
 
