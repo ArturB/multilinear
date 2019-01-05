@@ -86,9 +86,7 @@ instance NFData a => NFData (Tensor a)
 
 -- | Print tensor
 -- | Assumes tensor is already in Multilinear class, because standardize function
-instance (
-    Storable a, Show a, NFData a
-    ) => Show (Tensor a) where
+instance Show (Tensor Double) where
     show = show . toStorableTensor
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
