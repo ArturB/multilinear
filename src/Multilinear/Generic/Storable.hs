@@ -173,7 +173,7 @@ instance Multilinear Tensor Double where
     {-# INLINE indices #-}
     indices x = case x of
         Scalar _            -> []
-        FiniteTensor i ts   -> Index.toTIndex i : indices (head $ toList ts)
+        FiniteTensor i ts   -> Index.toTIndex i : indices (ts StorableV.! 0)
         SimpleFinite i _    -> [Index.toTIndex i]
 
     -- Get tensor order [ (contravariant,covariant)-type ]
