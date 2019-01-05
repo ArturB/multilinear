@@ -47,6 +47,14 @@ incompatibleTypes = "Incompatible tensor types!"
 scalarIndices :: String
 scalarIndices = "Scalar has no indices!"
 
+{-| ERROR MESSAGE -}
+indexNotFound :: String
+indexNotFound = "This tensor has not such index!"
+
+{-| ERROR MESSAGE -}
+tensorOfScalars :: String
+tensorOfScalars = "Tensor construction error! Vector of scalars"
+
 -- | Tensor with Unboxed.Vector replaced by C array
 data Tensor a where
     {-| Scalar -}
