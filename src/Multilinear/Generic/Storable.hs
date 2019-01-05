@@ -14,6 +14,8 @@ module Multilinear.Generic.Storable (
     Tensor(..), 
 ) where
 
+import           Control.DeepSeq
+import qualified Control.Parallel.Strategies   as Parallel
 import           Data.List
 import qualified Data.Vector                   as Boxed
 import qualified Data.Vector.Storable          as StorableV
