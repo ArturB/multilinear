@@ -75,7 +75,7 @@ mergeCommonIndices f t1 t2 =
         expectedIndices == resultIndices
         
 -- | Contracted indices have to be consumed in result tensor.
-consumeContractedIndices :: Multilinear t a => 
+consumeContractedIndices :: (Multilinear t a, Num (t a)) => 
     t a -- ^ first tensor to contract
  -> t a -- ^ second tensor to contract
  -> Bool
