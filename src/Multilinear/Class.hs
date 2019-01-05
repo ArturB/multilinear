@@ -360,4 +360,4 @@ class (
 
     -- | Check if tensor is a complex tensor
     isComplexTensor :: t a -> Bool
-    isComplexTensor = length (indices t) > 1
+    isComplexTensor t = length (indices t) > 1
