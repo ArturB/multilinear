@@ -15,11 +15,6 @@ module GPU (
 
 import           Multilinear.Class
 import           Multilinear.Generic.GPU
-import qualified Multilinear.Form               as Form
-import qualified Multilinear.Matrix             as Matrix
-import qualified Multilinear.Vector             as Vector
-import qualified Multilinear.NForm              as NForm
-import qualified Multilinear.NVector            as NVector
 import qualified ConstructorsTests
 import qualified MultilinearTests
 import           Test.QuickCheck
@@ -107,13 +102,13 @@ vectorConstructorError = ConstructorsTests.vectorConstructorError
 formConstructorError :: Char -> Positive (Small Int) -> Tensor Double -> Property
 formConstructorError = ConstructorsTests.formConstructorError
 
-matrixConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
+matrixConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Tensor Double -> Property
 matrixConstructorError = ConstructorsTests.matrixConstructorError
 
-nVectorConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
+nVectorConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Tensor Double -> Property
 nVectorConstructorError = ConstructorsTests.nVectorConstructorError
 
-nFormConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
+nFormConstructorError :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Tensor Double -> Property
 nFormConstructorError = ConstructorsTests.nFormConstructorError
 
 -- | Check indices preservation if zipWith function
