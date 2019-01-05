@@ -10,7 +10,7 @@ Portability : Windows/POSIX
 -}
 
 module Test.QuickCheck.Common (
-    main
+    quickCheckN, executePropertyTest
 ) where
 
 import           System.Exit
