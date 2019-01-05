@@ -65,6 +65,20 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
+fromStorableTensor :: Storable a => StorableT.Tensor a -> Tensor a
+fromStorableTensor (Scalar x) = Ptr.Scalar x
+fromStorableTensor (SimpleFinite i ts) = let
+    (ptr,_) = StorableV.unsafeToForeignPtr0 ts
+    in Ptr.SimpleFinite i (unsafeForeignPtrToPtr ptr, StorableV.length ts)
+fromStorableTensor (FiniteTensor i ts) = Ptr.FiniteTensor i (toPtrTensor <$> ts)
+
+toStorableTensor :: Storable a => Tensor a -> StorableT.Tensor a
+toStorableTensor (Ptr.Scalar x) = Scalar x
+toStorableTensor (Ptr.SimpleFinite i (ptr,len)) = let
+    fptr = unsafePerformIO $ newForeignPtr_ ptr
+    ts = StorableV.unsafeFromForeignPtr0 fptr len
+    in SimpleFinite i ts
+toStorableTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
 
 -- | NFData instance
 instance NFData a => NFData (Tensor a)

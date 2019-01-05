@@ -31,7 +31,6 @@ import           GHC.Generics
 import           Multilinear.Class             as Multilinear
 import qualified Multilinear.Index             as Index
 import qualified Multilinear.Index.Finite      as Finite
-import qualified Multilinear.Generic.PtrTensor as Ptr
 import           System.IO.Unsafe
 
 {-| Tensor defined recursively as scalar or list of other tensors -}
@@ -55,17 +54,3 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
-toPtrTensor :: Storable a => Tensor a -> Ptr.Tensor a
-toPtrTensor (Scalar x) = Ptr.Scalar x
-toPtrTensor (SimpleFinite i ts) = let
-    (ptr,_) = StorableV.unsafeToForeignPtr0 ts
-    in Ptr.SimpleFinite i (unsafeForeignPtrToPtr ptr, StorableV.length ts)
-toPtrTensor (FiniteTensor i ts) = Ptr.FiniteTensor i (toPtrTensor <$> ts)
-
-fromPtrTensor :: Storable a => Ptr.Tensor a -> Tensor a
-fromPtrTensor (Ptr.Scalar x) = Scalar x
-fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
-    fptr = unsafePerformIO $ newForeignPtr_ ptr
-    ts = StorableV.unsafeFromForeignPtr0 fptr len
-    in SimpleFinite i ts
-fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
