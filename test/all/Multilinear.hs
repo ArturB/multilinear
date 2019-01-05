@@ -139,13 +139,15 @@ transposeTest t =
 -- | Filter second half of elements for each tensor index and check if they disappeared
 filterIndexTest :: Multilinear t a => 
     t a -> Bool
-filterIndexTest s@(Scalar _) = s == filterIndex "c" (Prelude.const True) s
 filterIndexTest t = 
-    let indsT = indices t
-        -- filter second half of an index
-        filteredHalf i = filterIndex (Index.indexName i) (< (fromJust (Index.indexSize i) `div` 2)) t
-        fts = indsT `zip` (filteredHalf <$> indsT) -- tensors with filtered indices, paired with respective transformed indices
-    in  all (\(i,ft) -> 
+    if isScalar t then
+        t == filterIndex "c" (Prelude.const True) t
+    else 
+        let indsT = indices t
+            -- filter second half of an index
+            filteredHalf i = filterIndex (Index.indexName i) (< (fromJust (Index.indexSize i) `div` 2)) t
+            fts = indsT `zip` (filteredHalf <$> indsT) -- tensors with filtered indices, paired with respective transformed indices
+        in  all (\(i,ft) -> 
                 size ft (Index.indexName i) == (fromJust (Index.indexSize i) `div` 2)
             ) fts
 

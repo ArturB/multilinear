@@ -74,18 +74,6 @@ benchmarks:
     dependencies:
     - criterion
     - multilinear
-  sequential-memory:
-    main:                Bench.hs
-    source-dirs:         benchmark/sequential/memory
-    dependencies:
-    - multilinear
-    - weigh
-  sequential-profile:
-    main:                Bench.hs
-    source-dirs:         benchmark/sequential/profile
-    dependencies:
-    - deepseq
-    - multilinear
   2-cores-time:
     main:                Bench.hs
     source-dirs:         benchmark/2-cores/time
@@ -115,26 +103,6 @@ benchmarks:
     - -with-rtsopts=-N
     dependencies:
     - criterion
-    - multilinear
-  multicore-memory:
-    main:                Bench.hs
-    source-dirs:         benchmark/multicore/memory
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - multilinear
-    - weigh
-  multicore-profile:
-    main:                Bench.hs
-    source-dirs:         benchmark/multicore/profile
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - deepseq
     - multilinear
   gpu-time:
     main:                Bench.hs
