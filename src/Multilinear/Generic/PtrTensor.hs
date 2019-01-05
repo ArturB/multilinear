@@ -89,8 +89,7 @@ instance NFData a => NFData (Tensor a)
 instance (
     Multilinear Tensor a, Show a, NFData a
     ) => Show (Tensor a) where
-
-    show = show . StorableT.fromPtrTensor
+    show = show . toStorableTensor
 
 
 indices :: Tensor a -> [Index.TIndex]
