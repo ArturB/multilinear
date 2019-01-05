@@ -91,18 +91,6 @@ instance (
     ) => Show (Tensor a) where
     show = show . toStorableTensor
 
-
-indices :: Tensor a -> [Index.TIndex]
-indices x = case x of
-        Scalar _            -> []
-        FiniteTensor i ts   -> Index.toTIndex i : indices (head $ Boxed.toList ts)
-        SimpleFinite i _    -> [Index.toTIndex i]
-
-{-| List of tensor indices names -}
-{-# INLINE indicesNames #-}
-indicesNames :: Tensor a -> [String]
-indicesNames t = Index.indexName <$> indices t
-
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem #-}
 _elemByElem :: 
@@ -277,3 +265,170 @@ instance Num (Tensor Double) where
     -- Simple integer can be conveted to Scalar
     {-# INLINE fromInteger #-}
     fromInteger x = Scalar $ fromInteger x
+
+-- Multilinear operations
+instance Multilinear Tensor Double where
+    fromIndices = fromStorableTensor . StorableT.fromIndices
+  
+    {-| Accessing tensor elements -}
+    {-# INLINE el #-}
+    -- Scalar has only one element
+    el (Scalar x) _ = Scalar x
+    -- simple tensor case
+    el t1@(SimpleFinite index1 ts) (inds,vals) =
+            -- zip indices with their given values
+        let indvals = zip inds vals
+            -- find value for simple tensor index if given
+            val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
+            -- if value for current index is given
+        in  if isJust val
+            -- then get it from current tensor
+            then Scalar $ ts StorableV.! snd (fromJust val)
+            -- otherwise return whole tensor - no filtering defined
+            else t1
+    -- finite tensor case
+    el (FiniteTensor index1 v1) (inds,vals) =
+            -- zip indices with their given values
+        let indvals = zip inds vals
+            -- find value for current index if given
+            val = Data.List.find (\(n,_) -> [n] == Index.indexName index1) indvals
+            -- and remove used index from indices list
+            indvals1 = Data.List.filter (\(n,_) -> [n] /= Index.indexName index1) indvals
+            -- indices unused so far
+            inds1 = Data.List.map fst indvals1
+            -- and its corresponding values
+            vals1 = Data.List.map snd indvals1
+            -- if value for current index was given
+        in  if isJust val
+            -- then get it from current tensor and recursively process other indices
+            then el (v1 Boxed.! snd (fromJust val)) (inds1,vals1)
+            -- otherwise recursively access elements of all child tensors
+            else FiniteTensor index1 $ (\t -> el t (inds,vals)) <$> v1
+
+    -- List of all tensor indices
+    {-# INLINE indices #-}
+    indices x = case x of
+        Scalar _            -> []
+        FiniteTensor i ts   -> Index.toTIndex i : indices (ts Boxed.! 0)
+        SimpleFinite i _    -> [Index.toTIndex i]
+
+    -- Get tensor order [ (contravariant,covariant)-type ]
+    {-# INLINE order #-}
+    order x = case x of
+        Scalar _ -> (0,0)
+        SimpleFinite index _ -> case index of
+            Finite.Contravariant _ _ -> (1,0)
+            Finite.Covariant _ _     -> (0,1)
+        FiniteTensor _ ts -> let (cnvr, covr) = order $ (ts Boxed.! 0)
+             in case (head $ indices x) of
+                Index.Contravariant _ _ -> (cnvr+1,covr)
+                Index.Covariant _ _     -> (cnvr,covr+1)
+
+    -- Get size of tensor index or Left if index is infinite or tensor has no such index
+    {-# INLINE size #-}
+    size t iname = case t of
+        Scalar _             -> error scalarIndices
+        SimpleFinite index _ -> 
+            if Index.indexName index == iname 
+            then Finite.indexSize index 
+            else error indexNotFound
+        FiniteTensor index ts -> 
+            if Index.indexName index == iname
+            then Finite.indexSize index
+            else size (ts Boxed.! 0) iname
+
+    -- Rename tensor indices
+    {-# INLINE ($|) #-}
+    Scalar x $| _ = Scalar x
+    SimpleFinite (Finite.Contravariant isize _) ts $| (u:_, _) = SimpleFinite (Finite.Contravariant isize [u]) ts
+    SimpleFinite (Finite.Covariant isize _) ts $| (_, d:_) = SimpleFinite (Finite.Covariant isize [d]) ts
+    FiniteTensor (Finite.Contravariant isize _) ts $| (u:us, ds) = FiniteTensor (Finite.Contravariant isize [u]) $ ($| (us,ds)) <$> ts
+    FiniteTensor (Finite.Covariant isize _) ts $| (us, d:ds) = FiniteTensor (Finite.Covariant isize [d]) $ ($| (us,ds)) <$> ts
+    t $| _ = t
+
+    -- Raise an index
+    {-# INLINE (/\) #-}
+    Scalar x /\ _ = Scalar x
+    FiniteTensor index ts /\ n
+        | Index.indexName index == n =
+            FiniteTensor (Finite.Contravariant (Finite.indexSize index) n) $ (/\ n) <$> ts
+        | otherwise =
+            FiniteTensor index $ (/\ n) <$> ts
+    t1@(SimpleFinite index ts) /\ n
+        | Index.indexName index == n =
+            SimpleFinite (Finite.Contravariant (Finite.indexSize index) n) ts
+        | otherwise = t1
+
+    -- Lower an index
+    {-# INLINE (\/) #-}
+    Scalar x \/ _ = Scalar x
+    FiniteTensor index ts \/ n
+        | Index.indexName index == n =
+            FiniteTensor (Finite.Covariant (Finite.indexSize index) n) $ (\/ n) <$> ts
+        | otherwise =
+            FiniteTensor index $ (\/ n) <$> ts
+    t1@(SimpleFinite index ts) \/ n
+        | Index.indexName index == n =
+            SimpleFinite (Finite.Covariant (Finite.indexSize index) n) ts
+        | otherwise = t1
+
+    {-| Transpose a tensor (switch all indices types) -}
+    {-# INLINE transpose #-}
+    transpose (Scalar x) = Scalar x
+
+    transpose (FiniteTensor (Finite.Covariant count name) ts) =
+        FiniteTensor (Finite.Contravariant count name) (Multilinear.transpose <$> ts)
+    transpose (FiniteTensor (Finite.Contravariant count name) ts) =
+        FiniteTensor (Finite.Covariant count name) (Multilinear.transpose <$> ts)
+
+    transpose (SimpleFinite (Finite.Covariant count name) ts) =
+        SimpleFinite (Finite.Contravariant count name) ts
+    transpose (SimpleFinite (Finite.Contravariant count name) ts) =
+        SimpleFinite (Finite.Covariant count name) ts
+
+
+    {-| Shift tensor index right -}
+    {-| Moves given index one level deeper in recursion -}
+    -- Scalar has no indices to shift
+    Scalar x `shiftRight` _ = Scalar x
+    -- Simple tensor has only one index which cannot be shifted
+    t1@(SimpleFinite _ _) `shiftRight` _ = t1
+    -- Finite tensor is shifted by converting to list and transposing it
+    t1@(FiniteTensor index1 ts1) `shiftRight` ind
+        -- We don't shift this index
+        | Data.List.length (indicesNames t1) > 1 && Index.indexName index1 /= ind =
+            FiniteTensor index1 $ (|>> ind) <$> ts1
+        -- We found index to shift
+        | Data.List.length (indicesNames t1) > 1 && Index.indexName index1 == ind =
+                -- Next index
+            let index2 = tensorFiniteIndex (ts1 Boxed.! 0)
+                -- Elements to transpose
+                dane = if isSimple (ts1 Boxed.! 0)
+                       then (\un -> Boxed.generate (StorableV.length un) (\i -> Scalar $ un StorableV.! i)) <$> 
+                            (tensorScalars <$> ts1)
+                       else tensorsFinite <$> ts1
+                result = FiniteTensor index2 $ FiniteTensor index1 <$> (_transpose dane)
+            -- reconstruct tensor with transposed elements
+            in  _mergeScalars result
+        -- there is only one index and therefore it cannot be shifted
+        | otherwise = t1
+    
+    -- | Move contravariant indices to lower recursion level
+    standardize tens = foldl' (<<<|) tens $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices tens)
+
+    -- | Filter tensor
+    filter _ (Scalar x) = Scalar x
+    filter f (SimpleFinite index ts) = 
+        let iname = Finite.indexName' index
+            ts' = (\i _ -> f iname i) `StorableV.ifilter` ts
+        in  SimpleFinite index { Finite.indexSize = StorableV.length ts' } ts'
+    filter f (FiniteTensor index ts) = 
+        let iname = Finite.indexName' index
+            ts' = Multilinear.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
+            ts'' = 
+                (\case 
+                    (SimpleFinite _ ts) -> not $ StorableV.null ts
+                    (FiniteTensor _ ts) -> not $ Boxed.null ts
+                    _ -> error $ "Filter: " ++ tensorOfScalars
+                ) `Boxed.filter` ts'
+        in  FiniteTensor index { Finite.indexSize = Boxed.length ts'' } ts''

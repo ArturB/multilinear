@@ -26,11 +26,6 @@ import           Multilinear.Class             as Multilinear
 import qualified Multilinear.Index             as Index
 import qualified Multilinear.Index.Finite      as Finite
 
-
-{-| ERROR MESSAGE -}
-incompatibleTypes :: String
-incompatibleTypes = "Incompatible tensor types!"
-
 {-| ERROR MESSAGE -}
 scalarIndices :: String
 scalarIndices = "Scalar has no indices!"
