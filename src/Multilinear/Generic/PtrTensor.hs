@@ -4,18 +4,19 @@ module Multilinear.Generic.PtrTensor (
 ) where
 
 import           Control.DeepSeq
-import qualified Control.Parallel.Strategies as Parallel
+import qualified Control.Parallel.Strategies  as Parallel
 import           Data.List
-import qualified Data.Vector                 as Boxed
-import qualified Data.Vector.Storable        as StorableV
+import qualified Data.Vector                  as Boxed
+import qualified Data.Vector.Storable         as StorableV
 import           Foreign.ForeignPtr
 import           Foreign.ForeignPtr.Unsafe
 import           Foreign.Ptr
 import           Foreign.Storable
 import           GHC.Generics
 import           Multilinear.Class
-import qualified Multilinear.Index.Finite    as Finite
-import qualified Multilinear.Index           as Index
+import qualified Multilinear.Generic.Storable as StorableT
+import qualified Multilinear.Index.Finite     as Finite
+import qualified Multilinear.Index            as Index
 import           System.IO.Unsafe
 
 
@@ -74,24 +75,7 @@ instance (
     Multilinear Tensor a, Show a, NFData a
     ) => Show (Tensor a) where
 
-    -- merge errors first and then print whole tensor
-    show = show' . standardize
-        where
-        show' x = case x of
-            -- Scalar is showed simply as its value
-            Scalar v -> show v
-            -- SimpleFinite is shown dependent on its index...
-            SimpleFinite index ts -> show index ++ "S: " ++ case index of
-                -- If index is contravariant, show tensor components vertically
-                Finite.Contravariant _ _ -> "\n" ++ tail (Unboxed.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
-                -- If index is covariant or indifferent, show tensor compoments horizontally
-                _                        -> "["  ++ tail (Unboxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
-            -- FiniteTensor is shown dependent on its index...
-            FiniteTensor index ts -> show index ++ "T: " ++ case index of
-                -- If index is contravariant, show tensor components vertically
-                Finite.Contravariant _ _ -> "\n" ++ tail (Boxed.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
-                -- If index is covariant or indifferent, show tensor compoments horizontally
-                _                        -> "["  ++ tail (Boxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
+    show = show . StorableT.fromPtrTensor
 
 
 indices :: Tensor a -> [Index.TIndex]
