@@ -371,7 +371,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             -- if value for current index is given
         in  if isJust val
             -- then get it from current tensor
-            then ts Boxed.! snd (fromJust val)
+            then ts Unboxed.! snd (fromJust val)
             -- otherwise return whole tensor - no filtering defined
             else t1
     -- finite tensor case
