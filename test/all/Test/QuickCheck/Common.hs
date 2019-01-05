@@ -14,6 +14,7 @@ module Test.QuickCheck.Common (
 ) where
 
 import           System.Exit
+import           System.IO
 import           Test.QuickCheck
 
 -- quickCheck with parametrizable tests number
