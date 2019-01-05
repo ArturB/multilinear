@@ -385,4 +385,4 @@ class (
           -> (Int -> Bool) -- ^ filter function
           -> t a           -- ^ tensor to filter
           -> t a
-    filterIndex iname f = filter (\i n -> i /= iname || f n)
+    filterIndex iname f = Multilinear.Class.filter (\i n -> i /= iname || f n)
