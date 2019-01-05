@@ -268,7 +268,9 @@ instance Num (Tensor Double) where
 
 -- Multilinear operations
 instance Multilinear Tensor Double where
-    fromIndices = fromStorableTensor . StorableT.fromIndices
+    fromIndices u d un dn f = 
+        let st = Multilinear.fromIndices u d un dn f :: StorableT.Tensor
+        in fromStorableTensor st
   
     {-| Accessing tensor elements -}
     {-# INLINE el #-}
