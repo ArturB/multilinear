@@ -13,11 +13,8 @@ module GPU (
     main
 ) where
 
-import           Data.Maybe
-import qualified Data.Set                       as Set
 import           Multilinear.Class
 import           Multilinear.Generic.GPU
-import qualified Multilinear.Index              as Index
 import qualified Multilinear.Form               as Form
 import qualified Multilinear.Matrix             as Matrix
 import qualified Multilinear.Vector             as Vector
@@ -84,6 +81,9 @@ transposeTest = MultilinearTests.transposeTest
 
 filterIndexTest :: Tensor Double -> Bool
 filterIndexTest = MultilinearTests.filterIndexTest
+
+showTest :: Tensor Double -> Bool
+showTest = MultilinearTests.showTest
 
 -- | Test generic vector constructor indices
 vectorConstructor :: Char -> Positive (Small Int) -> Bool
