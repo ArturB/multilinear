@@ -1,6 +1,6 @@
 {-|
-Module      : GPU
-Description : Test of GPU tensor
+Module      : MultilinearTests
+Description : Tests for Multilinear class
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
@@ -9,7 +9,7 @@ Portability : Windows/POSIX
 
 -}
 
-module Multilinear (
+module MultilinearTests (
     preserveIndicesBinary, 
     preserveIndicesUnary, 
     mergeCommonIndices, 
