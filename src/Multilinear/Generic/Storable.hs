@@ -1,6 +1,6 @@
 {-|
-Module      : Multilinear.Generic.GPU
-Description : Generic implementation of tensor as nested arrays, evaluated on GPU using OpenCL
+Module      : Multilinear.Generic.Storable
+Description : Generic implementation of tensor as nested Storable vectors
 Copyright   : (c) Artur M. Brodzki, 2018
 License     : BSD3
 Maintainer  : artur@brodzki.org
@@ -9,7 +9,7 @@ Portability : Windows/POSIX
 
 -}
 
-module Multilinear.Generic.GPU (
+module Multilinear.Generic.Storable (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
