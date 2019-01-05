@@ -18,8 +18,6 @@ module Multilinear.Generic.GPU (
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.GPU.map, 
-    Multilinear.Generic.GPU.filter,
-    Multilinear.Generic.GPU.filterIndex,
     Multilinear.Generic.GPU.zipWith
 ) where
 

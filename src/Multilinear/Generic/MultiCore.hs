@@ -18,8 +18,6 @@ module Multilinear.Generic.MultiCore (
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.MultiCore.map, 
-    Multilinear.Generic.MultiCore.filter,
-    Multilinear.Generic.MultiCore.filterIndex,
     Multilinear.Generic.MultiCore.zipWith
 ) where
 

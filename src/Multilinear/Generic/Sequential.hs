@@ -18,8 +18,6 @@ module Multilinear.Generic.Sequential (
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.Sequential.map, 
-    Multilinear.Generic.Sequential.filter,
-    Multilinear.Generic.Sequential.filterIndex,
     Multilinear.Generic.Sequential.zipWith
 ) where
 
