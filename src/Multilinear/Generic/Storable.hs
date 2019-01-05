@@ -65,6 +65,9 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
+-- | NFData instance
+instance NFData a => NFData (Tensor a)
+
 -- | Print tensor
 instance (
     Multilinear Tensor a, Show a
