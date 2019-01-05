@@ -13,8 +13,8 @@ module Multilinear.Generic.GPU (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
-    (!), tensorIndex, _mergeScalars, 
-    _contractedIndices, _elemByElem, zipT, fastDot,
+    (!), _mergeScalars, 
+    _elemByElem, zipT, fastDot,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.GPU.map, 
@@ -26,7 +26,6 @@ import qualified Control.Parallel.Strategies   as Parallel
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
-import qualified Data.Set                      as Set
 import qualified Data.Vector                   as Boxed
 import qualified Data.Vector.Storable          as StorableV
 import           Foreign.ForeignPtr
@@ -108,14 +107,6 @@ fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
     in SimpleFinite i ts
 fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
 
-{-| Return generic tensor index -}
-{-# INLINE tensorIndex #-}
-tensorIndex :: Storable a => Tensor a -> Index.TIndex
-tensorIndex x = case x of
-    Scalar _           -> error scalarIndices
-    SimpleFinite i _   -> Index.toTIndex i
-    FiniteTensor i _   -> Index.toTIndex i
-
 {-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
 {-# INLINE firstTensor #-}
 firstTensor :: Storable a => Tensor a -> Tensor a
@@ -181,21 +172,6 @@ _transpose v =
         l = Boxed.toList $ Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
         lp = l `Parallel.using` Parallel.parListChunk (innerS `div` 8) Parallel.rdeepseq
     in  Boxed.fromList lp
-
--- | Contracted indices have to be consumed in result tensor.
-_contractedIndices :: 
-    Tensor Double -- ^ first tensor to contract
- -> Tensor Double -- ^ second tensor to contract
- -> Set.Set String
-_contractedIndices t1 t2 = 
-    let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
-        iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
-        iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
-        iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
-    in  -- contracted are indices covariant in the first tensor and contravariant in the second
-        Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
-        -- or contravariant in the first tensor and covariant in the second
-        Set.intersection iContravariantNames1 iCovariantNames2
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
@@ -348,7 +324,7 @@ dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Fin
     | otherwise = contractionErr "finite-finite" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) t1 t2
 -- Other cases cannot happen!
-dot t1' t2' = contractionErr "other" (tensorIndex t1') (tensorIndex t2')
+dot t1' t2' = contractionErr "other" (head $ indices t1') (head $ indices t2')
 
 -- | contraction error
 {-# INLINE contractionErr #-}
@@ -540,7 +516,7 @@ instance Multilinear Tensor Double where
             Finite.Contravariant _ _ -> (1,0)
             Finite.Covariant _ _     -> (0,1)
         _ -> let (cnvr, covr) = order $ firstTensor x
-             in case tensorIndex x of
+             in case (head $ indices x) of
                 Index.Contravariant _ _ -> (cnvr+1,covr)
                 Index.Covariant _ _     -> (cnvr,covr+1)
 

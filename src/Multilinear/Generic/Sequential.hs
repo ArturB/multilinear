@@ -14,7 +14,7 @@ module Multilinear.Generic.Sequential (
     Tensor(..), 
     -- * Auxiliary functions
     (!), _mergeScalars, 
-    _contractedIndices, _elemByElem, zipT,
+    _elemByElem, zipT,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.Sequential.map, 
@@ -25,7 +25,6 @@ import           Control.DeepSeq
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
-import qualified Data.Set                   as Set
 import qualified Data.Vector                as Boxed
 import qualified Data.Vector.Unboxed        as Unboxed
 import           Foreign.Storable
@@ -133,21 +132,6 @@ _transpose v =
     let outerS = Boxed.length v
         innerS = Boxed.length $ v Boxed.! 0
     in  Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
-
--- | Contracted indices have to be consumed in result tensor.
-_contractedIndices :: 
-    Tensor Double -- ^ first tensor to contract
- -> Tensor Double -- ^ second tensor to contract
- -> Set.Set String
-_contractedIndices t1 t2 = 
-    let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
-        iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
-        iContravariantNames2 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t2)
-        iCovariantNames2 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t2)
-    in  -- contracted are indices covariant in the first tensor and contravariant in the second
-        Set.intersection iCovariantNames1 iContravariantNames2 `Set.union`
-        -- or contravariant in the first tensor and covariant in the second
-        Set.intersection iContravariantNames1 iCovariantNames2
 
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem' #-}
