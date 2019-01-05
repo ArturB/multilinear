@@ -18,7 +18,7 @@ import           Data.List
 import qualified Data.Vector                   as Boxed
 import qualified Data.Vector.Storable          as StorableV
 import           GHC.Generics
-import qualified Multilinear.Class             as Multilinear
+import           Multilinear.Class
 import qualified Multilinear.Index             as Index
 import qualified Multilinear.Index.Finite      as Finite
 
