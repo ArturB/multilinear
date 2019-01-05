@@ -137,7 +137,7 @@ transposeTest t =
     in  isScalar t || ( inames1 == inames2 && indices1 /= indices2 )
 
 -- | Filter second half of elements for each tensor index and check if they disappeared
-filterIndexTest :: Multilinear t a => 
+filterIndexTest :: (Eq (t a), Multilinear t a) => 
     t a -> Bool
 filterIndexTest t = 
     if isScalar t then
