@@ -34,10 +34,10 @@ import           Test.QuickCheck.Multilinear.Generic.GPU()
 vectorConstructorValues :: Multilinear t a => Char -> Positive (Small Int) -> t a -> Bool
 vectorConstructorValues c s _ = 
     let size = getSmall $ getPositive s
-        v :: (t a) = Vector.fromIndices [c] size fromIntegral
-        vConst :: t a = Vector.const [c] size (fromIntegral size)
-    in  all (\i -> v $$| ([c],[i]) == fromIntegral i) [0 .. size - 1] && 
-        all (\i -> vConst $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
+        v = Vector.fromIndices [c] size fromIntegral
+        vConst = Vector.const [c] size (fromIntegral size)
+    in  all (\i -> (v :: t a) $$| ([c],[i]) == fromIntegral i) [0 .. size - 1] && 
+        all (\i -> (vConst :: t a) $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
 
 -- | Test generic form constructor values
 formConstructorValues :: Multilinear t a => Char -> Positive (Small Int) -> t a -> Bool
