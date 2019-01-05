@@ -125,7 +125,7 @@ main = do
     executePropertyTest "probability distribution of tensors order" 10000 $ 
         \(t :: Tensor Double) -> collect (order t) $ preserveIndicesUnary abs
     executePropertyTest "probability distribution of contracted indices" 10000 $
-        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ contractedIndices t1 t2) $ preserveIndicesBinary (+)
+        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ contractedIndicesNames t1 t2) $ preserveIndicesBinary (+)
 
     putStrLn "\nTesting multilinear library...\n"
 
