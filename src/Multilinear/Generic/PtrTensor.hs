@@ -87,7 +87,7 @@ instance NFData a => NFData (Tensor a)
 -- | Print tensor
 -- | Assumes tensor is already in Multilinear class, because standardize function
 instance (
-    Multilinear Tensor a, Show a, NFData a
+    Show a, NFData a
     ) => Show (Tensor a) where
     show = show . toStorableTensor
 
