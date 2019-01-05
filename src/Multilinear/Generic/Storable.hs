@@ -22,6 +22,24 @@ import           Multilinear.Class             as Multilinear
 import qualified Multilinear.Index             as Index
 import qualified Multilinear.Index.Finite      as Finite
 
+
+{-| ERROR MESSAGE -}
+incompatibleTypes :: String
+incompatibleTypes = "Incompatible tensor types!"
+
+{-| ERROR MESSAGE -}
+scalarIndices :: String
+scalarIndices = "Scalar has no indices!"
+
+{-| ERROR MESSAGE -}
+indexNotFound :: String
+indexNotFound = "This tensor has not such index!"
+
+{-| ERROR MESSAGE -}
+tensorOfScalars :: String
+tensorOfScalars = "Tensor construction error! Vector of scalars"
+
+
 {-| Tensor defined recursively as scalar or list of other tensors -}
 {-| @c@ is type of a container, @i@ is type of index size and @a@ is type of tensor elements -}
 data Tensor a where
@@ -66,6 +84,28 @@ instance (
                 Finite.Contravariant _ _ -> "\n" ++ tail (Boxed.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
                 -- If index is covariant or indifferent, show tensor compoments horizontally
                 _                        -> "["  ++ tail (Boxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
+
+
+{-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
+{-# INLINE _mergeScalars #-}
+_mergeScalars :: Storable a => Tensor a -> Tensor a
+_mergeScalars x = case x of
+    (FiniteTensor index1 ts1) -> case ts1 Boxed.! 0 of
+        Scalar _ -> SimpleFinite index1 $ StorableV.generate (Boxed.length ts1) (\i -> scalarVal (ts1 Boxed.! i))
+        _        -> FiniteTensor index1 $ _mergeScalars <$> ts1
+    _ -> x
+
+{-| Transpose Vector of Vectors, analogous to Data.List.transpose function. It is assumed, that all vectors on deeper recursion level have the same length.  -}
+_transpose :: (
+    NFData a
+    ) => Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
+      -> Boxed.Vector (Boxed.Vector a)
+_transpose v = 
+    let outerS = Boxed.length v
+        innerS = Boxed.length $ v Boxed.! 0
+        l = Boxed.toList $ Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
+        lp = l `Parallel.using` Parallel.parListChunk (innerS `div` 8) Parallel.rdeepseq
+    in  Boxed.fromList lp
 
 
 -- Multilinear operations
