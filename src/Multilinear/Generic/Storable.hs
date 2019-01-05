@@ -11,7 +11,7 @@ Portability : Windows/POSIX
 
 module Multilinear.Generic.Storable (
     -- * Generic tensor datatype and its instances
-    Tensor(..), 
+    Tensor(..), _mergeScalars
 ) where
 
 import           Control.DeepSeq

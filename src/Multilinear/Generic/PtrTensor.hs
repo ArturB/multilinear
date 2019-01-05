@@ -98,6 +98,25 @@ instance NFData a => NFData (Tensor a)
 instance Show (Tensor Double) where
     show = show . toStorableTensor
 
+{-| Merge FiniteTensor of Scalars to SimpleFinite tensor for performance improvement -}
+{-# INLINE _mergeScalars #-}
+_mergeScalars :: Storable a => Tensor a -> Tensor a
+_mergeScalars t = fromStor
+
+{-| Transpose Vector of Vectors, analogous to Data.List.transpose function. It is assumed, that all vectors on deeper recursion level have the same length.  -}
+_transpose :: (
+    NFData a
+    ) => Boxed.Vector (Boxed.Vector a)  -- ^ Vector of vectors to transpose
+      -> Boxed.Vector (Boxed.Vector a)
+_transpose v = 
+    let outerS = Boxed.length v
+        innerS = Boxed.length $ v Boxed.! 0
+        l = Boxed.toList $ Boxed.generate innerS (\i -> Boxed.generate outerS $ \j -> v Boxed.! j Boxed.! i)
+        lp = l `Parallel.using` Parallel.parListChunk (innerS `div` 8) Parallel.rdeepseq
+    in  Boxed.fromList lp
+
+
+
 {-| Apply a tensor operator (here denoted by (+) ) elem by elem, trying to connect as many common indices as possible -}
 {-# INLINE _elemByElem #-}
 _elemByElem :: 
