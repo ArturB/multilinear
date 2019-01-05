@@ -10,21 +10,24 @@ Portability : Windows/POSIX
 -}
 
 module Multilinear (
-    main
+    preserveIndicesBinary, 
+    preserveIndicesUnary, 
+    mergeCommonIndices, 
+    consumeContractedIndices, 
+    orderIndices, 
+    shiftEquiv, 
+    renameTest, 
+    raiseLowerTest, 
+    transposeTest, 
+    filterIndexTest, 
+    showTest
 ) where
 
 import           Data.Maybe
 import qualified Data.Set                       as Set
 import           Multilinear.Class
-import           Multilinear.Generic.GPU
 import qualified Multilinear.Index              as Index
-import           Test.QuickCheck
-import           Test.QuickCheck.Common
 import           Test.QuickCheck.Multilinear.Generic.GPU()
-
--- | Default test number for property
-defTestN :: Int
-defTestN = 200
 
 ----------------------------------------------------
 -- TESTED TENSOR PROPERTIES FOR SEQUENTIAL TENSOR --
