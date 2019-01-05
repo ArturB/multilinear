@@ -17,6 +17,7 @@ module ConstructorsTests (
     nFormConstructorValues, nFormConstructorError
 ) where
 
+import           Control.DeepSeq
 import           Multilinear.Class
 import           Multilinear.Generic.GPU
 import qualified Multilinear.Form               as Form
@@ -31,7 +32,7 @@ import           Test.QuickCheck.Multilinear.Generic.GPU()
 
 
 -- | Test generic vector constructor values
-vectorConstructorValues :: Multilinear t a => Char -> Positive (Small Int) -> t a -> Bool
+vectorConstructorValues :: (Num a, Multilinear t a) => Char -> Positive (Small Int) -> t a -> Bool
 vectorConstructorValues c s _ = 
     let size = getSmall $ getPositive s
         v = Vector.fromIndices [c] size fromIntegral :: t a
@@ -40,21 +41,21 @@ vectorConstructorValues c s _ =
         all (\i -> vConst  $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
 
 -- | Test generic form constructor values
-formConstructorValues :: Multilinear t a => Char -> Positive (Small Int) -> t a -> Bool
+formConstructorValues :: (Num a, Multilinear t a) => Char -> Positive (Small Int) -> t a -> Bool
 formConstructorValues c s _ = 
     let size = getSmall $ getPositive s
-        f :: t a = Form.fromIndices [c] size fromIntegral
-        fConst :: t a = Form.const [c] size (fromIntegral size)
+        f = Form.fromIndices [c] size fromIntegral :: t a
+        fConst = Form.const [c] size (fromIntegral size) :: t a
     in  all (\i -> f $$| ([c],[i]) == fromIntegral i) [0.. size - 1] && 
         all (\i -> fConst $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
 
 -- | Test generic matrix constructor values
-matrixConstructorValues :: Multilinear t a => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Bool
+matrixConstructorValues :: (Num a, Multilinear t a) => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Bool
 matrixConstructorValues c1 c2 s1 s2 _ = 
     let size1 = getSmall $ getPositive s1
         size2 = getSmall $ getPositive s2
-        v :: t a = Matrix.fromIndices [c1,c2] size1 size2 (\x y -> fromIntegral x + fromIntegral y)
-        vConst :: t a = Matrix.const [c1,c2] size1 size2 (fromIntegral size1)
+        v = Matrix.fromIndices [c1,c2] size1 size2 (\x y -> fromIntegral x + fromIntegral y) :: t a
+        vConst = Matrix.const [c1,c2] size1 size2 (fromIntegral size1) :: t a
     in  c1 == c2 || (
         all (\(i1,i2) -> v $$| ([c1,c2],[i1,i2]) == fromIntegral i1 + fromIntegral i2) 
             (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1]) && 
@@ -63,12 +64,12 @@ matrixConstructorValues c1 c2 s1 s2 _ =
         )
 
 -- | Test generic NVector constructor values
-nVectorConstructorValues :: Multilinear t a => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Bool
+nVectorConstructorValues :: (Num a, Multilinear t a) => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Bool
 nVectorConstructorValues c1 c2 s1 s2 _ = 
     let size1 = getSmall $ getPositive s1
         size2 = getSmall $ getPositive s2
-        v :: t a = NVector.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
-        vConst :: t a = NVector.const [c1,c2] [size1,size2] (fromIntegral size1)
+        v = NVector.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y) :: t a
+        vConst = NVector.const [c1,c2] [size1,size2] (fromIntegral size1) :: t a
     in  c1 == c2 || (
         all (\(i1,i2) -> v $$| ([c1,c2],[i1,i2]) == fromIntegral i1 + fromIntegral i2) 
             (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1]) && 
@@ -77,12 +78,12 @@ nVectorConstructorValues c1 c2 s1 s2 _ =
         )
 
 -- | Test generic NForm constructor values
-nFormConstructorValues :: Multilinear t a => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Bool
+nFormConstructorValues :: (Num a, Multilinear t a) => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Bool
 nFormConstructorValues c1 c2 s1 s2 _ = 
     let size1 = getSmall $ getPositive s1
         size2 = getSmall $ getPositive s2
-        v :: t a = NForm.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
-        vConst :: t a = NForm.const [c1,c2] [size1,size2] (fromIntegral size1)
+        v = NForm.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y) :: t a
+        vConst = NForm.const [c1,c2] [size1,size2] (fromIntegral size1) :: t a
     in  c1 == c2 || (
         all (\(i1,i2) -> v $$| ([c1,c2],[i1,i2]) == fromIntegral i1 + fromIntegral i2) 
             (pure (,) <*> [0 .. size1 - 1] <*> [0 .. size2 - 1]) && 
@@ -92,39 +93,39 @@ nFormConstructorValues c1 c2 s1 s2 _ =
 
 
 -- | Test generic vector constructor indices error
-vectorConstructorError :: Multilinear t a => Char -> Positive (Small Int) -> t a -> Property
+vectorConstructorError :: (NFData a, Multilinear t a) => Char -> Positive (Small Int) -> t a -> Property
 vectorConstructorError c s _ = 
     let size = getSmall $ getPositive s
-        v :: t a = Vector.fromIndices [c,'a'] size fromIntegral
+        v = Vector.fromIndices [c,'a'] size fromIntegral :: t a
     in  expectFailure (total v)
 
 -- | Test generic form constructor indices error
-formConstructorError :: Multilinear t a => Char -> Positive (Small Int) -> t a -> Property
+formConstructorError :: (NFData a, Multilinear t a) => Char -> Positive (Small Int) -> t a -> Property
 formConstructorError c s _ = 
     let size = getSmall $ getPositive s
-        f :: t a = Form.fromIndices [c,'a'] size fromIntegral
+        f = Form.fromIndices [c,'a'] size fromIntegral :: t a
     in  expectFailure (total f)
 
 -- | Test generic matrix constructor indices error
-matrixConstructorError :: Multilinear t a => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
+matrixConstructorError :: (NFData a, Multilinear t a) => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
 matrixConstructorError c1 c2 s1 s2 _ = 
     let size1 = getSmall $ getPositive s1
         size2 = getSmall $ getPositive s2
-        v :: t a = Matrix.fromIndices [c1,c2,'a'] size1 size2 (\x y -> fromIntegral x + fromIntegral y)
+        v = Matrix.fromIndices [c1,c2,'a'] size1 size2 (\x y -> fromIntegral x + fromIntegral y) :: t a
     in  expectFailure (total v)
 
 -- | Test generic NVector constructor indices error
-nVectorConstructorError :: Multilinear t a => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
+nVectorConstructorError :: (NFData a, Multilinear t a) => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
 nVectorConstructorError c1 c2 s1 s2 _ = 
     let size1 = getSmall $ getPositive s1
         size2 = getSmall $ getPositive s2
-        v :: t a = NVector.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+        v = NVector.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y) :: t a
     in  expectFailure (total v)
 
 -- | Test generic NForm constructor indices error
-nFormConstructorError :: Multilinear t a => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
+nFormConstructorError :: (NFData a, Multilinear t a) => Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> t a -> Property
 nFormConstructorError c1 c2 s1 s2 _ = 
     let size1 = getSmall $ getPositive s1
         size2 = getSmall $ getPositive s2
-        v :: t a = NForm.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
+        v = NForm.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y) :: t a
     in  expectFailure (total v)
