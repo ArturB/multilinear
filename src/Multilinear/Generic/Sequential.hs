@@ -13,7 +13,7 @@ module Multilinear.Generic.Sequential (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
-    (!), tensorIndex, _mergeScalars, 
+    (!), _mergeScalars, 
     _contractedIndices, _elemByElem, zipT,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
@@ -73,14 +73,6 @@ data Tensor a where
 
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
-
-{-| Return generic tensor index -}
-{-# INLINE tensorIndex #-}
-tensorIndex :: Unboxed.Unbox a => Tensor a -> Index.TIndex
-tensorIndex x = case x of
-    Scalar _           -> error scalarIndices
-    SimpleFinite i _   -> Index.toTIndex i
-    FiniteTensor i _   -> Index.toTIndex i
 
 {-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
 {-# INLINE firstTensor #-}
@@ -257,7 +249,7 @@ dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Fin
 dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) t1 t2
 
 -- Other cases cannot happen!
-dot t1' t2' = contractionErr "other" (tensorIndex t1') (tensorIndex t2')
+dot t1' t2' = contractionErr "other" (head $ indices t1') (head $ indices t2')
 
 -- | contraction error
 {-# INLINE contractionErr #-}
@@ -450,7 +442,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             Finite.Contravariant _ _ -> (1,0)
             Finite.Covariant _ _     -> (0,1)
         _ -> let (cnvr, covr) = order $ firstTensor x
-             in case tensorIndex x of
+             in case (head $ indices x) of
                 Index.Contravariant _ _ -> (cnvr+1,covr)
                 Index.Covariant _ _     -> (cnvr,covr+1)
 
