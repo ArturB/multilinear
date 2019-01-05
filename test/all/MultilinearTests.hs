@@ -83,10 +83,10 @@ consumeContractedIndices :: (Multilinear t a, Num (t a)) =>
  -> t a -- ^ second tensor to contract
  -> Bool
 consumeContractedIndices t1 t2 = 
-    let inames1 = Set.fromList $ Index.indexName <$> indices t1
-        inames2 = Set.fromList $ Index.indexName <$> indices t2
+    let inames1 = Set.fromList $ indicesNames t1
+        inames2 = Set.fromList $ indicesNames t2
         expectedIndices = Set.difference (Set.union inames1 inames2) (Set.fromList $ contractedIndicesNames t1 t2)
-        resultIndices = Set.fromList $ Index.indexName <$> indices (t1 * t2)
+        resultIndices = Set.fromList $ indicesNames (t1 * t2)
     in  expectedIndices == resultIndices
 
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
