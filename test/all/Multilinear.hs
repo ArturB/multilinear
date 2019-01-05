@@ -70,7 +70,7 @@ mergeCommonIndices f t1 t2 =
         expectedIndices = Set.union inames1 inames2
         resultIndices = Set.fromList $ Index.indexName <$> indices (f t1 t2)
         -- if we have indices, which have the same name but different type, it is forbidden and test passed
-    in  Set.size commonIndicesNamesNoType /= Set.size (commonIndicesNames t1 t2) || 
+    in  Set.size commonIndicesNamesNoType /= Set.size (commonIndices t1 t2) || 
         -- otherwise, the result indices set must be union of arguments indices
         expectedIndices == resultIndices
         
