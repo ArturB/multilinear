@@ -71,10 +71,10 @@ orderIndices :: Tensor Double -> Bool
 orderIndices = MultilinearTests.orderIndices
 
 shiftEquiv :: Tensor Double -> Bool
-shiftEquiv MultilinearTests.shiftEquiv
+shiftEquiv = MultilinearTests.shiftEquiv
 
 renameTest :: Tensor Double -> Bool
-renameTest MultilinearTests.renameTest
+renameTest = MultilinearTests.renameTest
 
 raiseLowerTest :: Tensor Double -> Bool
 raiseLowerTest = MultilinearTests.raiseLowerTest
@@ -84,9 +84,6 @@ transposeTest = MultilinearTests.transposeTest
 
 filterIndexTest :: Tensor Double -> Bool
 filterIndexTest = MultilinearTests.filterIndexTest
-
-showTest :: Show a => a -> Bool
-showTest = not . null . show
 
 -- | Test generic vector constructor indices
 vectorConstructor :: Char -> Positive (Small Int) -> Bool
