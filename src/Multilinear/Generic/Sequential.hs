@@ -73,17 +73,6 @@ data Tensor a where
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
 
-{-| Recursive indexing on list tensor. If index is greater than index size, performs modulo indexing
-    @t ! i = t[i]@ -}
-{-# INLINE (!) #-}
-(!) :: Unboxed.Unbox a => Tensor a      -- ^ tensor @t@
-    -> Int           -- ^ index @i@
-    -> Tensor a      -- ^ tensor @t[i]@
-t ! i = case t of
-    Scalar _            -> error scalarIndices
-    SimpleFinite ind ts -> Scalar $ ts Unboxed.! (i `mod` Finite.indexSize ind)
-    FiniteTensor ind ts -> ts Boxed.! (i `mod` Finite.indexSize ind)
-
 -- | Print tensor
 -- | Assumes tensor is already in Multilinear class, because standardize function
 instance (
@@ -374,7 +363,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
     -- Scalar has only one element
     el (Scalar x) _ = Scalar x
     -- simple tensor case
-    el t1@(SimpleFinite index1 _) (inds,vals) =
+    el t1@(SimpleFinite index1 ts) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for simple tensor index if given
@@ -382,7 +371,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             -- if value for current index is given
         in  if isJust val
             -- then get it from current tensor
-            then t1 ! snd (fromJust val)
+            then ts Boxed.! snd (fromJust val)
             -- otherwise return whole tensor - no filtering defined
             else t1
     -- finite tensor case
@@ -400,7 +389,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             -- if value for current index was given
         in  if isJust val
             -- then get it from current tensor and recursively process other indices
-            then el (t1 ! snd (fromJust val)) (inds1,vals1)
+            then el (v1 Boxed.! snd (fromJust val)) (inds1,vals1)
             -- otherwise recursively access elements of all child tensors
             else FiniteTensor index1 $ (\t -> el t (inds,vals)) <$> v1
 
