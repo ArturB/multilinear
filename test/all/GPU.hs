@@ -189,10 +189,11 @@ main = do
 
     -- PRINT PROBABILITY DISTRIBUTION OF TESTED TENSORS ORDER
     executePropertyTest "probability distribution of tensors order" 10000 $ 
-        \(t :: Tensor Double) -> collect (order t) $ preserveIndicesUnary abs
+        \(t :: Tensor Double) -> collect (order t) 
+            (preserveIndicesUnary abs :: Tensor Double -> Bool)
     executePropertyTest "probability distribution of contracted indices" 10000 $
-        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ _contractedIndices t1 t2) $ preserveIndicesBinary (+)
-
+        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ contractedIndices t1 t2) 
+            (preserveIndicesBinary (+) :: Tensor Double -> Tensor Double -> Bool)
     putStrLn "\nTesting multilinear library...\n"
 
     ---------------------------
