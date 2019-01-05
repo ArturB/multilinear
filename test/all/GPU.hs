@@ -26,6 +26,7 @@ import qualified Multilinear.NVector            as NVector
 import           System.Exit
 import           System.IO
 import           Test.QuickCheck
+import           Test.QuickCheck.Common
 import           Test.QuickCheck.Multilinear.Generic.GPU()
 
 -- | Default test number for property
