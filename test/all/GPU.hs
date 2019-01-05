@@ -199,15 +199,23 @@ main = do
     -- CHECKING NUM INSTANCE --
     ---------------------------
 
-    executePropertyTest "preserveIndicesBinary for (+)"   defTestN $ preserveIndicesBinary (+)
-    executePropertyTest "preserveIndicesBinary for (-)"   defTestN $ preserveIndicesBinary (-)
-    executePropertyTest "preserveIndicesBinary for (*)"   defTestN $ preserveIndicesBinary (*)
-    executePropertyTest "preserveIndicesUnary for abs"    defTestN $ preserveIndicesUnary abs
-    executePropertyTest "preserveIndicesUnary for signum" defTestN $ preserveIndicesUnary signum
+    executePropertyTest "preserveIndicesBinary for (+)"   defTestN 
+        (preserveIndicesBinary (+) :: Tensor Double -> Tensor Double -> Bool)
+    executePropertyTest "preserveIndicesBinary for (-)"   defTestN 
+        (preserveIndicesBinary (-) :: Tensor Double -> Tensor Double -> Bool)
+    executePropertyTest "preserveIndicesBinary for (*)"   defTestN 
+        (preserveIndicesBinary (*) :: Tensor Double -> Tensor Double -> Bool)
+    executePropertyTest "preserveIndicesUnary for abs"    defTestN 
+        (preserveIndicesUnary abs :: Tensor Double -> Bool)
+    executePropertyTest "preserveIndicesUnary for signum" defTestN 
+        (preserveIndicesUnary signum :: Tensor Double -> Bool)
 
-    executePropertyTest "mergeCommonIndices for (+)"      defTestN $ mergeCommonIndices (+)
-    executePropertyTest "mergeCommonIndices for (-)"      defTestN $ mergeCommonIndices (-)
-    executePropertyTest "consumeContractedIndices"        defTestN consumeContractedIndices
+    executePropertyTest "mergeCommonIndices for (+)"      defTestN 
+        (mergeCommonIndices (+) :: Tensor Double -> Tensor Double -> Bool)
+    executePropertyTest "mergeCommonIndices for (-)"      defTestN 
+        (mergeCommonIndices (-) :: Tensor Double -> Tensor Double -> Bool)
+    executePropertyTest "consumeContractedIndices"        defTestN 
+        (consumeContractedIndices :: Tensor Double -> Tensor Double -> Bool)
 
     ----------------------------------
     -- CHECKING FRACTIONAL INSTANCE --
