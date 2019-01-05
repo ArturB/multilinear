@@ -379,9 +379,9 @@ instance Multilinear Tensor Double where
     transpose (Scalar x) = Scalar x
 
     transpose (FiniteTensor (Finite.Covariant count name) ts) =
-        FiniteTensor (Finite.Contravariant count name) (Multilinear.transpose <$> ts)
+        FiniteTensor (Finite.Contravariant count name) (Multilinear.Class.transpose <$> ts)
     transpose (FiniteTensor (Finite.Contravariant count name) ts) =
-        FiniteTensor (Finite.Covariant count name) (Multilinear.transpose <$> ts)
+        FiniteTensor (Finite.Covariant count name) (Multilinear.Class.transpose <$> ts)
 
     transpose (SimpleFinite (Finite.Covariant count name) ts) =
         SimpleFinite (Finite.Contravariant count name) ts
@@ -426,7 +426,7 @@ instance Multilinear Tensor Double where
         in  SimpleFinite index { Finite.indexSize = StorableV.length ts' } ts'
     filter f (FiniteTensor index ts) = 
         let iname = Finite.indexName' index
-            ts' = Multilinear.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
+            ts' = Multilinear.Class.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
             ts'' = 
                 (\case 
                     (SimpleFinite _ ts) -> not $ StorableV.null ts
