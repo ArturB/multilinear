@@ -105,7 +105,7 @@ vectorConstructor c s =
     let size = getSmall $ getPositive s
         v :: Tensor Double = Vector.fromIndices [c] size fromIntegral
         vConst :: Tensor Double = Vector.const [c] size (fromIntegral size)
-    in  v `Multilinear.size` [c] == size && vConst `Multilinear.size` [c] == size
+    in  v `Multilinear.Class.size` [c] == size && vConst `Multilinear.Class.size` [c] == size
 
 -- | Test generic form constructor indices
 formConstructor :: Char -> Positive (Small Int) -> Bool
@@ -113,7 +113,7 @@ formConstructor c s =
     let size = getSmall $ getPositive s
         f :: Tensor Double = Form.fromIndices [c] size fromIntegral
         fConst :: Tensor Double = Form.const [c] size (fromIntegral size)
-    in  f `Multilinear.size` [c] == size && fConst `Multilinear.size` [c] == size
+    in  f `Multilinear.Class.size` [c] == size && fConst `Multilinear.Class.size` [c] == size
 
 -- | Test generic matrix constructor indices
 matrixConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
@@ -122,8 +122,8 @@ matrixConstructor c1 c2 s1 s2 =
         size2 = getSmall $ getPositive s2
         v :: Tensor Double = Matrix.fromIndices [c1,c2] size1 size2 (\x y -> fromIntegral x + fromIntegral y)
         vConst :: Tensor Double = Matrix.const [c1,c2] size1 size2 (fromIntegral size1)
-    in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2 
-              && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
+    in  c1 == c2 || ( v `Multilinear.Class.size` [c1] == size1 && v `Multilinear.Class.size` [c2] == size2 
+              && vConst `Multilinear.Class.size` [c1] == size1 && vConst `Multilinear.Class.size` [c2] == size2 )
 
 -- | Test generic NVector constructor indices
 nVectorConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
@@ -132,8 +132,8 @@ nVectorConstructor c1 c2 s1 s2 =
         size2 = getSmall $ getPositive s2
         v :: Tensor Double = NVector.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
         vConst :: Tensor Double = NVector.const [c1,c2] [size1,size2] (fromIntegral size1)
-    in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
-              && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
+    in  c1 == c2 || ( v `Multilinear.Class.size` [c1] == size1 && v `Multilinear.Class.size` [c2] == size2
+              && vConst `Multilinear.Class.size` [c1] == size1 && vConst `Multilinear.Class.size` [c2] == size2 )
 
 -- | Test generic NForm constructor indices
 nFormConstructor :: Char -> Char -> Positive (Small Int) -> Positive (Small Int) -> Bool
@@ -142,8 +142,8 @@ nFormConstructor c1 c2 s1 s2 =
         size2 = getSmall $ getPositive s2
         v :: Tensor Double = NForm.fromIndices [c1,c2] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
         vConst :: Tensor Double = NForm.const [c1,c2] [size1,size2] (fromIntegral size1)
-    in  c1 == c2 || ( v `Multilinear.size` [c1] == size1 && v `Multilinear.size` [c2] == size2
-              && vConst `Multilinear.size` [c1] == size1 && vConst `Multilinear.size` [c2] == size2 )
+    in  c1 == c2 || ( v `Multilinear.Class.size` [c1] == size1 && v `Multilinear.Class.size` [c2] == size2
+              && vConst `Multilinear.Class.size` [c1] == size1 && vConst `Multilinear.Class.size` [c2] == size2 )
 
 -- | Test generic vector constructor indices error
 vectorConstructorError :: Char -> Positive (Small Int) -> Property
@@ -246,9 +246,9 @@ nFormConstructorValues c1 c2 s1 s2 =
 
 -- | Check indices preservation if zipWith function
 zipWithTest :: Tensor Double -> Tensor Double -> Bool
-zipWithTest t1@(Scalar _) t2 = preserveIndicesUnary (\t -> Multilinear.zipWith (+) t1 t) t2
-zipWithTest t1 t2@(Scalar _) = preserveIndicesUnary (\t -> Multilinear.zipWith (+) t t2) t1
-zipWithTest t1 _ = preserveIndicesBinary (Multilinear.zipWith (+)) t1 t1
+zipWithTest t1@(Scalar _) t2 = preserveIndicesUnary (\t -> Multilinear.Class.zipWith (+) t1 t) t2
+zipWithTest t1 t2@(Scalar _) = preserveIndicesUnary (\t -> Multilinear.Class.zipWith (+) t t2) t1
+zipWithTest t1 _ = preserveIndicesBinary (Multilinear.Class.zipWith (+)) t1 t1
 
 -- | Order of the tensor must be equal to number of its covariant and contravariant indices
 orderIndices :: Tensor Double -> Bool
