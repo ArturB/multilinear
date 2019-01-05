@@ -1,6 +1,7 @@
 module Multilinear.Generic.PtrTensor (
     Tensor(..), 
-    _elemByElem, zipT, dot
+    _elemByElem, zipT, dot, 
+    fromStorableTensor, toStorableTensor
 ) where
 
 import           Control.DeepSeq
