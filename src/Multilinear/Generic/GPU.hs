@@ -13,8 +13,7 @@ module Multilinear.Generic.GPU (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
-    (!), _mergeScalars, 
-    _elemByElem, zipT, fastDot,
+    _mergeScalars, _elemByElem, zipT, fastDot,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.GPU.map, 
@@ -106,24 +105,6 @@ fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
     ts = StorableV.unsafeFromForeignPtr0 fptr len
     in SimpleFinite i ts
 fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
-
-{-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
-{-# INLINE firstTensor #-}
-firstTensor :: Storable a => Tensor a -> Tensor a
-firstTensor x = case x of
-    FiniteTensor _ ts   -> Boxed.head ts
-    _                   -> x
-
-{-| Recursive indexing on list tensor. If index is greater than index size, performs modulo indexing
-    @t ! i = t[i]@ -}
-{-# INLINE (!) #-}
-(!) :: Storable a => Tensor a      -- ^ tensor @t@
-    -> Int           -- ^ index @i@
-    -> Tensor a      -- ^ tensor @t[i]@
-t ! i = case t of
-    Scalar _            -> error scalarIndices
-    SimpleFinite ind ts -> Scalar $ ts StorableV.! (i `mod` Finite.indexSize ind)
-    FiniteTensor ind ts -> ts Boxed.! (i `mod` Finite.indexSize ind)
 
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
@@ -471,7 +452,7 @@ instance Multilinear Tensor Double where
     -- Scalar has only one element
     el (Scalar x) _ = Scalar x
     -- simple tensor case
-    el t1@(SimpleFinite index1 _) (inds,vals) =
+    el t1@(SimpleFinite index1 ts) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for simple tensor index if given
@@ -479,11 +460,11 @@ instance Multilinear Tensor Double where
             -- if value for current index is given
         in  if isJust val
             -- then get it from current tensor
-            then t1 ! snd (fromJust val)
+            then Scalar $ ts StorableV.! snd (fromJust val)
             -- otherwise return whole tensor - no filtering defined
             else t1
     -- finite tensor case
-    el t1@(FiniteTensor index1 v1) (inds,vals) =
+    el (FiniteTensor index1 v1) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for current index if given
@@ -497,7 +478,7 @@ instance Multilinear Tensor Double where
             -- if value for current index was given
         in  if isJust val
             -- then get it from current tensor and recursively process other indices
-            then el (t1 ! snd (fromJust val)) (inds1,vals1)
+            then el (v1 Boxed.! snd (fromJust val)) (inds1,vals1)
             -- otherwise recursively access elements of all child tensors
             else FiniteTensor index1 $ (\t -> el t (inds,vals)) <$> v1
 
@@ -515,7 +496,7 @@ instance Multilinear Tensor Double where
         SimpleFinite index _ -> case index of
             Finite.Contravariant _ _ -> (1,0)
             Finite.Covariant _ _     -> (0,1)
-        _ -> let (cnvr, covr) = order $ firstTensor x
+        FiniteTensor _ ts -> let (cnvr, covr) = order $ (ts Boxed.! 0)
              in case (head $ indices x) of
                 Index.Contravariant _ _ -> (cnvr+1,covr)
                 Index.Covariant _ _     -> (cnvr,covr+1)
@@ -528,10 +509,10 @@ instance Multilinear Tensor Double where
             if Index.indexName index == iname 
             then Finite.indexSize index 
             else error indexNotFound
-        FiniteTensor index _ -> 
+        FiniteTensor index ts -> 
             if Index.indexName index == iname
             then Finite.indexSize index
-            else size (firstTensor t) iname
+            else size (ts Boxed.! 0) iname
 
     -- Rename tensor indices
     {-# INLINE ($|) #-}
