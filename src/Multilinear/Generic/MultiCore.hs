@@ -580,7 +580,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a, NFData a) => Multilinear Tensor
         in  SimpleFinite index { Finite.indexSize = Unboxed.length ts' } ts'
     filter f (FiniteTensor index ts) = 
         let iname = Finite.indexName' index
-            ts' = Multilinear.Generic.MultiCore.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
+            ts' = Multilinear.Class.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
             ts'' = 
                 (\case 
                     (SimpleFinite _ ts) -> not $ Unboxed.null ts
