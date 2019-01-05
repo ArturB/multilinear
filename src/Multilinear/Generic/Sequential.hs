@@ -13,8 +13,7 @@ module Multilinear.Generic.Sequential (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
-    (!), _mergeScalars, 
-    _elemByElem, zipT,
+    _mergeScalars, _elemByElem, zipT,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.Sequential.map, 
@@ -375,7 +374,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             -- otherwise return whole tensor - no filtering defined
             else t1
     -- finite tensor case
-    el t1@(FiniteTensor index1 v1) (inds,vals) =
+    el (FiniteTensor index1 v1) (inds,vals) =
             -- zip indices with their given values
         let indvals = zip inds vals
             -- find value for current index if given
