@@ -197,7 +197,7 @@ class (
     t $$| is = el t is
 
     {-| List of all tensor indices -}
-    indices :: t a -> [TIndex]
+    indices :: t a -> [Index.TIndex]
 
     {-| List of tensor indices names -}
     {-# INLINE indicesNames #-}
@@ -214,7 +214,7 @@ class (
     {-| Check if tensors are equivalent (have same indices but in different order) -}
     {-# INLINE equiv #-}
     equiv :: t a -> t a -> Bool
-    equiv t1 t2 = Data.Set.fromList (indices t1) == Data.Set.fromList (indices t2)
+    equiv t1 t2 = Set.fromList (indices t1) == Set.fromList (indices t2)
 
     {-| Infix equivalent of 'equiv'. Has low priority equal to 1. |-}
     {-# INLINE (|==|) #-}
@@ -323,7 +323,7 @@ class (
     standardize :: t a -> t a
 
     -- | Return list of indices with the same name in two tensors
-    commonIndices :: t a -> t a -> [TIndex]
+    commonIndices :: t a -> t a -> [Index.TIndex]
     commonIndices t1 t2 = let 
         indices1 = Set.fromList $ indices t1
         indices2 = Set.fromList $ indices t2
@@ -334,7 +334,7 @@ class (
     commonIndicesNames t1 t2 = indexName <$> commonIndices t1 t2
 
     -- | Return list of contracted indices in two tensors
-    contractedIndices :: t a -> t a -> [TIndex]
+    contractedIndices :: t a -> t a -> [Index.TIndex]
     contractedIndices t1 t2 = 
       let iContravariantNames1 = Set.fromList $ Index.indexName <$> (Index.isContravariant `Prelude.filter` indices t1)
           iCovariantNames1 = Set.fromList $ Index.indexName <$> (Index.isCovariant `Prelude.filter` indices t1)
