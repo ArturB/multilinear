@@ -64,13 +64,35 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
-{-| Return generic tensor index -}
-{-# INLINE tensorIndex #-}
-tensorIndex :: Tensor a -> Index.TIndex
-tensorIndex x = case x of
-    Scalar _           -> error scalarIndices
-    SimpleFinite i _   -> Index.toTIndex i
-    FiniteTensor i _   -> Index.toTIndex i
+
+-- | NFData instance
+instance NFData a => NFData (Tensor a)
+
+-- | Print tensor
+-- | Assumes tensor is already in Multilinear class, because standardize function
+instance (
+    Multilinear Tensor a, Show a, NFData a
+    ) => Show (Tensor a) where
+
+    -- merge errors first and then print whole tensor
+    show = show' . standardize
+        where
+        show' x = case x of
+            -- Scalar is showed simply as its value
+            Scalar v -> show v
+            -- SimpleFinite is shown dependent on its index...
+            SimpleFinite index ts -> show index ++ "S: " ++ case index of
+                -- If index is contravariant, show tensor components vertically
+                Finite.Contravariant _ _ -> "\n" ++ tail (Unboxed.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
+                -- If index is covariant or indifferent, show tensor compoments horizontally
+                _                        -> "["  ++ tail (Unboxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
+            -- FiniteTensor is shown dependent on its index...
+            FiniteTensor index ts -> show index ++ "T: " ++ case index of
+                -- If index is contravariant, show tensor components vertically
+                Finite.Contravariant _ _ -> "\n" ++ tail (Boxed.foldl' (\string e -> string ++ "\n  |" ++ show e) "" ts)
+                -- If index is covariant or indifferent, show tensor compoments horizontally
+                _                        -> "["  ++ tail (Boxed.foldl' (\string e -> string ++ "," ++ show e) "" ts) ++ "]"
+
 
 indices :: Tensor a -> [Index.TIndex]
 indices x = case x of
@@ -193,7 +215,7 @@ dot (FiniteTensor i1@(Finite.Contravariant count1 _) ts1') (FiniteTensor i2@(Fin
     | otherwise = contractionErr "finite-finite" (Index.toTIndex i1) (Index.toTIndex i2)
 dot t1@(FiniteTensor _ _) t2@(FiniteTensor _ _) = zipT (*) t1 t2
 -- Other cases cannot happen!
-dot t1' t2' = contractionErr "other" (tensorIndex t1') (tensorIndex t2')
+dot t1' t2' = contractionErr "other" (head $ indices t1') (head $ indices t2')
 
 -- | contraction error
 {-# INLINE contractionErr #-}
