@@ -322,7 +322,7 @@ class (
     -- | Move covariant indices to deeper recursion level
     standardize :: t a -> t a
 
-    -- | Return list of indices with the same name in two tensors
+    -- | Return list of indices with the same name and type in two tensors
     commonIndices :: t a -> t a -> [Index.TIndex]
     commonIndices t1 t2 = let 
         indices1 = Set.fromList $ indices t1

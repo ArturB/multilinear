@@ -64,19 +64,13 @@ mergeCommonIndices :: Multilinear t a =>
  -> t a  -- ^ Second operator argument
  -> Bool
 mergeCommonIndices f t1 t2 = 
-    let indices1 = Set.fromList $ indices t1
-        indices2 = Set.fromList $ indices t2
-        inames1 = Set.fromList $ Index.indexName <$> indices t1
-        inames2 = Set.fromList $ Index.indexName <$> indices t2
-
-        commonIndices = Set.intersection indices1 indices2
+    let inames1 = Set.fromList $ indicesNames t1
+        inames2 = Set.fromList $ indicesNames t2
         commonIndicesNames = Set.intersection inames1 inames2
-        
         expectedIndices = Set.union inames1 inames2
         resultIndices = Set.fromList $ Index.indexName <$> indices (f t1 t2)
-
         -- if we have indices, which have the same name but different type, it is forbidden and test passed
-    in  Set.size commonIndices /= Set.size commonIndicesNames || 
+    in  Set.size commonIndices /= Set.size commonIndicesNames t1 t2 || 
         -- otherwise, the result indices set must be union of arguments indices
         expectedIndices == resultIndices
         
@@ -88,8 +82,7 @@ consumeContractedIndices :: Multilinear t a =>
 consumeContractedIndices t1 t2 = 
     let inames1 = Set.fromList $ Index.indexName <$> indices t1
         inames2 = Set.fromList $ Index.indexName <$> indices t2
-        contractedIndices = _contractedIndices t1 t2
-        expectedIndices = Set.difference (Set.union inames1 inames2) contractedIndices
+        expectedIndices = Set.difference (Set.union inames1 inames2) (contractedIndices t1 t2)
         resultIndices = Set.fromList $ Index.indexName <$> indices (t1 * t2)
     in  expectedIndices == resultIndices
 
