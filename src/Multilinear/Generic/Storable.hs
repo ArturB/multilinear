@@ -17,6 +17,7 @@ module Multilinear.Generic.Storable (
 import           Control.DeepSeq
 import qualified Control.Parallel.Strategies   as Parallel
 import           Data.List
+import           Data.Maybe
 import qualified Data.Vector                   as Boxed
 import qualified Data.Vector.Storable          as StorableV
 import           Foreign.Storable
