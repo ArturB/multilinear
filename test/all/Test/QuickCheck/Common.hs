@@ -9,7 +9,7 @@ Portability : Windows/POSIX
 
 -}
 
-module GPU (
+module Test.QuickCheck.Common (
     main
 ) where
 
