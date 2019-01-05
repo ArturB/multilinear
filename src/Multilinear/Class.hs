@@ -202,7 +202,7 @@ class (
     {-| List of tensor indices names -}
     {-# INLINE indicesNames #-}
     indicesNames :: t a -> [String]
-    indicesNames t = indexName <$> indices t
+    indicesNames t = Index.indexName <$> indices t
 
     {-| Tensor order - number of covariant and contravariant indices -}
     {-| @order t = (cv, cov)@ where @cv@ is number of upper and @cov@ is number of lower indices -}
@@ -331,7 +331,7 @@ class (
 
     -- | Return just names of common indices of tensors. 
     commonIndicesNames :: t a -> t a -> [String]
-    commonIndicesNames t1 t2 = indexName <$> commonIndices t1 t2
+    commonIndicesNames t1 t2 = Index.indexName <$> commonIndices t1 t2
 
     -- | Return list of contracted indices in two tensors
     contractedIndices :: t a -> t a -> [Index.TIndex]
@@ -347,4 +347,4 @@ class (
    
     -- | Return just names of contracted indices of tensors. 
     contractedIndicesNames :: t a -> t a -> [String]
-    contractedIndicesNames t1 t2 = indexName <$> contractedIndices t1 t2
+    contractedIndicesNames t1 t2 = Index.indexName <$> contractedIndices t1 t2
