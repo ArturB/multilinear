@@ -177,16 +177,6 @@ nFormConstructorError c1 c2 s1 s2 =
         v :: Tensor Double = NForm.fromIndices [c1,c2,'a'] [size1,size2] (\[x,y] -> fromIntegral x + fromIntegral y)
     in  expectFailure (total v)
 
-
--- | Test generic vector constructor values
-vectorConstructorValues :: Char -> Positive (Small Int) -> Bool
-vectorConstructorValues c s = 
-    let size = getSmall $ getPositive s
-        v :: Tensor Double = Vector.fromIndices [c] size fromIntegral
-        vConst :: Tensor Double = Vector.const [c] size (fromIntegral size)
-    in  all (\i -> v $$| ([c],[i]) == fromIntegral i) [0 .. size - 1] && 
-        all (\i -> vConst $$| ([c],[i]) == fromIntegral size) [0 .. size - 1]
-
 -- | Test generic form constructor values
 formConstructorValues :: Char -> Positive (Small Int) -> Bool
 formConstructorValues c s = 
