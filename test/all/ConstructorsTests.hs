@@ -179,7 +179,7 @@ nVectorConstructorError c1 c2 s1 s2 _ =
 
 -- | Test generic NForm constructor indices error
 nFormConstructorError :: (
-    NFData a, FData (t a), Multilinear t a
+    NFData a, NFData (t a), Multilinear t a
  ) => Char 
    -> Char 
    -> Positive (Small Int) 
