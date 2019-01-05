@@ -13,8 +13,7 @@ module Multilinear.Generic.Sequential (
     -- * Generic tensor datatype and its instances
     Tensor(..), 
     -- * Auxiliary functions
-    (!), isScalar, isSimple, isFiniteTensor,
-    tensorIndex, _mergeScalars, 
+    (!), tensorIndex, _mergeScalars, 
     _contractedIndices, _elemByElem, zipT,
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
