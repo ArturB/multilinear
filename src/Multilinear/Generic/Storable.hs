@@ -14,10 +14,12 @@ module Multilinear.Generic.Storable (
     Tensor(..), 
 ) where
 
+import           Data.List
 import qualified Data.Vector                   as Boxed
 import qualified Data.Vector.Storable          as StorableV
 import           GHC.Generics
 import           Multilinear.Class
+import qualified Mutltilinear.Index            as Index
 import qualified Multilinear.Index.Finite      as Finite
 
 {-| Tensor defined recursively as scalar or list of other tensors -}
