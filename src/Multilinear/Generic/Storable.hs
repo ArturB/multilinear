@@ -17,6 +17,7 @@ module Multilinear.Generic.Storable (
 import           Data.List
 import qualified Data.Vector                   as Boxed
 import qualified Data.Vector.Storable          as StorableV
+import           Foreign.Storable
 import           GHC.Generics
 import           Multilinear.Class             as Multilinear
 import qualified Multilinear.Index             as Index
