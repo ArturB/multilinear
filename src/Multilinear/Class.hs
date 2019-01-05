@@ -372,7 +372,6 @@ class (
         and for "a" index filter elements with index value <= 10
     But this disallow to remove particular matrix element. 
     If for some index all elements are removed, the index itself is removed from tensor. -}
-    {-# INLINE filter #-}
     filter :: 
           (String -> Int -> Bool) -- ^ filter function
           -> t a                  -- ^ tensor to filter
