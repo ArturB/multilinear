@@ -150,7 +150,7 @@ import qualified Data.Set            as Set
 import qualified Data.Vector.Unboxed as Unboxed
 import           Foreign.Storable
 import           GHC.Generics
-import           Multilinear.Index
+import qualified Multilinear.Index  as Index
 
 {-| Multidimensional array treated as multilinear map - tensor 
     Superclasses:
