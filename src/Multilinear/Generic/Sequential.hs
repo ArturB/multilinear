@@ -73,13 +73,6 @@ data Tensor a where
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
 
-{-| Returns sample tensor on deeper recursion level.Used to determine some features common for all tensors -}
-{-# INLINE firstTensor #-}
-firstTensor :: Unboxed.Unbox a => Tensor a -> Tensor a
-firstTensor x = case x of
-    FiniteTensor _ ts   -> Boxed.head ts
-    _                   -> x
-
 {-| Recursive indexing on list tensor. If index is greater than index size, performs modulo indexing
     @t ! i = t[i]@ -}
 {-# INLINE (!) #-}
@@ -425,7 +418,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
         SimpleFinite index _ -> case index of
             Finite.Contravariant _ _ -> (1,0)
             Finite.Covariant _ _     -> (0,1)
-        _ -> let (cnvr, covr) = order $ firstTensor x
+        FiniteTensor _ ts -> let (cnvr, covr) = order $ (ts Boxed.! 0) x
              in case (head $ indices x) of
                 Index.Contravariant _ _ -> (cnvr+1,covr)
                 Index.Covariant _ _     -> (cnvr,covr+1)
@@ -438,10 +431,10 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
             if Index.indexName index == iname 
             then Finite.indexSize index 
             else error indexNotFound
-        FiniteTensor index _ -> 
+        FiniteTensor index ts -> 
             if Index.indexName index == iname
             then Finite.indexSize index
-            else size (firstTensor t) iname
+            else size (ts Boxed.! 0) iname
 
     -- Rename tensor indices
     {-# INLINE ($|) #-}
