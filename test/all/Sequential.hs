@@ -13,16 +13,14 @@ module Sequential (
     main
 ) where
 
-import           Data.Maybe
-import qualified Data.Set                       as Set
 import           Multilinear.Class
 import           Multilinear.Generic.Sequential
-import qualified Multilinear.Index              as Index
 import qualified Multilinear.Form               as Form
 import qualified Multilinear.Matrix             as Matrix
 import qualified Multilinear.Vector             as Vector
 import qualified Multilinear.NForm              as NForm
 import qualified Multilinear.NVector            as NVector
+import qualified MultilinearTests
 import           Test.QuickCheck
 import           Test.QuickCheck.Common
 import           Test.QuickCheck.Multilinear.Generic.Sequential()
