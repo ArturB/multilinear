@@ -125,7 +125,7 @@ nFormConstructorValues c1 c2 s1 s2 _ =
 
 -- | Test generic vector constructor indices error
 vectorConstructorError :: forall a t . (
-    NFData a, NFData (t a), Multilinear t a
+    NFData a, NFData (t a), Multilinear t a, Num a
  ) => Char 
    -> Positive (Small Int) 
    -> t a 
