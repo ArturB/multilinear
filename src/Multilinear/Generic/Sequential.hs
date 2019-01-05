@@ -418,7 +418,7 @@ instance (NFData a, Unboxed.Unbox a, Storable a) => Multilinear Tensor a where
         SimpleFinite index _ -> case index of
             Finite.Contravariant _ _ -> (1,0)
             Finite.Covariant _ _     -> (0,1)
-        FiniteTensor _ ts -> let (cnvr, covr) = order $ (ts Boxed.! 0) x
+        FiniteTensor _ ts -> let (cnvr, covr) = order (ts Boxed.! 0)
              in case (head $ indices x) of
                 Index.Contravariant _ _ -> (cnvr+1,covr)
                 Index.Covariant _ _     -> (cnvr,covr+1)
