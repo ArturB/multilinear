@@ -23,7 +23,7 @@ import qualified Multilinear.Matrix             as Matrix
 import qualified Multilinear.Vector             as Vector
 import qualified Multilinear.NForm              as NForm
 import qualified Multilinear.NVector            as NVector
-import           MultilinearTests
+import qualified MultilinearTests
 import           Test.QuickCheck
 import           Test.QuickCheck.Common
 import           Test.QuickCheck.Multilinear.Generic.GPU()
@@ -31,6 +31,62 @@ import           Test.QuickCheck.Multilinear.Generic.GPU()
 -- | Default test number for property
 defTestN :: Int
 defTestN = 200
+
+---------------------------------------------------
+-- TYPE-SPECIALIED VERSIONS OF TESTING FUNCTIONS --
+---------------------------------------------------
+
+preserveIndicesUnary :: 
+   (Tensor Double -> 
+    Tensor Double) -- ^ Unary tensor operator to test
+ -> Tensor Double  -- ^ Operator argument
+ -> Bool
+preserveIndicesUnary = MultilinearTests.preserveIndicesUnary
+
+preserveIndicesBinary ::
+   (Tensor Double -> 
+    Tensor Double -> 
+        Tensor Double) -- ^ Binary tensor operator to test
+ -> Tensor Double      -- ^ First operator argument
+ -> Tensor Double      -- ^ Second operator argument
+ -> Bool
+preserveIndicesBinary = MultilinearTests.preserveIndicesBinary
+
+mergeCommonIndices ::
+   (Tensor Double -> 
+    Tensor Double -> 
+    Tensor Double) -- ^ Binary tensor operator to test
+ -> Tensor Double  -- ^ First operator argument
+ -> Tensor Double  -- ^ Second operator argument
+ -> Bool
+mergeCommonIndices = MultilinearTests.mergeCommonIndices
+        
+consumeContractedIndices :: 
+    Tensor Double -- ^ first tensor to contract
+ -> Tensor Double -- ^ second tensor to contract
+ -> Bool
+consumeContractedIndices = MultilinearTests.consumeContractedIndices
+
+orderIndices :: Tensor Double -> Bool
+orderIndices = MultilinearTests.orderIndices
+
+shiftEquiv :: Tensor Double -> Bool
+shiftEquiv MultilinearTests.shiftEquiv
+
+renameTest :: Tensor Double -> Bool
+renameTest MultilinearTests.renameTest
+
+raiseLowerTest :: Tensor Double -> Bool
+raiseLowerTest = MultilinearTests.raiseLowerTest
+
+transposeTest :: Tensor Double -> Bool
+transposeTest = MultilinearTests.transposeTest
+
+filterIndexTest :: Tensor Double -> Bool
+filterIndexTest = MultilinearTests.filterIndexTest
+
+showTest :: Show a => a -> Bool
+showTest = not . null . show
 
 -- | Test generic vector constructor indices
 vectorConstructor :: Char -> Positive (Small Int) -> Bool
@@ -189,34 +245,25 @@ main = do
 
     -- PRINT PROBABILITY DISTRIBUTION OF TESTED TENSORS ORDER
     executePropertyTest "probability distribution of tensors order" 10000 $ 
-        \(t :: Tensor Double) -> collect (order t) 
-            (preserveIndicesUnary abs :: Tensor Double -> Bool)
+        \(t :: Tensor Double) -> collect (order t) $ preserveIndicesUnary abs
     executePropertyTest "probability distribution of contracted indices" 10000 $
-        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ contractedIndices t1 t2) 
-            (preserveIndicesBinary (+) :: Tensor Double -> Tensor Double -> Bool)
+        \(t1 :: Tensor Double, t2 :: Tensor Double) -> collect (length $ _contractedIndices t1 t2) $ preserveIndicesBinary (+)
+
     putStrLn "\nTesting multilinear library...\n"
 
     ---------------------------
     -- CHECKING NUM INSTANCE --
     ---------------------------
 
-    executePropertyTest "preserveIndicesBinary for (+)"   defTestN 
-        (preserveIndicesBinary (+) :: Tensor Double -> Tensor Double -> Bool)
-    executePropertyTest "preserveIndicesBinary for (-)"   defTestN 
-        (preserveIndicesBinary (-) :: Tensor Double -> Tensor Double -> Bool)
-    executePropertyTest "preserveIndicesBinary for (*)"   defTestN 
-        (preserveIndicesBinary (*) :: Tensor Double -> Tensor Double -> Bool)
-    executePropertyTest "preserveIndicesUnary for abs"    defTestN 
-        (preserveIndicesUnary abs :: Tensor Double -> Bool)
-    executePropertyTest "preserveIndicesUnary for signum" defTestN 
-        (preserveIndicesUnary signum :: Tensor Double -> Bool)
+    executePropertyTest "preserveIndicesBinary for (+)"   defTestN $ preserveIndicesBinary (+)
+    executePropertyTest "preserveIndicesBinary for (-)"   defTestN $ preserveIndicesBinary (-)
+    executePropertyTest "preserveIndicesBinary for (*)"   defTestN $ preserveIndicesBinary (*)
+    executePropertyTest "preserveIndicesUnary for abs"    defTestN $ preserveIndicesUnary abs
+    executePropertyTest "preserveIndicesUnary for signum" defTestN $ preserveIndicesUnary signum
 
-    executePropertyTest "mergeCommonIndices for (+)"      defTestN 
-        (mergeCommonIndices (+) :: Tensor Double -> Tensor Double -> Bool)
-    executePropertyTest "mergeCommonIndices for (-)"      defTestN 
-        (mergeCommonIndices (-) :: Tensor Double -> Tensor Double -> Bool)
-    executePropertyTest "consumeContractedIndices"        defTestN 
-        (consumeContractedIndices :: Tensor Double -> Tensor Double -> Bool)
+    executePropertyTest "mergeCommonIndices for (+)"      defTestN $ mergeCommonIndices (+)
+    executePropertyTest "mergeCommonIndices for (-)"      defTestN $ mergeCommonIndices (-)
+    executePropertyTest "consumeContractedIndices"        defTestN consumeContractedIndices
 
     ----------------------------------
     -- CHECKING FRACTIONAL INSTANCE --
