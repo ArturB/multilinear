@@ -647,7 +647,7 @@ instance Multilinear Tensor Double where
         in  SimpleFinite index { Finite.indexSize = StorableV.length ts' } ts'
     filter f (FiniteTensor index ts) = 
         let iname = Finite.indexName' index
-            ts' = Multilinear.Class.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
+            ts' = Multilinear.filter f <$> ((\i _ -> f iname i) `Boxed.ifilter` ts)
             ts'' = 
                 (\case 
                     (SimpleFinite _ ts) -> not $ StorableV.null ts
