@@ -117,6 +117,8 @@ zipWithTest t1@(Scalar _) t2 = preserveIndicesUnary (\t -> Multilinear.Generic.G
 zipWithTest t1 t2@(Scalar _) = preserveIndicesUnary (\t -> Multilinear.Generic.GPU.zipWith (+) t t2) t1
 zipWithTest t1 _ = preserveIndicesBinary (Multilinear.Generic.GPU.zipWith (+)) t1 t1
 
+-- | Check 
+
 -- | ENTRY POINT
 main :: IO ()
 main = do
