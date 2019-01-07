@@ -91,6 +91,7 @@ data Tensor a where
     } -> Tensor a
     deriving (Eq, Generic)
 
+-- | Convert GPU tensor to PtrTensor
 toPtrTensor :: Storable a => Tensor a -> Ptr.Tensor a
 toPtrTensor (Scalar x) = Ptr.Scalar x
 toPtrTensor (SimpleFinite i ts) = let
@@ -98,6 +99,7 @@ toPtrTensor (SimpleFinite i ts) = let
     in Ptr.SimpleFinite i (unsafeForeignPtrToPtr ptr, StorableV.length ts)
 toPtrTensor (FiniteTensor i ts) = Ptr.FiniteTensor i (toPtrTensor <$> ts)
 
+-- | Convert PtrTensor to GPU tensor
 fromPtrTensor :: Storable a => Ptr.Tensor a -> Tensor a
 fromPtrTensor (Ptr.Scalar x) = Scalar x
 fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
@@ -105,6 +107,13 @@ fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
     ts = StorableV.unsafeFromForeignPtr0 fptr len
     in SimpleFinite i ts
 fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
+
+-- | Convert GPU tensor to StorableV.Vector by concatenating all its rows (functionals)
+toVector :: Storable a => Tensor a => StorableV.Vector a
+toVector (Scalar x) = StorableV.singleton x
+toVector (SimpleFinite _ ts) = ts
+toVector (FiniteTensor _ ts) = foldr' (StorableV.++) StorableV.empty $ toVector <$> ts 
+
 
 -- | NFData instance
 instance NFData a => NFData (Tensor a)
