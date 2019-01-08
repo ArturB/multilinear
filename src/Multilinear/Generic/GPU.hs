@@ -115,11 +115,9 @@ toVector :: (
     Multilinear Tensor a, Storable a
  ) => Tensor a 
    -> StorableV.Vector a
-toVector = toVector'
-    where 
-        toVector' (Scalar x) = StorableV.singleton x
-        toVector' (SimpleFinite _ ts) = ts
-        toVector' (FiniteTensor _ ts) = foldr' (StorableV.++) StorableV.empty $ toVector <$> ts 
+toVector (Scalar x) = StorableV.singleton x
+toVector (SimpleFinite _ ts) = ts
+toVector (FiniteTensor _ ts) = foldr' (StorableV.++) StorableV.empty $ toVector <$> ts 
 
 -- | Deserialize tensor from vector using given indices
 fromVector :: Storable a => [Index.TIndex] -> StorableV.Vector a -> Tensor a
