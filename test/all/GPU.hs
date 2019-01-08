@@ -120,8 +120,9 @@ zipWithTest t1 _ = preserveIndicesBinary (Multilinear.Generic.GPU.zipWith (+)) t
 -- | Check serialization and deserialization if tensor to vector
 vectorSerializeTest :: Tensor Double -> Bool
 vectorSerializeTest t = let
+    inds = indices t
     v = toVector t
-    in t == fromVector v
+    in t == fromVector inds v
 
 -- | ENTRY POINT
 main :: IO ()
