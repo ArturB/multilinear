@@ -110,21 +110,23 @@ fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
 
 -- | Convert GPU tensor to StorableV.Vector by concatenating all its rows (functionals)
 toVector :: Storable a => Tensor a -> StorableV.Vector a
-toVector (Scalar x) = StorableV.singleton x
-toVector (SimpleFinite _ ts) = ts
-toVector (FiniteTensor _ ts) = foldr' (StorableV.++) StorableV.empty $ toVector <$> ts 
+toVector = toVector' . standardize
+    where 
+        toVector' (Scalar x) = StorableV.singleton x
+        toVector' (SimpleFinite _ ts) = ts
+        toVector' (FiniteTensor _ ts) = foldr' (StorableV.++) StorableV.empty $ toVector <$> ts 
 
 -- | Deserialize tensor from vector using given indices
 fromVector :: Storable a => [Index.TIndex] -> StorableV.Vector a -> Tensor a
 fromVector [] v = Scalar $ StorableV.head v
-fromVector [i] v = SimpleFinite i v
+fromVector [i] v = SimpleFinite (fromTIndex i) v
 fromVector is v = 
     let sizes = Index.indexSize is
         subtensors = head is
         chunk = product $ tail is
     in  if StorableV.length v /= product sizes then
             error "StorableV.Vector deserialization error!"
-        else FiniteTensor (head is) $ Boxed.generate subtensors 
+        else FiniteTensor (fromTIndex $ head is) $ Boxed.generate subtensors 
                 $ \i -> fromVector is $ StorableV.slice (i * chunk) chunk
 
 

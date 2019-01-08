@@ -117,7 +117,11 @@ zipWithTest t1@(Scalar _) t2 = preserveIndicesUnary (\t -> Multilinear.Generic.G
 zipWithTest t1 t2@(Scalar _) = preserveIndicesUnary (\t -> Multilinear.Generic.GPU.zipWith (+) t t2) t1
 zipWithTest t1 _ = preserveIndicesBinary (Multilinear.Generic.GPU.zipWith (+)) t1 t1
 
--- | Check 
+-- | Check serialization and deserialization if tensor to vector
+vectorSerializeTest :: Tensor Double -> Bool
+vectorSerializeTest t = let
+    v = toVector t
+    in t == fromVector v
 
 -- | ENTRY POINT
 main :: IO ()
@@ -190,6 +194,7 @@ main = do
     executePropertyTest "preserveIndicesUnary for (.*)"   defTestN $ preserveIndicesUnary (.* 5)
     executePropertyTest "filterIndexTest" defTestN filterIndexTest
     executePropertyTest "zipWithTest" defTestN zipWithTest
+    executePropertyTest "vectorSerializeTest" defTestN vectorSerializeTest
     executePropertyTest "showTest" 100 showTest
 
     -----------------------------------

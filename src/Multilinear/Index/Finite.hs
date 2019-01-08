@@ -15,6 +15,7 @@ module Multilinear.Index.Finite (
     Index(..),
 ) where
 
+import           Data.Maybe
 import           Control.DeepSeq
 import           GHC.Generics
 import qualified Multilinear.Index as TIndex
@@ -62,6 +63,10 @@ instance TIndex.Index Index where
     {-| Convert to TIndex type -}
     toTIndex (Covariant size name)     = TIndex.Covariant (Just size) name
     toTIndex (Contravariant size name) = TIndex.Contravariant (Just size) name
+
+    {-| Convert from TIndex type -}
+    fromTIndex (TIndex.Covariant size name) = Covariant (fromMaybe size) name
+    fromTIndex (TIndex.Contravariant size name) = Contravariant (fromMaybe size) name
 
 {-| Indices can be compared by its name and size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
