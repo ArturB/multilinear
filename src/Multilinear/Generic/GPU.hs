@@ -17,7 +17,9 @@ module Multilinear.Generic.GPU (
     -- * Additional functions
     (.+), (.-), (.*), (+.), (-.), (*.),
     Multilinear.Generic.GPU.map, 
-    Multilinear.Generic.GPU.zipWith
+    Multilinear.Generic.GPU.zipWith,
+    fromPtrTensor, toPtrTensor,
+    toVector, fromVector
 ) where
 
 import           Control.DeepSeq
@@ -131,7 +133,7 @@ fromVector is v =
     in  if StorableV.length v /= product sizes then
             error "StorableV.Vector deserialization error!"
         else FiniteTensor (head inds) $ Boxed.generate subtensors
-                $ \i -> fromVector (tail inds) $ StorableV.slice (i * chunk) chunk v
+                $ \i -> fromVector (tail is) $ StorableV.slice (i * chunk) chunk v
 
 
 -- | NFData instance
