@@ -115,7 +115,7 @@ toVector :: (
     Multilinear Tensor a, Storable a
  ) => Tensor a 
    -> StorableV.Vector a
-toVector = toVector' . standardize
+toVector = toVector'
     where 
         toVector' (Scalar x) = StorableV.singleton x
         toVector' (SimpleFinite _ ts) = ts
