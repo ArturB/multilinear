@@ -122,7 +122,7 @@ vectorSerializeTest :: Tensor Double -> Bool
 vectorSerializeTest t = let
     inds = indices t
     v = toVector t
-    in if length inds < 2 then True else t == fromVector inds v
+    in if length inds > 2 then True else t == fromVector inds v
 
 -- | ENTRY POINT
 main :: IO ()
