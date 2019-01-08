@@ -122,7 +122,7 @@ toVector = toVector' . standardize
 -- | Deserialize tensor from vector using given indices
 fromVector :: Storable a => [Index.TIndex] -> StorableV.Vector a -> Tensor a
 fromVector [] v = Scalar $ StorableV.head v
-fromVector [i] v = SimpleFinite (Index.fromTIndex i) v
+fromVector [i] v = SimpleFinite (Finite.fromTIndex i) v
 fromVector is v = 
     let inds = Finite.fromTIndex <$> is
         sizes = Index.indexSize <$> inds
