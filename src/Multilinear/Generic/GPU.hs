@@ -109,7 +109,10 @@ fromPtrTensor (Ptr.SimpleFinite i (ptr,len)) = let
 fromPtrTensor (Ptr.FiniteTensor i ts) = FiniteTensor i (fromPtrTensor <$> ts)
 
 -- | Convert GPU tensor to StorableV.Vector by concatenating all its rows (functionals)
-toVector :: Storable a => Tensor a -> StorableV.Vector a
+toVector :: (
+    Multilinear Tensor a, Storable a
+ ) => Tensor a 
+   -> StorableV.Vector a
 toVector = toVector' . standardize
     where 
         toVector' (Scalar x) = StorableV.singleton x
