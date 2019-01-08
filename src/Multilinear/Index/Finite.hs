@@ -12,7 +12,7 @@ Finite-dimensional tensor index.
 -}
 
 module Multilinear.Index.Finite (
-    Index(..),
+    Index(..), fromTIndex
 ) where
 
 import           Data.Maybe
@@ -64,9 +64,9 @@ instance TIndex.Index Index where
     toTIndex (Covariant size name)     = TIndex.Covariant (Just size) name
     toTIndex (Contravariant size name) = TIndex.Contravariant (Just size) name
 
-    {-| Convert from TIndex type -}
-    fromTIndex (TIndex.Covariant size name) = Covariant (fromJust size) name
-    fromTIndex (TIndex.Contravariant size name) = Contravariant (fromJust size) name
+{-| Convert from TIndex type -}
+fromTIndex (TIndex.Covariant size name) = Covariant (fromJust size) name
+fromTIndex (TIndex.Contravariant size name) = Contravariant (fromJust size) name
 
 {-| Indices can be compared by its name and size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
@@ -75,5 +75,5 @@ instance Ord Index where
         indexName' ind1 <= indexName' ind2 || 
         (indexName' ind1 == indexName' ind2 && indexSize ind1 <= indexSize ind2)
 
--- NFData instance
+-- | NFData instance
 instance NFData Index

@@ -41,9 +41,6 @@ class Index i where
     {-| Convert to generic index type -}
     toTIndex :: i -> TIndex
 
-    {-| Convert from generic index type -}
-    fromTIndex :: TIndex -> i
-
 {-| Generic index type finitely- or infinitely-dimensional -}
 data TIndex =
     Covariant {
@@ -86,8 +83,6 @@ instance Index TIndex where
 
     {-| TIndex must not be converted to TIndex -}
     toTIndex = id
-
-    fromTIndex = id
 
 {-| Indices can be compared by its name and size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
