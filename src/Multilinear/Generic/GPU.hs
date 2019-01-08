@@ -124,9 +124,9 @@ fromVector :: Storable a => [Index.TIndex] -> StorableV.Vector a -> Tensor a
 fromVector [] v = Scalar $ StorableV.head v
 fromVector [i] v = SimpleFinite (Index.fromTIndex i) v
 fromVector is v = 
-    let inds = Index.fromTIndex <$> is
-        sizes = Index.indexSize <$> inds
-        subtensors = Index.indexSize $ head inds
+    let inds = Finite.fromTIndex <$> is
+        sizes = Finite.indexSize <$> inds
+        subtensors = Finite.indexSize $ head inds
         chunk = product $ tail inds
     in  if StorableV.length v /= product sizes then
             error "StorableV.Vector deserialization error!"
