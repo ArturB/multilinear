@@ -124,10 +124,10 @@ fromVector :: Storable a => [Index.TIndex] -> StorableV.Vector a -> Tensor a
 fromVector [] v = Scalar $ StorableV.head v
 fromVector [i] v = SimpleFinite (Index.fromTIndex i) v
 fromVector is v = 
-    let inds = Finite.fromTIndex <$> is
-        sizes = Finite.indexSize <$> inds
-        subtensors = Finite.indexSize $ head inds
-        chunk = product $ tail inds
+    let inds = Index.fromTIndex <$> is :: Finite.Index
+        sizes = Index.indexSize <$> inds
+        subtensors = head sizes
+        chunk = product $ tail sizes
     in  if StorableV.length v /= product sizes then
             error "StorableV.Vector deserialization error!"
         else FiniteTensor (head inds) $ Boxed.generate subtensors
