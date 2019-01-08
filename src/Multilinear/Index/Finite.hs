@@ -65,8 +65,8 @@ instance TIndex.Index Index where
     toTIndex (Contravariant size name) = TIndex.Contravariant (Just size) name
 
     {-| Convert from TIndex type -}
-    fromTIndex (TIndex.Covariant size name) = Covariant (fromMaybe size) name
-    fromTIndex (TIndex.Contravariant size name) = Contravariant (fromMaybe size) name
+    fromTIndex (TIndex.Covariant size name) = Covariant (fromMaybe size 0) name
+    fromTIndex (TIndex.Contravariant size name) = Contravariant (fromMaybe size 0) name
 
 {-| Indices can be compared by its name and size |-}
 {-| Used to allow to put tensors to typical ordered containers |-}
