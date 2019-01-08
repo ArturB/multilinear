@@ -124,13 +124,14 @@ fromVector :: Storable a => [Index.TIndex] -> StorableV.Vector a -> Tensor a
 fromVector [] v = Scalar $ StorableV.head v
 fromVector [i] v = SimpleFinite (Index.fromTIndex i) v
 fromVector is v = 
-    let sizes = fromJust . Index.indexSize <$> is
-        subtensors = Index.indexSize $ head is
-        chunk = product $ tail is
+    let inds = Index.fromTIndex is
+        sizes = Index.indexSize <$> inds
+        subtensors = Index.indexSize $ head inds
+        chunk = product $ tail inds
     in  if StorableV.length v /= product sizes then
             error "StorableV.Vector deserialization error!"
-        else FiniteTensor (Index.fromTIndex $ head is) $ Boxed.generate subtensors
-                $ \i -> fromVector is $ StorableV.slice (i * chunk) chunk v
+        else FiniteTensor (head inds) $ Boxed.generate subtensors
+                $ \i -> fromVector (tail inds) $ StorableV.slice (i * chunk) chunk v
 
 
 -- | NFData instance
